@@ -1,6 +1,6 @@
 from distutils.core import setup
 
-setup (name='pyonep',
+setup (name='onepv1lib',
        version='1.0',
        url = 'http://github.com/exosite-labs/pyonep',
        author = 'Exosite',
