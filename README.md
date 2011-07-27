@@ -51,9 +51,12 @@ This library requires you to initialize with the following parameters:
 --) datastore_config: local write buffer and read cache parameter setup
 --) transport_config: Exosite server parameter setup
 
-For examples, reference example scripts in the ./onepv1lib/examples/ folder
+For examples, reference example scripts in the ./onepv1lib/examples/ folder.  
+Note that to run the examples without installing the pyonep package, the 
+example script must be located in the root folder (with ./onepv1lib as a 
+sub-folder).
 
-For more information, reference Exosite online documentation.
+For more information on the API, reference Exosite online documentation.
 
 ========================================
 Release Info
