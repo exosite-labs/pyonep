@@ -40,7 +40,7 @@ Quick Start
 To use the pyonep Exosite API, import per:
 	from onepv1lib.datastore import Datastore
 
-This library requires you to initialize with the following parameters:
+This library requires you to initialize with the following parameters:</br>
 --) cik: a 40 character "client interface key" that authenticates your 
         application with the One Platform
 --) interval: number of seconds between One Platform publish activity.  Even if
