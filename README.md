@@ -42,13 +42,13 @@ To use the pyonep Exosite API, import per:
 
 This library requires you to initialize with the following parameters:</br>
 --) cik: a 40 character "client interface key" that authenticates your 
-        application with the One Platform
+        application with the One Platform</br>
 --) interval: number of seconds between One Platform publish activity.  Even if
         your application calls the "write" function more often than this 
-        interval, the data will be grouped to be published at this interval 
+        interval, the data will be grouped to be published at this interval</br>
 --) autocreate: dataport parameter setup - see the One Platform documentation
-        for more information about dataport parameters.
---) datastore_config: local write buffer and read cache parameter setup
+        for more information about dataport parameters.</br>
+--) datastore_config: local write buffer and read cache parameter setup</br>
 --) transport_config: Exosite server parameter setup
 
 For examples, reference example scripts in the ./onepv1lib/examples/ folder.  
