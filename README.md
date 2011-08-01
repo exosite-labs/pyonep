@@ -61,7 +61,12 @@ For more information on the API, reference Exosite online documentation.
 ========================================
 Release Info
 ========================================
+----------------------------------------
+Release 0.2
+----------------------------------------
+--) updated example code
 
+----------------------------------------
 Release 0.1
 ----------------------------------------
 --) initial version

@@ -1,11 +1,3 @@
-LICENSE
-MANIFEST.in
-README.md
-setup.py
-onepv1lib\__init__.py
-onepv1lib\datastore.py
-onepv1lib\exceptions.py
-onepv1lib\onep.py
-onepv1lib\__init__.py
-examples\read_write_record.py
-
+include LICENSE
+include README.md
+recursive-include examples *
