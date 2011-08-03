@@ -17,7 +17,7 @@ Required Python Packages
 ****************************************
 https://github.com/simplejson/simplejson
 
-simplejson only necessary for python version 2.5 and earlier.  For python 2.6 
+Simplejson only necessary for python version 2.5 and earlier.  For python 2.6 
 and later, the library uses the native "python-json" package.
 
 ========================================
@@ -27,7 +27,7 @@ Installation
 
 2.) Navigate into the root "pyonep" directory
 
-3.) Install the package:
+3.) Install the package:<br>
 	python setup.py install
 
 4.) If you do not want to install the package, or cannot due to system 
@@ -37,19 +37,19 @@ script.  Or, alternatively, add the ./onepv1lib folder to your sys.path.
 ========================================
 Quick Start
 ========================================
-To use the pyonep Exosite API, import per:
+To use the pyonep Exosite API, import per:<br>
 	from onepv1lib.datastore import Datastore
 
-This library requires you to initialize with the following parameters:</br>
+This library requires you to initialize with the following parameters:<br>
 --) cik: a 40 character "client interface key" that authenticates your 
-        application with the One Platform</br>
+        application with the One Platform<br>
 --) interval: number of seconds between One Platform publish activity.  Even if
         your application calls the "write" function more often than this 
-        interval, the data will be grouped to be published at this interval</br>
+        interval, the data will be grouped to be published at this interval<br>
 --) autocreate: dataport parameter setup - see the One Platform documentation
-        for more information about dataport parameters.</br>
---) datastore_config: local write buffer and read cache parameter setup</br>
---) transport_config: Exosite server parameter setup
+        for more information about dataport parameters.<br>
+--) datastore_config: local write buffer and read cache parameter setup<br>
+--) transport_config: Exosite server parameter setup<br>
 
 For examples, reference example scripts in the ./onepv1lib/examples/ folder.  
 Note that to run the examples without installing the pyonep package, the 
@@ -64,9 +64,9 @@ Release Info
 ----------------------------------------
 Release 0.2
 ----------------------------------------
---) updated example code
+--) updated example code<br>
 
 ----------------------------------------
 Release 0.1
 ----------------------------------------
---) initial version
+--) initial version<br>
