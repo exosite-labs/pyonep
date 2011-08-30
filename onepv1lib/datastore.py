@@ -288,6 +288,15 @@ class Datastore():
     return self._thread.isAlive()
 
 #-------------------------------------------------------------------------------
+  def comment(self,alias,visibility,commentstr):
+    rid = self.__lookup(alias)
+    if rid:
+      status,message = self._conn.comment(self._cik,rid,visibility,commentstr)
+      if status:
+        return True
+    return False
+
+#-------------------------------------------------------------------------------
   def read(self,alias,count=1):
     if self._cache.has_key(alias): #has cache data
       if self.__isExpired(alias) or count != len(self._cache[alias]['data']):
