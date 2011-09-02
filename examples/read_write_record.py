@@ -41,7 +41,7 @@ def caseCreateDataport():
 #===============================================================================
   print "++caseCreateDataport++"
   reporter = Datastore(cik,interval,dataport_config,datastore_config,transport_config)
-  status,message = reporter.createDataport(alias='V1',name=None,format="float",preprocess=[['add',1]],count=10,duration="infinity",visibility="parent")
+  status,message = reporter.createDataport(alias='V1',format="float",name=None,preprocess=[['add',1]],count=10,duration="infinity",visibility="parent")
   if status:
     commentstr = json.dumps({"unit":"C"})
     reporter.comment('V1','public',commentstr)
