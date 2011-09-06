@@ -30,10 +30,9 @@ class OnepV1():
   headers = {'Content-Type': 'application/json; charset=utf-8'}
 #-------------------------------------------------------------------------------  
   def __init__(self,host='m2.exosite.com',port='80',url='/api:v1/rpc/process',httptimeout=3):
-    self.host = host
-    self.port = port
-    self.url  = url
-    self.httptimeout  = int(httptimeout)
+    self.host        = host + ':' + port
+    self.url         = url
+    self.httptimeout = int(httptimeout)
 
 #-------------------------------------------------------------------------------
   def composeCall(self,method,argu):
@@ -42,7 +41,10 @@ class OnepV1():
 #-------------------------------------------------------------------------------
   def callJsonRPC(self, clientkey, callrequests):
     jsonreq = {"auth":{"cik":clientkey},"calls":callrequests}
-    conn    = httplib.HTTPConnection(self.host, self.port, timeout=self.httptimeout)
+    if sys.version_info < (2 , 6):
+     conn = httplib.HTTPConnection(self.host)
+    else:
+     conn = httplib.HTTPConnection(self.host, timeout=self.httptimeout)
     param = json.dumps(jsonreq)
     try:
       conn.request("POST", self.url, param, self.headers)
