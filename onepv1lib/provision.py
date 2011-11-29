@@ -107,9 +107,9 @@ class Provision(object):
     path = PROVISION_MANAGE_MODEL + model
     return self._request(path, cik, data, 'PUT') != None
 
-  def serialnumber_activate(self, cik, model, serialnumber, vendor="exosite"):
+  def serialnumber_activate(self, model, serialnumber, vendor="exosite"):
     data = urllib.urlencode({'vendor':vendor, 'model':model, 'sn':serialnumber})
-    return self._request(PROVISION_ACTIVATE, cik, data, 'POST')
+    return self._request(PROVISION_ACTIVATE, '', data, 'POST')
 
   def serialnumber_add(self, cik, model, sn):
     data = urllib.urlencode({'add':'true', 'sn':sn})
@@ -135,9 +135,10 @@ class Provision(object):
     path = PROVISION_MANAGE_MODEL + model + '/' + serialnumber
     return self._request(path, cik, '', 'GET')
 
-  def serialnumber_list(self, cik, model):
+  def serialnumber_list(self, cik, model, offset=0, limit=5):
+    data = urllib.urlencode({'offset':offset, 'limit':limit})
     path = PROVISION_MANAGE_MODEL + model + '/'
-    return self._request(path, cik, '', 'GET')
+    return self._request(path, cik, data, 'GET')
 
   def serialnumber_reenable(self, cik, model, serialnumber):
     data = urllib.urlencode({'enable':'true'})
