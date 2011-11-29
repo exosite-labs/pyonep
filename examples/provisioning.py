@@ -13,7 +13,7 @@ if __name__ == '__main__':
   print provision.model_info(ownercik, model)
   provision.serialnumber_add(ownercik, model, '001')
   provision.serialnumber_add_batch(ownercik, model, ['002','003'])
-  print provision.serialnumber_list(ownercik, model)
+  print provision.serialnumber_list(ownercik, model, limit=10)
   provision.serialnumber_remove_batch(ownercik, model, ['002','003'])
   print provision.serialnumber_list(ownercik, model)
   provision.serialnumber_enable(ownercik, model, '001',sn_owner) ## return clientid
@@ -22,7 +22,7 @@ if __name__ == '__main__':
   print "AFTER DISABLE:",provision.serialnumber_info(ownercik, model, '001')
   provision.serialnumber_reenable(ownercik, model, '001')
   print "AFTER REENABLE:",provision.serialnumber_info(ownercik, model, '001')
-  sn_cik = provision.serialnumber_activate(ownercik, model, '001') ##return client key
+  sn_cik = provision.serialnumber_activate(model, '001', vendor) ##return client key
   print "AFTER ACTIVATE:",provision.serialnumber_info(ownercik, model, '001')
   content_id = "a.txt"
   content_data = "This is content data"
