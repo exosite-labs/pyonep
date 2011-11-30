@@ -135,7 +135,7 @@ class Provision(object):
     path = PROVISION_MANAGE_MODEL + model + '/' + serialnumber
     return self._request(path, cik, '', 'GET')
 
-  def serialnumber_list(self, cik, model, offset=0, limit=5):
+  def serialnumber_list(self, cik, model, offset=0, limit=1000):
     data = urllib.urlencode({'offset':offset, 'limit':limit})
     path = PROVISION_MANAGE_MODEL + model + '/'
     return self._request(path, cik, data, 'GET')
