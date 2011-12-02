@@ -4,9 +4,9 @@ if __name__ == '__main__':
   ownercik  = 'VENDOR-CIK'
   clonerid  = 'CLONE-TEMPLATE-RID'
   sn_owner  = 'DEVICE-CLIENT-OWNER-RID'
-  provision = Provision('http://127.0.0.1:8080')
-  model  ='test_model'
-  vendor = 'exosite'
+  model     = 'MODEL-NAME'
+  vendor    = 'VENDOR-NAME'
+  provision = Provision('http://m2.exosite.com')
   provision.vendor_register(ownercik, vendor)
   provision.model_create(ownercik, model, clonerid)
   print provision.model_list(ownercik)

@@ -107,7 +107,7 @@ class Provision(object):
     path = PROVISION_MANAGE_MODEL + model
     return self._request(path, cik, data, 'PUT') != None
 
-  def serialnumber_activate(self, model, serialnumber, vendor="exosite"):
+  def serialnumber_activate(self, model, serialnumber, vendor):
     data = urllib.urlencode({'vendor':vendor, 'model':model, 'sn':serialnumber})
     return self._request(PROVISION_ACTIVATE, '', data, 'POST')
 
