@@ -117,8 +117,11 @@ class OnepV1():
     return self.callJsonRPC(clientkey,request)
 
 #-------------------------------------------------------------------------------
-  def listing(self, clientkey, types):
-    argu = [types]
+  def listing(self, clientkey, types, options=None):
+    if options == None:
+      argu = [types]
+    else:
+      argu =[types,options]
     request = self.composeCall("listing",argu)
     return self.callJsonRPC(clientkey,request)
 
