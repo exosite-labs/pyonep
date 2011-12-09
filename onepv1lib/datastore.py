@@ -337,7 +337,7 @@ class Datastore():
     self.start()
 
 #-------------------------------------------------------------------------------
-  def start(self,daemon=False):
+  def start(self,daemon=True):
     time.sleep(1)
     self._killed = False
     self._forceterminate = False
