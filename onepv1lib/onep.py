@@ -1,6 +1,6 @@
 #==============================================================================
 # onep.py
-# Main API library class for Exosite's Data Platform as exposed over HTTP JSON 
+# Main API library class for Exosite's Data Platform as exposed over HTTP JSON
 # RPC
 #==============================================================================
 ##
@@ -28,21 +28,22 @@ except ImportError:
 class OnepV1():
 #===============================================================================
   headers = {'Content-Type': 'application/json; charset=utf-8'}
-#-------------------------------------------------------------------------------  
+#-------------------------------------------------------------------------------
   def __init__(self,host='m2.exosite.com',port='80',url='/api:v1/rpc/process',httptimeout=3):
-    self.host = host
-    self.port = port
-    self.url  = url
-    self.httptimeout  = int(httptimeout)
+    self.host        = host + ':' + port
+    self.url         = url
+    self.httptimeout = int(httptimeout)
+    self._clientid   = None
+    self._resourceid = None
 
 #-------------------------------------------------------------------------------
-  def composeCall(self,method,argu):
-    return [{"id":1,"procedure":method,"arguments":argu}]
-
-#-------------------------------------------------------------------------------
-  def callJsonRPC(self, clientkey, callrequests):
-    jsonreq = {"auth":{"cik":clientkey},"calls":callrequests}
-    conn    = httplib.HTTPConnection(self.host, self.port, timeout=self.httptimeout)
+  def __callJsonRPC(self, clientkey, callrequests):
+    auth = self.__getAuth(clientkey)
+    jsonreq = {"auth":auth,"calls":callrequests}
+    if sys.version_info < (2 , 6):
+     conn = httplib.HTTPConnection(self.host)
+    else:
+     conn = httplib.HTTPConnection(self.host, timeout=self.httptimeout)
     param = json.dumps(jsonreq)
     try:
       conn.request("POST", self.url, param, self.headers)
@@ -63,7 +64,7 @@ class OnepV1():
     if isinstance(res,list) and len(res) > 0:
       if res[0].has_key('status'):
         if 'ok'  == res[0]['status']:
-          if res[0].has_key('result'):          
+          if res[0].has_key('result'):
             return True,res[0]['result']
           return True,'ok'
         else:
@@ -73,109 +74,131 @@ class OnepV1():
     raise OneException("Unknown error")
 
 #-------------------------------------------------------------------------------
+  def __composeCall(self,method,argu):
+    return [{"id":1,"procedure":method,"arguments":argu}]
+
+#-------------------------------------------------------------------------------
+  def __getAuth(self,clientkey):
+    if None != self._clientid:
+      return {"cik":clientkey,"client_id":self._clientid}
+    elif None != self._resourceid:
+      return {"cik":clientkey,"resource_id":self._resourceid}
+    return {"cik":clientkey}
+
+#-------------------------------------------------------------------------------
   def activate(self,clientkey,codetype,code):
     argu = [codetype, code]
-    request = self.composeCall("activate",argu)
-    return self.callJsonRPC(clientkey,request)
+    request = self.__composeCall("activate",argu)
+    return self.__callJsonRPC(clientkey,request)
 
 #-------------------------------------------------------------------------------
   def comment(self, clientkey, rid, visibility, comment):
     argu = [rid, visibility, comment]
-    request = self.composeCall("comment",argu)
-    return self.callJsonRPC(clientkey,request)
+    request = self.__composeCall("comment",argu)
+    return self.__callJsonRPC(clientkey,request)
+
+#-------------------------------------------------------------------------------
+  def connect_as(self, clientid):
+    self._clientid = clientid
+    self._resourceid = None
+
+#-------------------------------------------------------------------------------
+  def connect_owner(self, resourceid):
+    self._resourceid = resourceid
+    self._clientid = None
 
 #-------------------------------------------------------------------------------
   def create(self, clientkey, type, desc):
     argu = [type,desc]
-    request = self.composeCall("create",argu)
-    return self.callJsonRPC(clientkey,request)
+    request = self.__composeCall("create",argu)
+    return self.__callJsonRPC(clientkey,request)
 
 #-------------------------------------------------------------------------------
   def deactivate(self,clientkey,codetype,code):
     argu = [codetype, code]
-    request = self.composeCall("deactivate",argu)
-    return self.callJsonRPC(clientkey,request)
+    request = self.__composeCall("deactivate",argu)
+    return self.__callJsonRPC(clientkey,request)
 
 #-------------------------------------------------------------------------------
   def drop(self, clientkey, rid):
     argu = [rid]
-    request = self.composeCall("drop",argu)
-    return self.callJsonRPC(clientkey,request)
+    request = self.__composeCall("drop",argu)
+    return self.__callJsonRPC(clientkey,request)
 
 #-------------------------------------------------------------------------------
   def flush(self, clientkey, rid):
     argu = [rid]
-    request = self.composeCall("flush",argu)
-    return self.callJsonRPC(clientkey,request)
+    request = self.__composeCall("flush",argu)
+    return self.__callJsonRPC(clientkey,request)
 
 #-------------------------------------------------------------------------------
   def info(self, clientkey, rid, options={}):
-    argu = [rid,options]  
-    request = self.composeCall("info",argu)
-    return self.callJsonRPC(clientkey,request)
+    argu = [rid,options]
+    request = self.__composeCall("info",argu)
+    return self.__callJsonRPC(clientkey,request)
 
 #-------------------------------------------------------------------------------
-  def listing(self, clientkey, types):
-    argu = [types]
-    request = self.composeCall("listing",argu)
-    return self.callJsonRPC(clientkey,request)
+  def listing(self, clientkey, types, options):
+    argu =[types,options]
+    request = self.__composeCall("listing",argu)
+    return self.__callJsonRPC(clientkey,request)
 
 #-------------------------------------------------------------------------------
   def lookup(self, clientkey, type, mapping):
     argu = [type,mapping]
-    request = self.composeCall("lookup",argu)
-    return self.callJsonRPC(clientkey,request)
+    request = self.__composeCall("lookup",argu)
+    return self.__callJsonRPC(clientkey,request)
 
 #-------------------------------------------------------------------------------
   def map(self, clientkey, rid, alias):
     argu = ["alias",rid,alias]
-    request = self.composeCall("map",argu)
-    return self.callJsonRPC(clientkey,request)
+    request = self.__composeCall("map",argu)
+    return self.__callJsonRPC(clientkey,request)
 
 #-------------------------------------------------------------------------------
   def read(self, clientkey, rid, options):
     argu = [rid,options]
-    request = self.composeCall("read",argu)
-    return self.callJsonRPC(clientkey,request)
+    request = self.__composeCall("read",argu)
+    return self.__callJsonRPC(clientkey,request)
 
 #-------------------------------------------------------------------------------
   def record(self, clientkey, rid, entries, options={}):
     argu = [rid, entries,options]
-    request = self.composeCall("record",argu)
-    return self.callJsonRPC(clientkey,request)
+    request = self.__composeCall("record",argu)
+    return self.__callJsonRPC(clientkey,request)
 
 #-------------------------------------------------------------------------------
   def revoke(self,clientkey,codetype,code):
     argu = [codetype, code]
-    request = self.composeCall("revoke",argu)
-    return self.callJsonRPC(clientkey,request)
+    request = self.__composeCall("revoke",argu)
+    return self.__callJsonRPC(clientkey,request)
 
 #-------------------------------------------------------------------------------
   def share(self, clientkey, rid, options={}):
     argu = [rid, options]
-    request = self.composeCall("share",argu)
-    return self.callJsonRPC(clientkey,request)
+    request = self.__composeCall("share",argu)
+    return self.__callJsonRPC(clientkey,request)
 
 #-------------------------------------------------------------------------------
   def unmap(self, clientkey, alias):
     argu = ["alias",alias]
-    request = self.composeCall("unmap",argu)
-    return self.callJsonRPC(clientkey,request)
+    request = self.__composeCall("unmap",argu)
+    return self.__callJsonRPC(clientkey,request)
 
 #-------------------------------------------------------------------------------
   def update(self, clientkey, rid, desc={}):
     argu = [rid,desc]
-    request = self.composeCall("update",argu)
-    return self.callJsonRPC(clientkey,request)
+    request = self.__composeCall("update",argu)
+    return self.__callJsonRPC(clientkey,request)
 
 #-------------------------------------------------------------------------------
   def write(self, clientkey, rid, value, options={}):
     argu = [rid,value,options]
-    request = self.composeCall("write",argu)
-    return self.callJsonRPC(clientkey,request)
+    request = self.__composeCall("write",argu)
+    return self.__callJsonRPC(clientkey,request)
 
 #-------------------------------------------------------------------------------
   def writegroup(self, clientkey, entries, options={}):
     argu = [entries,options]
-    request = self.composeCall("write",argu)
-    return self.callJsonRPC(clientkey,request)    
+    request = self.__composeCall("write",argu)
+    return self.__callJsonRPC(clientkey,request)

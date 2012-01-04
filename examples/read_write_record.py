@@ -13,6 +13,7 @@
 
 import time,sys,random,math
 from onepv1lib.datastore import Datastore
+import json
 
 # put a 1P CIK here - register on portals.exosite.com and +Add Device to get one
 cik = "PUTYOUR40CHARACTERCIKHERE" 
@@ -34,6 +35,16 @@ datastore_config = {'write_buffer_size':1024,       #buffer up to N bytes for wr
                     'log_level':'warn'}             #log level (debug, info, warn, error)
 # configures how often our write buffer will be processed for sending
 interval = 3
+
+#===============================================================================
+def caseCreateDataport():
+#===============================================================================
+  print "++caseCreateDataport++"
+  reporter = Datastore(cik,interval,dataport_config,datastore_config,transport_config)
+  status,message = reporter.createDataport(alias='V1',format="float",name=None,preprocess=[['add',1]],count=10,duration="infinity",visibility="parent")
+  if status:
+    commentstr = json.dumps({"unit":"C"})
+    reporter.comment('V1','public',commentstr)
 
 #===============================================================================
 def caseWrite():
@@ -106,4 +117,5 @@ if __name__ == '__main__':
   caseRecordOffset()
   caseWrite()
   caseRead()
+  caseCreateDataport()
 

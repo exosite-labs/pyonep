@@ -62,6 +62,11 @@ For more information on the API, reference Exosite online documentation.
 Release Info
 ========================================
 ----------------------------------------
+Release 0.3
+----------------------------------------
+--) add provisioning library<br>
+
+----------------------------------------
 Release 0.2
 ----------------------------------------
 --) updated example code<br>
