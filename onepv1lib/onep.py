@@ -55,6 +55,8 @@ class OnepV1():
     except Exception:
       print sys.exc_info()[0]
       raise JsonRPCResponseException("Failed to get response of request.")
+    finally:
+      conn.close()
     try:
       res = json.loads(read)
     except:
