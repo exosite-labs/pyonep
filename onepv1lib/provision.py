@@ -65,9 +65,14 @@ class Provision(object):
     headers = {"Accept":"*"}
     return self._request(PROVISION_DOWNLOAD, cik, data, 'GET', headers)
 
-  def content_info(self, cik, model, contentid):
-    path = PROVISION_MANAGE_CONTENT + model + '/' + contentid
-    return self._request(path, cik, '', 'GET')
+  def content_info(self, cik, model, contentid, vendor=None):
+    if not vendor: ## if no vendor name, cik should be the owner one
+      path = PROVISION_MANAGE_CONTENT + model + '/' + contentid
+      return self._request(path, cik, '', 'GET')
+    else: ## if provide vendor name, cik can be the device one
+      data = urllib.urlencode({'vendor':vendor, 'model': model, \
+              'id':contentid, 'info':'true'})
+      return self._request(PROVISION_DOWNLOAD, cik, data, 'GET')
 
   def content_list(self, cik, model):
     path = PROVISION_MANAGE_CONTENT + model + '/'

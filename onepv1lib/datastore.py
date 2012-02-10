@@ -191,7 +191,7 @@ class Datastore():
           self.__writegroup(livedata)
           logger.info("[Live] Written to 1p:" + str(livedata))
         except OneException,e: # go to historical data when write live data failure
-          print e.message
+          logger.warn(e.message)
           lock.acquire()
           try:             
             for (alias,value) in livedata:
@@ -228,7 +228,7 @@ class Datastore():
             else:
               del self._recordBuffer[alias]
           except OneException,e:
-            logger.error(e.message)
+            logger.warn(e.message)
             continue    
       finally:
         lock.release()     
@@ -274,7 +274,7 @@ class Datastore():
       self._cache[alias]['time'] = int(time.time())     
       return data
     except OneException,e:
-      logger.error(e.message)
+      logger.warn(e.message)
     except Exception,e:
       print sys.exc_info()[0]
       logger.error("Unknown error when reading data.")

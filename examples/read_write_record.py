@@ -2,7 +2,7 @@
 #==============================================================================
 # read_write_record.py
 # Simple use cases of the onepv2lib package communicating/interacting with the
-# Exosite Data Platform 
+# Exosite Data Platform
 #==============================================================================
 ##
 ## Tested with python 2.6
@@ -16,7 +16,7 @@ from onepv1lib.datastore import Datastore
 import json
 
 # put a 1P CIK here - register on portals.exosite.com and +Add Device to get one
-cik = "PUTYOUR40CHARACTERCIKHERE" 
+cik = "PUTYOUR40CHARACTERCIKHERE"
 # dataport configuration - if the dataport doesn't exist, it will be auto-created with these params
 dataport_config = {'format':'string',               #use string format (float, int are also supported)
                     'preprocess':[['add',1],['mul',2]], #preprocess is pretty flexible - can preprocess raw data with constants and other data
@@ -75,7 +75,7 @@ def caseRead():
     reporter.stop(True)
     sys.exit(0)
   reporter.stop(True)
-  
+
 #===============================================================================
 def caseRecordOffset():
 #===============================================================================
@@ -89,7 +89,7 @@ def caseRecordOffset():
     reporter.stop(True)
     sys.exit(0)
   reporter.stop(True)
-  
+
 #===============================================================================
 def caseRecord():
 #===============================================================================
@@ -104,7 +104,7 @@ def caseRecord():
     reporter.stop(True)
     sys.exit(0)
   reporter.stop(True)
-  
+
 #===============================================================================
 if __name__ == '__main__':
   print "================================="
