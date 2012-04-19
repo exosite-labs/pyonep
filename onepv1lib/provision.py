@@ -48,11 +48,15 @@ class Provision(object):
     req.get_method = lambda : method
     try:
       resp = urllib2.urlopen(req)
-      return resp.read()
+      resp_data = resp.read()
+      resp.close()
+      return resp_data
     except HTTPError, e:
       print 'Http error code: ' + str(e.code)
     except URLError, e:
       print 'Failed to reach server! Reason: ' + str(e.reason)
+    except Exception,e:
+      print "Caught exception from provision:", e
     return None
 
   def content_create(self, cik, model, contentid, description):
