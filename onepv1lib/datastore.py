@@ -221,10 +221,16 @@ class Datastore():
                 else:
                   recentry.append([entry[0], entry[1]])
               if recentry:
-                self.__record(alias,recentry)
-                logger.info("[Historical] Written to 1p: " + alias + ", " + str(recentry))
-                self._recordCount -= len(entries)
-                del self._recordBuffer[alias]
+                try:
+                  self.__record(alias,recentry)
+                  logger.info("[Historical] Written to 1p: " + alias + ", " + str(recentry))
+                  self._recordCount -= len(entries)
+                  del self._recordBuffer[alias]
+                except OneException,e:
+                  if e.message.find("datapoint") != -1:
+                    print e.message
+                    self._recordCount -= len(entries)
+                    del self._recordBuffer[alias]
             else:
               del self._recordBuffer[alias]
           except OneException,e:
