@@ -176,6 +176,9 @@ class Provision(object):
     data = urllib.urlencode({'vendor':vendor})
     return self._request(PROVISION_REGISTER, key, data, 'POST') != None
 
+  def vendor_show(self, key):
+    return self._request(PROVISION_REGISTER, key, '', 'GET')
+
   def vendor_unregister(self, key, vendor):
     data = urllib.urlencode({'delete':'true','vendor':vendor})
     return self._request(PROVISION_REGISTER, key, data, 'POST') != None
