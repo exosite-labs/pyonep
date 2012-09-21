@@ -8,6 +8,7 @@
 ## Copyright (c) 2011, Exosite LLC
 ## All rights reserved.
 ##
+# vim: tabstop=2 expandtab shiftwidth=2 softtabstop=2 smarttab
 
 import urllib, urllib2, socket
 from urllib2 import Request, urlopen, URLError, HTTPError

@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 #==============================================================================
 # onep.py
 # Main API library class for Exosite's Data Platform as exposed over HTTP JSON
@@ -9,6 +10,7 @@
 ## Copyright (c) 2010, Exosite LLC
 ## All rights reserved.
 ##
+# vim: tabstop=2 expandtab shiftwidth=2 softtabstop=2 smarttab
 
 import sys,httplib
 from exceptions import *
@@ -202,3 +204,5 @@ class OnepV1():
     argu = [entries,options]
     request = self.__composeCall("write",argu)
     return self.__callJsonRPC(clientkey,request)
+
+

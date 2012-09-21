@@ -8,6 +8,7 @@
 ## Copyright (c) 2010, Exosite LLC
 ## All rights reserved.
 ##
+# vim: tabstop=2 expandtab shiftwidth=2 softtabstop=2 smarttab
 
 #==============================================================================
 class OneException(Exception):
