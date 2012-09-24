@@ -15,7 +15,7 @@
 
 import threading,time,sys,logging
 from onep import OnepV1
-from exceptions import *
+from onep_exceptions import *
 
 # setup default configurations
 transport_config = {'host':'m2.exosite.com',

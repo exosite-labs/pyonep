@@ -13,7 +13,7 @@
 # vim: tabstop=2 expandtab shiftwidth=2 softtabstop=2 smarttab
 
 import sys,httplib
-from exceptions import *
+from onep_exceptions import *
 
 try:
   if sys.version_info < (2 , 6):
@@ -30,15 +30,14 @@ except ImportError:
 class OnepV1():
 #===============================================================================
   headers = {'Content-Type': 'application/json; charset=utf-8'}
-#-------------------------------------------------------------------------------
-  def __init__(self,host='m2.exosite.com',port='80',url='/api:v1/rpc/process',httptimeout=3):
+  def __init__(self,host='m2.exosite.com',port='80',url='/api:v1/rpc/process',httptimeout=3,verbose=False):
     self.host        = host + ':' + port
     self.url         = url
     self.httptimeout = int(httptimeout)
     self._clientid   = None
     self._resourceid = None
+    self.verbose     = verbose 
 
-#-------------------------------------------------------------------------------
   def __callJsonRPC(self, clientkey, callrequests):
     auth = self.__getAuth(clientkey)
     jsonreq = {"auth":auth,"calls":callrequests}
@@ -47,22 +46,23 @@ class OnepV1():
     else:
      conn = httplib.HTTPConnection(self.host, timeout=self.httptimeout)
     param = json.dumps(jsonreq)
+    if self.verbose: print("Request JSON: {0}".format(param))
     try:
       conn.request("POST", self.url, param, self.headers)
     except Exception:
-      print sys.exc_info()[0]
       raise JsonRPCRequestException("Failed to make http request.")
     try:
       read = conn.getresponse().read()
     except Exception:
-      print sys.exc_info()[0]
+      if self.verbose: print sys.exc_info()[0]
       raise JsonRPCResponseException("Failed to get response of request.")
     try:
       res = json.loads(read)
+      if self.verbose: print("Response JSON: {0}".format(res))
     except:
       raise OnePlatformException("Return invalid response value.")
     if isinstance(res,dict) and res.has_key('error'):
-      raise OnePlatformException(res['error'])
+      raise OnePlatformException(str(res['error']))
     if isinstance(res,list) and len(res) > 0:
       if res[0].has_key('status'):
         if 'ok'  == res[0]['status']:
@@ -72,14 +72,12 @@ class OnepV1():
         else:
           return False,res[0]['status']
       if res[0].has_key('error'):
-        raise OnePlatformException(res[0]['error'])
+        raise OnePlatformException(str(res[0]['error']))
     raise OneException("Unknown error")
 
-#-------------------------------------------------------------------------------
   def __composeCall(self,method,argu):
     return [{"id":1,"procedure":method,"arguments":argu}]
 
-#-------------------------------------------------------------------------------
   def __getAuth(self,clientkey):
     if None != self._clientid:
       return {"cik":clientkey,"client_id":self._clientid}
@@ -87,122 +85,81 @@ class OnepV1():
       return {"cik":clientkey,"resource_id":self._resourceid}
     return {"cik":clientkey}
 
-#-------------------------------------------------------------------------------
-  def activate(self,clientkey,codetype,code):
-    argu = [codetype, code]
-    request = self.__composeCall("activate",argu)
-    return self.__callJsonRPC(clientkey,request)
-
-#-------------------------------------------------------------------------------
-  def comment(self, clientkey, rid, visibility, comment):
-    argu = [rid, visibility, comment]
-    request = self.__composeCall("comment",argu)
-    return self.__callJsonRPC(clientkey,request)
-
-#-------------------------------------------------------------------------------
   def connect_as(self, clientid):
     self._clientid = clientid
     self._resourceid = None
 
-#-------------------------------------------------------------------------------
   def connect_owner(self, resourceid):
     self._resourceid = resourceid
     self._clientid = None
 
-#-------------------------------------------------------------------------------
-  def create(self, clientkey, type, desc):
-    argu = [type,desc]
-    request = self.__composeCall("create",argu)
-    return self.__callJsonRPC(clientkey,request)
+  def __getattr__(self, name):
+    return lambda *args, **kwargs: self.call_single(name, *args, **kwargs)
 
-#-------------------------------------------------------------------------------
-  def deactivate(self,clientkey,codetype,code):
-    argu = [codetype, code]
-    request = self.__composeCall("deactivate",argu)
-    return self.__callJsonRPC(clientkey,request)
-
-#-------------------------------------------------------------------------------
-  def drop(self, clientkey, rid):
-    argu = [rid]
-    request = self.__composeCall("drop",argu)
-    return self.__callJsonRPC(clientkey,request)
-
-#-------------------------------------------------------------------------------
-  def flush(self, clientkey, rid):
-    argu = [rid]
-    request = self.__composeCall("flush",argu)
-    return self.__callJsonRPC(clientkey,request)
-
-#-------------------------------------------------------------------------------
-  def info(self, clientkey, rid, options={}):
-    argu = [rid,options]
-    request = self.__composeCall("info",argu)
-    return self.__callJsonRPC(clientkey,request)
-
-#-------------------------------------------------------------------------------
-  def listing(self, clientkey, types, options):
-    argu =[types,options]
-    request = self.__composeCall("listing",argu)
-    return self.__callJsonRPC(clientkey,request)
-
-#-------------------------------------------------------------------------------
-  def lookup(self, clientkey, type, mapping):
-    argu = [type,mapping]
-    request = self.__composeCall("lookup",argu)
-    return self.__callJsonRPC(clientkey,request)
-
-#-------------------------------------------------------------------------------
-  def map(self, clientkey, rid, alias):
-    argu = ["alias",rid,alias]
-    request = self.__composeCall("map",argu)
-    return self.__callJsonRPC(clientkey,request)
-
-#-------------------------------------------------------------------------------
-  def read(self, clientkey, rid, options):
-    argu = [rid,options]
-    request = self.__composeCall("read",argu)
-    return self.__callJsonRPC(clientkey,request)
-
-#-------------------------------------------------------------------------------
-  def record(self, clientkey, rid, entries, options={}):
-    argu = [rid, entries,options]
-    request = self.__composeCall("record",argu)
-    return self.__callJsonRPC(clientkey,request)
-
-#-------------------------------------------------------------------------------
-  def revoke(self,clientkey,codetype,code):
-    argu = [codetype, code]
-    request = self.__composeCall("revoke",argu)
-    return self.__callJsonRPC(clientkey,request)
-
-#-------------------------------------------------------------------------------
-  def share(self, clientkey, rid, options={}):
-    argu = [rid, options]
-    request = self.__composeCall("share",argu)
-    return self.__callJsonRPC(clientkey,request)
-
-#-------------------------------------------------------------------------------
-  def unmap(self, clientkey, alias):
-    argu = ["alias",alias]
-    request = self.__composeCall("unmap",argu)
-    return self.__callJsonRPC(clientkey,request)
-
-#-------------------------------------------------------------------------------
-  def update(self, clientkey, rid, desc={}):
-    argu = [rid,desc]
-    request = self.__composeCall("update",argu)
-    return self.__callJsonRPC(clientkey,request)
-
-#-------------------------------------------------------------------------------
-  def write(self, clientkey, rid, value, options={}):
-    argu = [rid,value,options]
-    request = self.__composeCall("write",argu)
-    return self.__callJsonRPC(clientkey,request)
-
-#-------------------------------------------------------------------------------
-  def writegroup(self, clientkey, entries, options={}):
-    argu = [entries,options]
-    request = self.__composeCall("write",argu)
-    return self.__callJsonRPC(clientkey,request)
+  def call_single(self, name, *args, **kwargs):
+    if ARG_MAPPING.has_key(name):
+      clientkey, arg = ARG_MAPPING[name](*args, **kwargs)
+      request = self.__composeCall(name, arg)
+      return self.__callJsonRPC(clientkey, request)
+    else:
+      raise AttributeError("No RPC method {0} defined".format(name))
 
 
+# Functions that map arguments to clientkey, RPC argument pair
+ARG_MAPPING = {
+    'activate': lambda clientkey, codetype, code: 
+      (clientkey, [codetype, code]),
+    'comment': lambda clientkey, rid, visibility, comment:
+      (clientkey, [rid, visibility, comment]),
+    'create': lambda clientkey, type, desc:
+      (clientkey, [type, desc]),
+    'deactivate': lambda clientkey, codetype, code:
+      (clientkey, [codetype, code]),
+    'drop': lambda clientkey, rid:
+      (clientkey, [rid]),
+    'flush': lambda clientkey, rid:
+      (clientkey, [rid]),
+    'info': lambda clientkey, rid, options={}:
+      (clientkey, [rid, options]),
+    'listing': lambda clientkey, types:
+      (clientkey, [types]),
+    'lookup': lambda clientkey, type, mapping:
+      (clientkey, [type, mapping]),
+    'map': lambda clientkey, rid, alias:
+      (clientkey, ['alias', rid, alias]),
+    'read': lambda clientkey, rid, options:
+      (clientkey, [rid, options]),
+    'record': lambda clientkey, rid, entries, options={}:
+      (clientkey, [rid, entries,options]),
+    'revoke': lambda clientkey, codetype, code:
+      (clientkey, [codetype, code]),
+    'share': lambda clientkey, rid, options={}:
+      (clientkey, [rid, options]),
+    'unmap': lambda clientkey, alias:
+      (clientkey, ['alias', alias]),
+    'update': lambda clientkey, rid, desc={}:
+      (clientkey, [rid, desc]),
+    'write': lambda clientkey, rid, value, options={}:
+      (clientkey, [rid, value, options]),
+    'writegroup': lambda clientkey, entries, options={}:
+      (clientkey, [entries, options]),
+  }
+
+def main(argv=None):
+  if argv is None:
+    argv = sys.argv
+  onep = OnepV1(verbose=False)
+  clientkey = 'f0cbd65a8d6ec75da52d91a48dfa6e6d05a8d68d'
+  #clientkey = '20df3a8522b2d98834a7d2b36a7fccf4a087b5c6'
+  print(onep.listing(clientkey, ['dataport']))
+  options = {
+      'starttime':1,
+      'endtime':1000000000000,
+      'limit':10,
+      'sort':'desc',
+      'selection':'all'
+      }
+  print(onep.read(clientkey, {'alias': 'sensor_a'}, options))
+  
+if __name__ == "__main__":
+  sys.exit(main())
