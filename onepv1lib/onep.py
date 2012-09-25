@@ -156,11 +156,15 @@ class OnepV1():
       i += 1
     return calls
 
+  def has_deferred(self, cik):
+    return self.deferred.has_requests(cik)
+
   def send_deferred(self, cik):
     '''Send all deferred requests for a particular cik.'''
     if self.deferred.has_requests(cik):
       calls = self._composeCalls(self.deferred.get_method_args_pairs(cik))
-    return self._callJsonRPC(cik, calls)
+      return self._callJsonRPC(cik, calls)
+    raise JsonRPCRequestException('No deferred requests to send.') 
 
 # Functions that map arguments to cik, RPC argument pair
 ARG_MAPPING = {
