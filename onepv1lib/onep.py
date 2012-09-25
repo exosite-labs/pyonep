@@ -26,9 +26,24 @@ except ImportError:
   print "The package '%s' is required." % json_module
   sys.exit(1)
 
-#===============================================================================
+
+class DeferredRequests():
+  '''Encapsulates a list of deferred requests for each CIK. Once the requests
+    are ready to be sent, get_method_args_pairs() returns a list of the method 
+    name and arguments for each request.'''
+  def __init__(self):
+    self._requests = {}
+  def add(self, cik, method, args):
+    '''Append a deferred request for a particular cik.'''
+    self._requests.setdefault(cik, []).append((method, args))
+  def has_requests(self, cik):
+    return (self._requests.has_key(cik) 
+        and len(self._requests[cik]) > 0)
+  def get_method_args_pairs(self, cik):
+    return self._requests[cik]
+
+
 class OnepV1():
-#===============================================================================
   headers = {'Content-Type': 'application/json; charset=utf-8'}
   def __init__(self,host='m2.exosite.com',port='80',url='/api:v1/rpc/process',httptimeout=3,verbose=False):
     self.host        = host + ':' + port
@@ -37,14 +52,17 @@ class OnepV1():
     self._clientid   = None
     self._resourceid = None
     self.verbose     = verbose 
+    self.deferred    = DeferredRequests() 
 
-  def __callJsonRPC(self, clientkey, callrequests):
-    auth = self.__getAuth(clientkey)
-    jsonreq = {"auth":auth,"calls":callrequests}
-    if sys.version_info < (2 , 6):
-     conn = httplib.HTTPConnection(self.host)
+  def _callJsonRPC(self, cik, callrequests):
+    '''Calls the Exosite One Platform RPC API.
+      Returns'''
+    auth = self._getAuth(cik)
+    jsonreq = {"auth": auth, "calls": callrequests}
+    if sys.version_info < (2, 6):
+      conn = httplib.HTTPConnection(self.host)
     else:
-     conn = httplib.HTTPConnection(self.host, timeout=self.httptimeout)
+      conn = httplib.HTTPConnection(self.host, timeout=self.httptimeout)
     param = json.dumps(jsonreq)
     if self.verbose: print("Request JSON: {0}".format(param))
     try:
@@ -55,35 +73,47 @@ class OnepV1():
       read = conn.getresponse().read()
     except Exception:
       if self.verbose: print sys.exc_info()[0]
-      raise JsonRPCResponseException("Failed to get response of request.")
+      raise JsonRPCResponseException("Failed to get response for request.")
     try:
       res = json.loads(read)
       if self.verbose: print("Response JSON: {0}".format(res))
     except:
       raise OnePlatformException("Return invalid response value.")
-    if isinstance(res,dict) and res.has_key('error'):
+    if isinstance(res, dict) and res.has_key('error'):
       raise OnePlatformException(str(res['error']))
-    if isinstance(res,list) and len(res) > 0:
-      if res[0].has_key('status'):
-        if 'ok'  == res[0]['status']:
-          if res[0].has_key('result'):
-            return True,res[0]['result']
-          return True,'ok'
-        else:
-          return False,res[0]['status']
-      if res[0].has_key('error'):
-        raise OnePlatformException(str(res[0]['error']))
+    if isinstance(res, list):
+      ret = []
+      for r in res:
+        # first, find the matching request so we can return it 
+        # along with the response.
+        request = None
+        for call in callrequests:
+          if call['id'] == r['id']:
+            request = call
+        if r.has_key('status'):
+          if 'ok'  == r['status']:
+            if r.has_key('result'):
+              ret.append((request, True, r['result']))
+            else:
+              ret.append((request, True, 'ok'))
+          else:
+            ret.append((request, False, r['status']))
+        elif r.has_key('error'):
+          raise OnePlatformException(str(r['error']))
+      if len(ret) == 1:
+        # backward compatibility: return just True/False and 'ok'/result/status
+        # as before
+        return ret[0][1:]
+      else:
+        return ret
     raise OneException("Unknown error")
 
-  def __composeCall(self,method,argu):
-    return [{"id":1,"procedure":method,"arguments":argu}]
-
-  def __getAuth(self,clientkey):
+  def _getAuth(self, cik):
     if None != self._clientid:
-      return {"cik":clientkey,"client_id":self._clientid}
+      return {"cik": cik, "client_id": self._clientid}
     elif None != self._resourceid:
-      return {"cik":clientkey,"resource_id":self._resourceid}
-    return {"cik":clientkey}
+      return {"cik": cik, "resource_id": self._resourceid}
+    return {"cik": cik}
 
   def connect_as(self, clientid):
     self._clientid = clientid
@@ -94,72 +124,81 @@ class OnepV1():
     self._clientid = None
 
   def __getattr__(self, name):
-    return lambda *args, **kwargs: self.call_single(name, *args, **kwargs)
-
-  def call_single(self, name, *args, **kwargs):
     if ARG_MAPPING.has_key(name):
-      clientkey, arg = ARG_MAPPING[name](*args, **kwargs)
-      request = self.__composeCall(name, arg)
-      return self.__callJsonRPC(clientkey, request)
+      return lambda *args, **kwargs: self._call_single(name, *args, **kwargs)
     else:
-      raise AttributeError("No RPC method {0} defined".format(name))
+      raise AttributeError
 
+  def _call_single(self, method, *args, **kwargs):
+    if ARG_MAPPING.has_key(method):
+      defer = False
+      if kwargs.has_key('defer'):
+        # remove defer argument before passing to ARG_MAPPING
+        defer = kwargs.pop('defer')
 
-# Functions that map arguments to clientkey, RPC argument pair
+      cik, arg = ARG_MAPPING[method](*args, **kwargs)
+      if defer:
+        self.deferred.add(cik, method, arg)
+        return True 
+      else:
+        calls = self._composeCalls([(method, arg)])
+        return self._callJsonRPC(cik, calls)
+    else:
+      raise AttributeError("No RPC method {0} defined".format(method))
+
+  def _composeCalls(self, method_args_pairs):
+    calls = []
+    i = 1 
+    for method, args in method_args_pairs:
+      calls.append({'id': i,
+                    'procedure': method,
+                    'arguments': args})
+      i += 1
+    return calls
+
+  def send_deferred(self, cik):
+    '''Send all deferred requests for a particular cik.'''
+    if self.deferred.has_requests(cik):
+      calls = self._composeCalls(self.deferred.get_method_args_pairs(cik))
+    return self._callJsonRPC(cik, calls)
+
+# Functions that map arguments to cik, RPC argument pair
 ARG_MAPPING = {
-    'activate': lambda clientkey, codetype, code: 
-      (clientkey, [codetype, code]),
-    'comment': lambda clientkey, rid, visibility, comment:
-      (clientkey, [rid, visibility, comment]),
-    'create': lambda clientkey, type, desc:
-      (clientkey, [type, desc]),
-    'deactivate': lambda clientkey, codetype, code:
-      (clientkey, [codetype, code]),
-    'drop': lambda clientkey, rid:
-      (clientkey, [rid]),
-    'flush': lambda clientkey, rid:
-      (clientkey, [rid]),
-    'info': lambda clientkey, rid, options={}:
-      (clientkey, [rid, options]),
-    'listing': lambda clientkey, types:
-      (clientkey, [types]),
-    'lookup': lambda clientkey, type, mapping:
-      (clientkey, [type, mapping]),
-    'map': lambda clientkey, rid, alias:
-      (clientkey, ['alias', rid, alias]),
-    'read': lambda clientkey, rid, options:
-      (clientkey, [rid, options]),
-    'record': lambda clientkey, rid, entries, options={}:
-      (clientkey, [rid, entries,options]),
-    'revoke': lambda clientkey, codetype, code:
-      (clientkey, [codetype, code]),
-    'share': lambda clientkey, rid, options={}:
-      (clientkey, [rid, options]),
-    'unmap': lambda clientkey, alias:
-      (clientkey, ['alias', alias]),
-    'update': lambda clientkey, rid, desc={}:
-      (clientkey, [rid, desc]),
-    'write': lambda clientkey, rid, value, options={}:
-      (clientkey, [rid, value, options]),
-    'writegroup': lambda clientkey, entries, options={}:
-      (clientkey, [entries, options]),
+    'activate': lambda cik, codetype, code:
+      (cik, [codetype, code]),
+    'comment': lambda cik, rid, visibility, comment:
+      (cik, [rid, visibility, comment]),
+    'create': lambda cik, type, desc:
+      (cik, [type, desc]),
+    'deactivate': lambda cik, codetype, code:
+      (cik, [codetype, code]),
+    'drop': lambda cik, rid:
+      (cik, [rid]),
+    'flush': lambda cik, rid:
+      (cik, [rid]),
+    'info': lambda cik, rid, options={}:
+      (cik, [rid, options]),
+    'listing': lambda cik, types:
+      (cik, [types]),
+    'lookup': lambda cik, type, mapping:
+      (cik, [type, mapping]),
+    'map': lambda cik, rid, alias:
+      (cik, ['alias', rid, alias]),
+    'read': lambda cik, rid, options:
+      (cik, [rid, options]),
+    'record': lambda cik, rid, entries, options={}:
+      (cik, [rid, entries,options]),
+    'revoke': lambda cik, codetype, code:
+      (cik, [codetype, code]),
+    'share': lambda cik, rid, options={}:
+      (cik, [rid, options]),
+    'unmap': lambda cik, alias:
+      (cik, ['alias', alias]),
+    'update': lambda cik, rid, desc={}:
+      (cik, [rid, desc]),
+    'write': lambda cik, rid, value, options={}:
+      (cik, [rid, value, options]),
+    'writegroup': lambda cik, entries, options={}:
+      (cik, [entries, options]),
   }
 
-def main(argv=None):
-  if argv is None:
-    argv = sys.argv
-  onep = OnepV1(verbose=False)
-  clientkey = 'f0cbd65a8d6ec75da52d91a48dfa6e6d05a8d68d'
-  #clientkey = '20df3a8522b2d98834a7d2b36a7fccf4a087b5c6'
-  print(onep.listing(clientkey, ['dataport']))
-  options = {
-      'starttime':1,
-      'endtime':1000000000000,
-      'limit':10,
-      'sort':'desc',
-      'selection':'all'
-      }
-  print(onep.read(clientkey, {'alias': 'sensor_a'}, options))
-  
-if __name__ == "__main__":
-  sys.exit(main())
