@@ -34,12 +34,16 @@ class DeferredRequests():
   def __init__(self):
     self._requests = {}
   def add(self, cik, method, args):
-    '''Append a deferred request for a particular cik.'''
+    '''Append a deferred request for a particular CIK.'''
     self._requests.setdefault(cik, []).append((method, args))
   def has_requests(self, cik):
+    '''Returns True if there are any deferred requests for CIK, False 
+    otherwise.'''
     return (self._requests.has_key(cik) 
         and len(self._requests[cik]) > 0)
   def get_method_args_pairs(self, cik):
+    '''Returns a list of method/arguments pairs corresponding to deferred 
+    requests for this CIK'''
     return self._requests[cik]
 
 
@@ -53,10 +57,33 @@ class OnepV1():
     self._resourceid = None
     self.verbose     = verbose 
     self.deferred    = DeferredRequests() 
+    self.api = [
+        self.activate,
+        self.comment,
+        self.create,
+        self.deactivate,
+        self.drop,
+        self.flush,
+        self.info,
+        self.listing,
+        self.lookup,
+        self.map,
+        self.read,
+        self.record,
+        self.revoke,
+        self.share,
+        self.unmap,
+        self.update,
+        self.write,
+        self.writegroup,
+        ]
+
 
   def _callJsonRPC(self, cik, callrequests):
     '''Calls the Exosite One Platform RPC API.
-      Returns'''
+      If callrequests is of length 1, result is a tuple with this structure: 
+        (success (True or False), response)
+      If callrequests is longer than 1, result is a list of tuples.'''
     auth = self._getAuth(cik)
     jsonreq = {"auth": auth, "calls": callrequests}
     if sys.version_info < (2, 6):
@@ -109,42 +136,12 @@ class OnepV1():
     raise OneException("Unknown error")
 
   def _getAuth(self, cik):
+    '''Create the authorization/identification portion of a request.'''
     if None != self._clientid:
       return {"cik": cik, "client_id": self._clientid}
     elif None != self._resourceid:
       return {"cik": cik, "resource_id": self._resourceid}
     return {"cik": cik}
-
-  def connect_as(self, clientid):
-    self._clientid = clientid
-    self._resourceid = None
-
-  def connect_owner(self, resourceid):
-    self._resourceid = resourceid
-    self._clientid = None
-
-  def __getattr__(self, name):
-    if ARG_MAPPING.has_key(name):
-      return lambda *args, **kwargs: self._call_single(name, *args, **kwargs)
-    else:
-      raise AttributeError
-
-  def _call_single(self, method, *args, **kwargs):
-    if ARG_MAPPING.has_key(method):
-      defer = False
-      if kwargs.has_key('defer'):
-        # remove defer argument before passing to ARG_MAPPING
-        defer = kwargs.pop('defer')
-
-      cik, arg = ARG_MAPPING[method](*args, **kwargs)
-      if defer:
-        self.deferred.add(cik, method, arg)
-        return True 
-      else:
-        calls = self._composeCalls([(method, arg)])
-        return self._callJsonRPC(cik, calls)
-    else:
-      raise AttributeError("No RPC method {0} defined".format(method))
 
   def _composeCalls(self, method_args_pairs):
     calls = []
@@ -156,6 +153,14 @@ class OnepV1():
       i += 1
     return calls
 
+  def _call(self, method, cik, arg, defer):
+    if defer:
+      self.deferred.add(cik, method, arg)
+      return True 
+    else:
+      calls = self._composeCalls([(method, arg)])
+      return self._callJsonRPC(cik, calls)
+ 
   def has_deferred(self, cik):
     return self.deferred.has_requests(cik)
 
@@ -166,43 +171,211 @@ class OnepV1():
       return self._callJsonRPC(cik, calls)
     raise JsonRPCRequestException('No deferred requests to send.') 
 
-# Functions that map arguments to cik, RPC argument pair
-ARG_MAPPING = {
-    'activate': lambda cik, codetype, code:
-      (cik, [codetype, code]),
-    'comment': lambda cik, rid, visibility, comment:
-      (cik, [rid, visibility, comment]),
-    'create': lambda cik, type, desc:
-      (cik, [type, desc]),
-    'deactivate': lambda cik, codetype, code:
-      (cik, [codetype, code]),
-    'drop': lambda cik, rid:
-      (cik, [rid]),
-    'flush': lambda cik, rid:
-      (cik, [rid]),
-    'info': lambda cik, rid, options={}:
-      (cik, [rid, options]),
-    'listing': lambda cik, types:
-      (cik, [types]),
-    'lookup': lambda cik, type, mapping:
-      (cik, [type, mapping]),
-    'map': lambda cik, rid, alias:
-      (cik, ['alias', rid, alias]),
-    'read': lambda cik, rid, options:
-      (cik, [rid, options]),
-    'record': lambda cik, rid, entries, options={}:
-      (cik, [rid, entries,options]),
-    'revoke': lambda cik, codetype, code:
-      (cik, [codetype, code]),
-    'share': lambda cik, rid, options={}:
-      (cik, [rid, options]),
-    'unmap': lambda cik, alias:
-      (cik, ['alias', alias]),
-    'update': lambda cik, rid, desc={}:
-      (cik, [rid, desc]),
-    'write': lambda cik, rid, value, options={}:
-      (cik, [rid, value, options]),
-    'writegroup': lambda cik, entries, options={}:
-      (cik, [entries, options]),
-  }
+  def connect_as(self, clientid):
+    self._clientid = clientid
+    self._resourceid = None
+
+  def connect_owner(self, resourceid):
+    self._resourceid = resourceid
+    self._clientid = None
+
+  # API methods
+
+  def activate(self, cik, codetype, code, defer=False):
+    return self._call('activate', cik, [codetype, code], defer)
+
+  def comment(self, cik, rid, visibility, comment, defer=False):
+    return self._call('comment', cik, [rid, visibility, comment], defer)
+
+  def create(self, cik, type, desc, defer=False):
+    return self._call('create', cik, [type, desc], defer)
+
+  def deactivate(self, cik, codetype, code, defer=False):
+    return self._call('deactivate', cik, [codetype, code], defer)
+
+  def drop(self, cik, rid, defer=False):
+    return self._call('drop', cik, [rid], defer)
+
+  def flush(self, cik, rid, defer=False):
+    return self._call('flush', cik, [rid], defer)
+
+  def info(self, cik, rid, options={}, defer=False):
+    return self._call('info', cik,  [rid, options], defer)
+
+  def listing(self, cik, types, defer=False):
+    return self._call('listing', cik, [types], defer)
+
+  def lookup(self, cik, type, mapping, defer=False):
+    return self._call('lookup', cik, [type, mapping], defer)
+
+  def map(self, cik, rid, alias, defer=False):
+    return self._call('map', cik, ['alias', rid, alias], defer)
+
+  def read(self, cik, rid, options, defer=False):
+    return self._call('read', cik, [rid, options], defer)
+
+  def record(self, cik, rid, entries, options={}, defer=False):
+    return self._call('record', cik, [rid, entries,options], defer)
+
+  def revoke(self, cik, codetype, code, defer=False):
+    return self._call('revoke', cik, [codetype, code], defer)
+
+  def share(self, cik, rid, options={}, defer=False):
+    return self._call('share', cik, [rid, options], defer)
+
+  def unmap(self, cik, alias, defer=False):
+    return self._call('unmap', cik, ['alias', alias], defer)
+
+  def update(self, cik, rid, desc={}, defer=False):
+    return self._call('update', cik, [rid, desc], defer)
+
+  def write(self, cik, rid, value, options={}, defer=False):
+    return self._call('write', cik, [rid, value, options], defer)
+
+  def writegroup(self, cik, entries, options={}, defer=False):
+    return self._call('writegroup', cik, [entries, options], defer)
+
+
+  # High level commands
+  # (Built on top of API)
+
+  def create_dataport(self,
+                      cik,
+                      type,
+                      format,
+                      name="",
+                      preprocess=[],
+                      subscribe="",
+                      visibility="private",
+                      defer=False):
+    desc = {
+     "format": format, 
+     "name": name,
+     "preprocess": preprocess,
+     "subscribe": subscribe,
+     "visibility": visibililty
+      }
+    return self.create(self, cik, type='dataport', desc=desc, defer=defer)
+
+  class Rule():
+    '''Collection of rule generation methods for create_datarule().'''
+
+    @classmethod
+    def simple(cls, comparison, constant, repeat):
+      return {"simple": {
+                "comparison": comparison,
+                "constant": constant,
+                "repeat": repeat}
+                }
+
+    @classmethod
+    def timeout(cls, repeat, timeout):
+      return {"timeout": {
+                "repeat": repeat,
+                "timeout": timeout}
+                }
+    
+    @classmethod
+    def interval(cls, comparison, constant, repeat, timeout):
+      return {"interval": {
+                "comparison": comparison,
+                "constant": constant,
+                "repeat": repeat,
+                "timeout": timeout}
+                }
+
+    @classmethod
+    def duration(cls, comparison, constant, repeat, timeout):
+      return {"duration": {
+                "comparison": comparison,
+                "constant": constant,
+                "repeat": repeat,
+                "timeout": timeout}
+                }
+
+    @classmethod
+    def count(cls, comparison, constant, repeat, timeout):
+      return {"count": {
+                "comparison": comparison,
+                "constant": constant,
+                "count": count,
+                "repeat": repeat,
+                "timeout": timeout}
+                }
+
+  class Operation:
+    ADD = "add"
+    SUB = "sub"
+    MUL = "mul"
+    DIV = "div"
+    MOD = "mod"
+    GT = "gt"
+    GEQ = "geq"
+    LT = "LT"
+    LEQ = "LEQ"
+    EQ = "EQ"
+
+  def create_datarule(self,
+                      cik,
+                      format,
+                      rule,
+                      name="",
+                      preprocess=[],
+                      subscribe="",
+                      visibility="private",
+                      defer=False
+                      ):
+    '''
+    :param cik: client key (string)
+    :param name: name of datarule (string)
+    :param format: type of data to generate ({"integer" or "boolean"})
+    :param rule: rule used to generate data (dict - see `Rule` class)
+    :param preprocess: array in the form [[`Operation`, number], ...]
+    :param subscribe: resource ID (string)
+    :param visibility: accessibility of data ("private" or "public")
+    :param defer: whether to defer until later
+    :rval: See return value for `create`
+    '''
+    desc = {
+      "format": format, #
+      "name": name,
+      "preprocess": preprocess,
+      "rule": rule,
+      "subscribe": subscribe,
+      "visibility": visibililty
+      }
+    return self.create(self, cik, type='datarule', desc=desc, defer=defer)
+
+  def create_datarule(self,
+                      cik,
+                      format,
+                      rule,
+                      name="",
+                      preprocess=[],
+                      subscribe="",
+                      visibility="private",
+                      defer=False
+                      ):
+    '''
+    :param cik: client key (string)
+    :param name: name of datarule (string)
+    :param format: type of data to generate ({"integer" or "boolean"})
+    :param rule: rule used to generate data (dict - see `Rule` class)
+    :param preprocess: array in the form [[`Operation`, number], ...]
+    :param subscribe: resource ID (string)
+    :param visibility: accessibility of data ("private" or "public")
+    :param defer: whether to defer until later
+    :rval: See return value for `create`
+    '''
+    desc = {
+      "format": format, #
+      "name": name,
+      "preprocess": preprocess,
+      "rule": rule,
+      "subscribe": subscribe,
+      "visibility": visibililty
+      }
+    return self.create(self, cik, type='datarule', desc=desc, defer=defer)
+
+
 
