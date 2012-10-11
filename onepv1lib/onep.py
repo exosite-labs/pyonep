@@ -36,6 +36,8 @@ class DeferredRequests():
   def add(self, cik, method, args):
     '''Append a deferred request for a particular CIK.'''
     self._requests.setdefault(cik, []).append((method, args))
+  def reset(self, cik):
+    self._requests.pop(cik)
   def has_requests(self, cik):
     '''Returns True if there are any deferred requests for CIK, False 
     otherwise.'''
@@ -82,8 +84,12 @@ class OnepV1():
   def _callJsonRPC(self, cik, callrequests):
     '''Calls the Exosite One Platform RPC API.
       If callrequests is of length 1, result is a tuple with this structure: 
-        (success (True or False), response)
-      If callrequests is longer than 1, result is a list of tuples.'''
+        (success (boolean), response)
+
+      If callrequests is longer than 1, result is a list of tuples with
+      this structure:
+        (request, success, response)
+        '''
     auth = self._getAuth(cik)
     jsonreq = {"auth": auth, "calls": callrequests}
     if sys.version_info < (2, 6):
@@ -168,7 +174,10 @@ class OnepV1():
     '''Send all deferred requests for a particular cik.'''
     if self.deferred.has_requests(cik):
       calls = self._composeCalls(self.deferred.get_method_args_pairs(cik))
-      return self._callJsonRPC(cik, calls)
+      r = self._callJsonRPC(cik, calls)
+      # remove deferred calls
+      self.deferred.reset(cik)
+      return r
     raise JsonRPCRequestException('No deferred requests to send.') 
 
   def connect_as(self, clientid):
@@ -241,7 +250,6 @@ class OnepV1():
 
   def create_dataport(self,
                       cik,
-                      type,
                       format,
                       name="",
                       preprocess=[],
@@ -249,13 +257,13 @@ class OnepV1():
                       visibility="private",
                       defer=False):
     desc = {
-     "format": format, 
-     "name": name,
-     "preprocess": preprocess,
-     "subscribe": subscribe,
-     "visibility": visibililty
-      }
-    return self.create(self, cik, type='dataport', desc=desc, defer=defer)
+        "format": format, 
+        "name": name,
+        "preprocess": preprocess,
+        "subscribe": subscribe,
+        "visibility": visibility
+        }
+    return self.create(cik, type='dataport', desc=desc, defer=defer)
 
   class Rule():
     '''Collection of rule generation methods for create_datarule().'''
@@ -344,7 +352,7 @@ class OnepV1():
       "subscribe": subscribe,
       "visibility": visibililty
       }
-    return self.create(self, cik, type='datarule', desc=desc, defer=defer)
+    return self.create(cik, type='datarule', desc=desc, defer=defer)
 
   def create_datarule(self,
                       cik,
@@ -375,7 +383,7 @@ class OnepV1():
       "subscribe": subscribe,
       "visibility": visibililty
       }
-    return self.create(self, cik, type='datarule', desc=desc, defer=defer)
+    return self.create(cik, type='datarule', desc=desc, defer=defer)
 
 
 
