@@ -253,6 +253,7 @@ class OnepV1():
                       format,
                       name="",
                       preprocess=[],
+                      retention={"count":"infinity","duration":"infinity"},
                       subscribe="",
                       visibility="private",
                       defer=False):
@@ -260,6 +261,7 @@ class OnepV1():
         "format": format, 
         "name": name,
         "preprocess": preprocess,
+        "retention": retention,
         "subscribe": subscribe,
         "visibility": visibility
         }
