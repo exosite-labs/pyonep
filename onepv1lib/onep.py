@@ -321,71 +321,7 @@ class OnepV1():
     MOD = "mod"
     GT = "gt"
     GEQ = "geq"
-    LT = "LT"
-    LEQ = "LEQ"
-    EQ = "EQ"
-
-  def create_datarule(self,
-                      cik,
-                      format,
-                      rule,
-                      name="",
-                      preprocess=[],
-                      subscribe="",
-                      visibility="private",
-                      defer=False
-                      ):
-    '''
-    :param cik: client key (string)
-    :param name: name of datarule (string)
-    :param format: type of data to generate ({"integer" or "boolean"})
-    :param rule: rule used to generate data (dict - see `Rule` class)
-    :param preprocess: array in the form [[`Operation`, number], ...]
-    :param subscribe: resource ID (string)
-    :param visibility: accessibility of data ("private" or "public")
-    :param defer: whether to defer until later
-    :rval: See return value for `create`
-    '''
-    desc = {
-      "format": format, #
-      "name": name,
-      "preprocess": preprocess,
-      "rule": rule,
-      "subscribe": subscribe,
-      "visibility": visibililty
-      }
-    return self.create(cik, type='datarule', desc=desc, defer=defer)
-
-  def create_datarule(self,
-                      cik,
-                      format,
-                      rule,
-                      name="",
-                      preprocess=[],
-                      subscribe="",
-                      visibility="private",
-                      defer=False
-                      ):
-    '''
-    :param cik: client key (string)
-    :param name: name of datarule (string)
-    :param format: type of data to generate ({"integer" or "boolean"})
-    :param rule: rule used to generate data (dict - see `Rule` class)
-    :param preprocess: array in the form [[`Operation`, number], ...]
-    :param subscribe: resource ID (string)
-    :param visibility: accessibility of data ("private" or "public")
-    :param defer: whether to defer until later
-    :rval: See return value for `create`
-    '''
-    desc = {
-      "format": format, #
-      "name": name,
-      "preprocess": preprocess,
-      "rule": rule,
-      "subscribe": subscribe,
-      "visibility": visibililty
-      }
-    return self.create(cik, type='datarule', desc=desc, defer=defer)
-
-
+    LT = "lt"
+    LEQ = "leq"
+    EQ = "eq"
 
