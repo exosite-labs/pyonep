@@ -20,6 +20,7 @@ from exceptions import *
 transport_config = {'host':'m2.exosite.com',
                     'port':'80',
                     'url':'/api:v1/rpc/process',
+                    'https':False,
                     'timeout':3}
 datastore_config = {'write_buffer_size':1024,
                     'read_cache_size':1024,
@@ -48,7 +49,9 @@ class Datastore():
     self._recordCount = 0
     self._auto = autocreate
     self._config = config
-    self._conn = OnepV1(transport['host'],transport['port'],transport['url'],transport['timeout'])
+    if not transport.has_key('https'):
+        transport['https'] = False
+    self._conn = OnepV1(transport['host'],transport['port'],transport['url'],transport['https'],transport['timeout'])
     self._cik  = cik
     if interval < 1:
       interval = 1

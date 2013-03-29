@@ -25,13 +25,37 @@ except ImportError:
   sys.exit(1)
 
 #===============================================================================
+class ConnectionFactory():
+  """Builds the correct kind of HTTPConnection object."""
+#===============================================================================
+  @staticmethod
+  def make_conn(hostport, https, timeout):
+    """Returns a HTTPConnection(-like) instance.
+
+       hostport: the host and port to connect to, joined by a colon
+       https: boolean indicating whether to use HTTPS
+       timeout: number of seconds to wait for a response before HTTP timeout"""
+    if https:
+      cls = httplib.HTTPSConnection
+    else:
+      cls = httplib.HTTPConnection
+
+    if sys.version_info < (2, 6):
+      conn = cls(hostport)
+    else:
+      conn = cls(hostport, timeout=timeout)
+
+    return conn
+
+#===============================================================================
 class OnepV1():
 #===============================================================================
   headers = {'Content-Type': 'application/json; charset=utf-8'}
 #-------------------------------------------------------------------------------
-  def __init__(self,host='m2.exosite.com',port='80',url='/api:v1/rpc/process',httptimeout=3):
+  def __init__(self,host='m2.exosite.com',port='80',url='/api:v1/rpc/process',https=False,httptimeout=3):
     self.host        = host + ':' + port
     self.url         = url
+    self.https       = https
     self.httptimeout = int(httptimeout)
     self._clientid   = None
     self._resourceid = None
@@ -40,10 +64,8 @@ class OnepV1():
   def __callJsonRPC(self, clientkey, callrequests):
     auth = self.__getAuth(clientkey)
     jsonreq = {"auth":auth,"calls":callrequests}
-    if sys.version_info < (2 , 6):
-     conn = httplib.HTTPConnection(self.host)
-    else:
-     conn = httplib.HTTPConnection(self.host, timeout=self.httptimeout)
+    conn = ConnectionFactory.make_conn(self.host, self.https, self.httptimeout)
+
     param = json.dumps(jsonreq)
     try:
       conn.request("POST", self.url, param, self.headers)
