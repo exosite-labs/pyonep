@@ -26,7 +26,6 @@ except ImportError:
   print "The package '%s' is required." % json_module
   sys.exit(1)
 
-
 class DeferredRequests():
   '''Encapsulates a list of deferred requests for each CIK. Once the requests
     are ready to be sent, get_method_args_pairs() returns a list of the method
@@ -48,12 +47,37 @@ class DeferredRequests():
     requests for this CIK'''
     return self._requests[cik]
 
+#===============================================================================
+class ConnectionFactory():
+  """Builds the correct kind of HTTPConnection object."""
+#===============================================================================
+  @staticmethod
+  def make_conn(hostport, https, timeout):
+    """Returns a HTTPConnection(-like) instance.
 
+       hostport: the host and port to connect to, joined by a colon
+       https: boolean indicating whether to use HTTPS
+       timeout: number of seconds to wait for a response before HTTP timeout"""
+    if https:
+      cls = httplib.HTTPSConnection
+    else:
+      cls = httplib.HTTPConnection
+
+    if sys.version_info < (2, 6):
+      conn = cls(hostport)
+    else:
+      conn = cls(hostport, timeout=timeout)
+
+    return conn
+
+#===============================================================================
 class OnepV1():
   headers = {'Content-Type': 'application/json; charset=utf-8'}
-  def __init__(self,host='logicpd.m2.exosite.com',port='80',url='/api:v1/rpc/process',httptimeout=3,verbose=False):
+
+  def __init__(self,host='logicpd.m2.exosite.com',port='80',url='/api:v1/rpc/process',https=False,httptimeout=3,verbose=False):
     self.host        = host + ':' + port
     self.url         = url
+    self.https       = https
     self.httptimeout = int(httptimeout)
     self._clientid   = None
     self._resourceid = None
@@ -75,6 +99,13 @@ class OnepV1():
       conn = httplib.HTTPConnection(self.host)
     else:
       conn = httplib.HTTPConnection(self.host, timeout=self.httptimeout)
+
+#-------------------------------------------------------------------------------
+  def __callJsonRPC(self, clientkey, callrequests):
+    auth = self.__getAuth(clientkey)
+    jsonreq = {"auth":auth,"calls":callrequests}
+    conn = ConnectionFactory.make_conn(self.host, self.https, self.httptimeout)
+
     param = json.dumps(jsonreq)
     if self.verbose: print("Request JSON: {0}".format(param))
     try:
@@ -226,4 +257,3 @@ class OnepV1():
 
   def writegroup(self, cik, entries, options={}, defer=False):
     return self._call('writegroup', cik, [entries, options], defer)
-
