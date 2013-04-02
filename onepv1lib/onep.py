@@ -51,7 +51,9 @@ class DeferredRequests():
 
 class OnepV1():
   headers = {'Content-Type': 'application/json; charset=utf-8'}
-  def __init__(self,host='m2.exosite.com',port='80',url='/api:v1/rpc/process',httptimeout=3,verbose=False):
+  def __init__(self,host='logicpd.m2.exosite.com',port='80',url='/api:v1/rpc/process',httptimeout=3,verbose=False):
+    print "OnepV1: " + host
+    print "new version!"
     self.host        = host + ':' + port
     self.url         = url
     self.httptimeout = int(httptimeout)
@@ -80,13 +82,12 @@ class OnepV1():
         self.writegroup,
         ]
 
-
-  def _callJsonRPC(self, cik, callrequests):
+  def _callJsonRPC(self, cik, callrequests, returnreq=False):
     '''Calls the Exosite One Platform RPC API.
-      If callrequests is of length 1, result is a tuple with this structure: 
+      If returnreq is False, result is a tuple with this structure: 
         (success (boolean), response)
 
-      If callrequests is longer than 1, result is a list of tuples with
+      If returnreq is True, result is a list of tuples with
       this structure:
         (request, success, response)
         '''
@@ -133,12 +134,13 @@ class OnepV1():
             ret.append((request, False, r['status']))
         elif r.has_key('error'):
           raise OnePlatformException(str(r['error']))
-      if len(ret) == 1:
-        # backward compatibility: return just True/False and 'ok'/result/status
-        # as before
-        return ret[0][1:]
-      else:
+      if returnreq:
         return ret
+      else:
+        # backward compatibility: return just True/False and
+        # 'ok'/result/status as before
+        return ret[0][1:]
+
     raise OneException("Unknown error")
 
   def _getAuth(self, cik):
@@ -174,7 +176,7 @@ class OnepV1():
     '''Send all deferred requests for a particular cik.'''
     if self.deferred.has_requests(cik):
       calls = self._composeCalls(self.deferred.get_method_args_pairs(cik))
-      r = self._callJsonRPC(cik, calls)
+      r = self._callJsonRPC(cik, calls, returnreq=True)
       # remove deferred calls
       self.deferred.reset(cik)
       return r
