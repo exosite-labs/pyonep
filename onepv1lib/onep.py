@@ -29,7 +29,7 @@ except ImportError:
 
 class DeferredRequests():
   '''Encapsulates a list of deferred requests for each CIK. Once the requests
-    are ready to be sent, get_method_args_pairs() returns a list of the method 
+    are ready to be sent, get_method_args_pairs() returns a list of the method
     name and arguments for each request.'''
   def __init__(self):
     self._requests = {}
@@ -39,12 +39,12 @@ class DeferredRequests():
   def reset(self, cik):
     self._requests.pop(cik)
   def has_requests(self, cik):
-    '''Returns True if there are any deferred requests for CIK, False 
+    '''Returns True if there are any deferred requests for CIK, False
     otherwise.'''
-    return (self._requests.has_key(cik) 
+    return (self._requests.has_key(cik)
         and len(self._requests[cik]) > 0)
   def get_method_args_pairs(self, cik):
-    '''Returns a list of method/arguments pairs corresponding to deferred 
+    '''Returns a list of method/arguments pairs corresponding to deferred
     requests for this CIK'''
     return self._requests[cik]
 
@@ -58,8 +58,8 @@ class OnepV1():
     self.httptimeout = int(httptimeout)
     self._clientid   = None
     self._resourceid = None
-    self.verbose     = verbose 
-    self.deferred    = DeferredRequests() 
+    self.verbose     = verbose
+    self.deferred    = DeferredRequests()
     self.api = [
         self.activate,
         self.comment,
@@ -81,9 +81,9 @@ class OnepV1():
         self.writegroup,
         ]
 
-  def _callJsonRPC(self, cik, callrequests, returnreq=False):
+  def _callJsonRPC(self, cik, callrequests, returnreq=False, showhttp=False):
     '''Calls the Exosite One Platform RPC API.
-      If returnreq is False, result is a tuple with this structure: 
+      If returnreq is False, result is a tuple with this structure:
         (success (boolean), response)
 
       If returnreq is True, result is a list of tuples with
@@ -99,11 +99,14 @@ class OnepV1():
     param = json.dumps(jsonreq)
     if self.verbose: print("Request JSON: {0}".format(param))
     try:
+
+      if showhttp: print("POST {}\nBody: {}\nHeaders: {}".format(self.url, param, self.headers))
       conn.request("POST", self.url, param, self.headers)
     except Exception:
       raise JsonRPCRequestException("Failed to make http request.")
     try:
       read = conn.getresponse().read()
+      if showhttp: print("Response: {}".format(read))
     except Exception:
       if self.verbose: print sys.exc_info()[0]
       raise JsonRPCResponseException("Failed to get response for request.")
@@ -117,7 +120,7 @@ class OnepV1():
     if isinstance(res, list):
       ret = []
       for r in res:
-        # first, find the matching request so we can return it 
+        # first, find the matching request so we can return it
         # along with the response.
         request = None
         for call in callrequests:
@@ -152,7 +155,7 @@ class OnepV1():
 
   def _composeCalls(self, method_args_pairs):
     calls = []
-    i = 1 
+    i = 1
     for method, args in method_args_pairs:
       calls.append({'id': i,
                     'procedure': method,
@@ -163,11 +166,11 @@ class OnepV1():
   def _call(self, method, cik, arg, defer):
     if defer:
       self.deferred.add(cik, method, arg)
-      return True 
+      return True
     else:
       calls = self._composeCalls([(method, arg)])
       return self._callJsonRPC(cik, calls)
- 
+
   def has_deferred(self, cik):
     return self.deferred.has_requests(cik)
 
@@ -179,7 +182,7 @@ class OnepV1():
       # remove deferred calls
       self.deferred.reset(cik)
       return r
-    raise JsonRPCRequestException('No deferred requests to send.') 
+    raise JsonRPCRequestException('No deferred requests to send.')
 
   def connect_as(self, clientid):
     self._clientid = clientid
@@ -259,7 +262,7 @@ class OnepV1():
                       visibility="private",
                       defer=False):
     desc = {
-        "format": format, 
+        "format": format,
         "name": name,
         "preprocess": preprocess,
         "retention": retention,
@@ -285,7 +288,7 @@ class OnepV1():
                 "repeat": repeat,
                 "timeout": timeout}
                 }
-    
+
     @classmethod
     def interval(cls, comparison, constant, repeat, timeout):
       return {"interval": {
