@@ -7,7 +7,6 @@
 ##
 ## Tested with python 2.7.2
 ##
-# vim: tabstop=2 expandtab shiftwidth=2 softtabstop=2 smarttab
 
 import argparse
 import random
