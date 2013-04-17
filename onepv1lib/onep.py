@@ -52,7 +52,6 @@ class DeferredRequests():
 class OnepV1():
   headers = {'Content-Type': 'application/json; charset=utf-8'}
   def __init__(self,host='logicpd.m2.exosite.com',port='80',url='/api:v1/rpc/process',httptimeout=3,verbose=False):
-    print "OnepV1: " + host
     self.host        = host + ':' + port
     self.url         = url
     self.httptimeout = int(httptimeout)
