@@ -11,8 +11,8 @@
 ## All rights reserved.
 ##
 # vim: tabstop=2 expandtab shiftwidth=2 softtabstop=2 smarttab
-
-import sys,httplib
+import sys
+import httplib
 from onep_exceptions import *
 
 try:
@@ -59,26 +59,6 @@ class OnepV1():
     self._resourceid = None
     self.verbose     = verbose
     self.deferred    = DeferredRequests()
-    self.api = [
-        self.activate,
-        self.comment,
-        self.create,
-        self.deactivate,
-        self.drop,
-        self.flush,
-        self.info,
-        self.listing,
-        self.lookup,
-        self.map,
-        self.read,
-        self.record,
-        self.revoke,
-        self.share,
-        self.unmap,
-        self.update,
-        self.write,
-        self.writegroup,
-        ]
 
   def _callJsonRPC(self, cik, callrequests, returnreq=False, showhttp=False):
     '''Calls the Exosite One Platform RPC API.
@@ -246,85 +226,4 @@ class OnepV1():
 
   def writegroup(self, cik, entries, options={}, defer=False):
     return self._call('writegroup', cik, [entries, options], defer)
-
-
-  # High level commands
-  # (Built on top of API)
-
-  def create_dataport(self,
-                      cik,
-                      format,
-                      name="",
-                      preprocess=[],
-                      retention={"count":"infinity","duration":"infinity"},
-                      subscribe="",
-                      visibility="private",
-                      defer=False):
-    desc = {
-        "format": format,
-        "name": name,
-        "preprocess": preprocess,
-        "retention": retention,
-        "subscribe": subscribe,
-        "visibility": visibility
-        }
-    return self.create(cik, type='dataport', desc=desc, defer=defer)
-
-  class Rule():
-    '''Collection of rule generation methods for create_datarule().'''
-
-    @classmethod
-    def simple(cls, comparison, constant, repeat):
-      return {"simple": {
-                "comparison": comparison,
-                "constant": constant,
-                "repeat": repeat}
-                }
-
-    @classmethod
-    def timeout(cls, repeat, timeout):
-      return {"timeout": {
-                "repeat": repeat,
-                "timeout": timeout}
-                }
-
-    @classmethod
-    def interval(cls, comparison, constant, repeat, timeout):
-      return {"interval": {
-                "comparison": comparison,
-                "constant": constant,
-                "repeat": repeat,
-                "timeout": timeout}
-                }
-
-    @classmethod
-    def duration(cls, comparison, constant, repeat, timeout):
-      return {"duration": {
-                "comparison": comparison,
-                "constant": constant,
-                "repeat": repeat,
-                "timeout": timeout}
-                }
-
-    @classmethod
-    def count(cls, comparison, constant, repeat, timeout):
-      return {"count": {
-                "comparison": comparison,
-                "constant": constant,
-                "count": count,
-                "repeat": repeat,
-                "timeout": timeout}
-                }
-
-  class Operation:
-    ADD = "add"
-    SUB = "sub"
-    MUL = "mul"
-    DIV = "div"
-    MOD = "mod"
-    GT = "gt"
-    GEQ = "geq"
-    LT = "lt"
-    LEQ = "leq"
-    EQ = "eq"
 
