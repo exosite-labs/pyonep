@@ -94,22 +94,11 @@ class OnepV1():
         (request, success, response)
         '''
     auth = self._getAuth(cik)
-    jsonreq = {"auth": auth, "calls": callrequests}
-    if sys.version_info < (2, 6):
-      conn = httplib.HTTPConnection(self.host)
-    else:
-      conn = httplib.HTTPConnection(self.host, timeout=self.httptimeout)
-
-#-------------------------------------------------------------------------------
-  def __callJsonRPC(self, clientkey, callrequests):
-    auth = self.__getAuth(clientkey)
     jsonreq = {"auth":auth,"calls":callrequests}
     conn = ConnectionFactory.make_conn(self.host, self.https, self.httptimeout)
-
     param = json.dumps(jsonreq)
     if self.verbose: print("Request JSON: {0}".format(param))
     try:
-
       if showhttp: print("POST {}\nBody: {}\nHeaders: {}".format(self.url, param, self.headers))
       conn.request("POST", self.url, param, self.headers)
     except Exception:
