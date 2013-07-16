@@ -1,7 +1,7 @@
 from distutils.core import setup
 
 setup(name='onepv1lib',
-      version='0.5',
+      version='0.6',
       url='http://github.com/dweaver/pyonep',
       author='Dan Weaver',
       author_email='danweaver@exosite.com',

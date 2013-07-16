@@ -246,3 +246,6 @@ class OnepV1():
 
   def writegroup(self, cik, entries, options={}, defer=False):
     return self._call('writegroup', cik, [entries, options], defer)
+
+  def usage(self, cik, rid, metric, starttime, endtime, defer=False):
+    return self._call('usage', cik, [rid, metric, starttime, endtime], defer)

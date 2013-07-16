@@ -27,7 +27,8 @@ Installation
 
 2.) Navigate into the root "pyonep" directory
 
-3.) Install the package:<br>
+3.) Install the package:
+
 	python setup.py install
 
 4.) If you do not want to install the package, or cannot due to system 
@@ -37,41 +38,65 @@ script.  Or, alternatively, add the ./onepv1lib folder to your sys.path.
 ========================================
 Quick Start
 ========================================
-To use the pyonep Exosite API, import per:<br>
+To use the pyonep Exosite API, import per:
+
 	from onepv1lib.datastore import Datastore
 
-This library requires you to initialize with the following parameters:<br>
---) cik: a 40 character "client interface key" that authenticates your 
-        application with the One Platform<br>
---) interval: number of seconds between One Platform publish activity.  Even if
+This library requires you to initialize with the following parameters:
+
+- cik: a 40 character "client interface key" that authenticates your 
+        application with the One Platform
+
+- interval: number of seconds between One Platform publish activity.  Even if
         your application calls the "write" function more often than this 
-        interval, the data will be grouped to be published at this interval<br>
---) autocreate: dataport parameter setup - see the One Platform documentation
-        for more information about dataport parameters.<br>
---) datastore_config: local write buffer and read cache parameter setup<br>
---) transport_config: Exosite server parameter setup<br>
+        interval, the data will be grouped to be published at this interval
+
+- autocreate: dataport parameter setup - see the One Platform documentation
+        for more information about dataport parameters.
+
+- datastore_config: local write buffer and read cache parameter setup
+
+- transport_config: Exosite server parameter setup
 
 For examples, reference example scripts in the ./onepv1lib/examples/ folder.  
 Note that to run the examples without installing the pyonep package, the 
 example script must be located in the root folder (with ./onepv1lib as a 
 sub-folder).
 
+It is also possible to use onep.py directly, passing the cik with each request.
+
 For more information on the API, reference Exosite online documentation.
 
-========================================
 Release Info
-========================================
-----------------------------------------
+============
+
+Release 0.6
+-----------
+
+- add usage command
+
+Release 0.5
+-----------
+
+- add support for https
+
+
+Release 0.4
+-----------
+
+- add support for sending multiple commands in a single request
+
 Release 0.3
-----------------------------------------
---) add provisioning library<br>
+-----------
 
-----------------------------------------
+- add provisioning library
+
 Release 0.2
-----------------------------------------
---) updated example code<br>
+-----------
 
-----------------------------------------
+- updated example code
+
 Release 0.1
-----------------------------------------
---) initial version<br>
+-----------
+
+- initial version
