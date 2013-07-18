@@ -1,7 +1,7 @@
- ========================================
+========================================
 About pyonep
 ========================================
-This project contains a package called "onepv1lib".  The onepv1lib package is an
+This project contains a package called "pyonep".  The pyonep package is an
 API library with python bindings to the Exosite One Platform API.  The API is 
 exposed over HTTP in a JSON RPC style interface.
 
@@ -32,15 +32,19 @@ Installation
 	python setup.py install
 
 4.) If you do not want to install the package, or cannot due to system 
-limitations, simply copy the ./onepv1lib folder into the same folder as your
-script.  Or, alternatively, add the ./onepv1lib folder to your sys.path.
+limitations, simply copy the ./pyonep/pyonep folder into the same folder as your
+script.  Or, alternatively, add the ./pyonep/pyonep folder to your sys.path.
 
 ========================================
 Quick Start
 ========================================
-To use the pyonep Exosite API, import per:
 
-	from onepv1lib.datastore import Datastore
+There are two primary ways to use pyonep: buffered
+access, and direct access. 
+
+1.) Buffered access: import per:
+
+	from pyonep.datastore import Datastore
 
 This library requires you to initialize with the following parameters:
 
@@ -58,45 +62,15 @@ This library requires you to initialize with the following parameters:
 
 - transport_config: Exosite server parameter setup
 
-For examples, reference example scripts in the ./onepv1lib/examples/ folder.  
+For examples, reference example scripts in the ./pyonep/examples/ folder.  
 Note that to run the examples without installing the pyonep package, the 
-example script must be located in the root folder (with ./onepv1lib as a 
+example script must be located in the root folder (with ./pyonep as a 
 sub-folder).
 
-It is also possible to use onep.py directly, passing the cik with each request.
+2.) It is also possible to use onep.py directly, passing the cik with each request.
 
-For more information on the API, reference Exosite online documentation.
+For more information on the API, see:
 
-Release Info
-============
+http://developers.exosite.com
 
-Release 0.6
------------
-
-- add usage command
-
-Release 0.5
------------
-
-- add support for https
-
-
-Release 0.4
------------
-
-- add support for sending multiple commands in a single request
-
-Release 0.3
------------
-
-- add provisioning library
-
-Release 0.2
------------
-
-- updated example code
-
-Release 0.1
------------
-
-- initial version
+reference Exosite online documentation.

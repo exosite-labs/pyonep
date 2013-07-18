@@ -11,10 +11,9 @@
 import argparse
 import random
 from pprint import pprint
-from onepv1lib import onep
+from pyonep import onep
 
 
-#===============================================================================
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Upload script to Exosite')
     parser.add_argument('cik', help='CIK of device')

@@ -1,4 +1,4 @@
-from onepv1lib.provision import Provision
+from pyonep.provision import Provision
 
 if __name__ == '__main__':
   ownercik  = 'VENDOR-CIK'
@@ -31,6 +31,6 @@ if __name__ == '__main__':
   provision.content_upload(ownercik, model, content_id, content_data, "text/plain")
   print provision.content_info(ownercik, model, content_id)
   provision.content_download(sn_cik, vendor, model, content_id)
-  provision.content_remove(ownercik, model, content_id)  
+  provision.content_remove(ownercik, model, content_id)
   provision.model_remove(ownercik, model)
   provision.vendor_unregister(ownercik, vendor)

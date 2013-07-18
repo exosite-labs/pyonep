@@ -1,10 +1,19 @@
-from distutils.core import setup
+from setuptools import setup
 
-setup(name='onepv1lib',
-      version='0.6',
+with open('requirements.txt') as f:
+    required = f.read().splitlines()
+
+setup(name='pyonep',
+      version='0.7.0',
       url='http://github.com/dweaver/pyonep',
-      author='Dan Weaver',
+      author='Exosite',
       author_email='danweaver@exosite.com',
       description='Python bindings for Exosite API over HTTP JSON RPC.',
-      packages=['onepv1lib'],
+      long_description = open('README.md').read() + '\n\n' +
+                         open('HISTORY.md').read(),
+      packages=['pyonep'],
+      package_dir={'exoline': 'exoline'},
+      keywords=['exosite', 'onep', 'one platform', 'm2m'],
+      install_requires=required,
+      zip_safe=False,
       )

@@ -241,11 +241,11 @@ class OnepV1():
   def update(self, cik, rid, desc={}, defer=False):
     return self._call('update', cik, [rid, desc], defer)
 
+  def usage(self, cik, rid, metric, starttime, endtime, defer=False):
+    return self._call('usage', cik, [rid, metric, starttime, endtime], defer)
+
   def write(self, cik, rid, value, options={}, defer=False):
     return self._call('write', cik, [rid, value, options], defer)
 
   def writegroup(self, cik, entries, options={}, defer=False):
     return self._call('writegroup', cik, [entries, options], defer)
-
-  def usage(self, cik, rid, metric, starttime, endtime, defer=False):
-    return self._call('usage', cik, [rid, metric, starttime, endtime], defer)
