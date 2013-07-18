@@ -99,8 +99,8 @@ class Datastore():
         return res
 
 #-------------------------------------------------------------------------------
-  def __read(self,alias,count=1,sort='desc',starttime=None,endtime=None):
-    rid = self.__lookup(alias)
+  def __read(self,alias,count=1,forcequery=False,sort='desc',starttime=None,endtime=None):
+    rid = self.__lookup(alias,forcequery)
     if None != starttime and None != endtime:
       status,res = self._conn.read(self._cik,rid,{"starttime":starttime,"endtime":endtime,"limit":count,"sort":sort})
     else:
@@ -195,7 +195,7 @@ class Datastore():
           self.__writegroup(livedata)
           logger.info("[Live] Written to 1p:" + str(livedata))
         except OneException,e: # go to historical data when write live data failure
-          print e.message
+          logger.warn(e.message)
           lock.acquire()
           try:
             for (alias,value) in livedata:
@@ -225,14 +225,20 @@ class Datastore():
                 else:
                   recentry.append([entry[0], entry[1]])
               if recentry:
-                self.__record(alias,recentry)
-                logger.info("[Historical] Written to 1p: " + alias + ", " + str(recentry))
-                self._recordCount -= len(entries)
-                del self._recordBuffer[alias]
+                try:
+                  self.__record(alias,recentry)
+                  logger.info("[Historical] Written to 1p: " + alias + ", " + str(recentry))
+                  self._recordCount -= len(entries)
+                  del self._recordBuffer[alias]
+                except OneException,e:
+                  if e.message.find("datapoint") != -1:
+                    print e.message
+                    self._recordCount -= len(entries)
+                    del self._recordBuffer[alias]
             else:
               del self._recordBuffer[alias]
           except OneException,e:
-            logger.error(e.message)
+            logger.warn(e.message)
             continue
       finally:
         lock.release()
@@ -243,11 +249,11 @@ class Datastore():
 # Read cache routines below
 #==============================================================================
 #-------------------------------------------------------------------------------
-  def __addCacheData(self,alias,count):
+  def __addCacheData(self,alias,count,forcequery=False):
     if self.__isCacheFull():
       self.__clearCache()
     self._cache[alias] = dict()
-    data = self.__refreshData(alias,count)
+    data = self.__refreshData(alias,count,forcequery)
     if data:
       self._cacheCount += 1
     return data
@@ -270,15 +276,15 @@ class Datastore():
     self._cacheCount = 0
 
 #-------------------------------------------------------------------------------
-  def __refreshData(self,alias,count):
+  def __refreshData(self,alias,count,forcequery=False):
     try:
       time.sleep(1)
-      data = self.__read(alias,count)
+      data = self.__read(alias,count,forcequery)
       self._cache[alias]['data'] = data
       self._cache[alias]['time'] = int(time.time())
       return data
     except OneException,e:
-      logger.error(e.message)
+      logger.warn(e.message)
     except Exception,e:
       print sys.exc_info()[0]
       logger.error("Unknown error when reading data.")
@@ -312,14 +318,14 @@ class Datastore():
         return False,"Failed to create Dataport."
 
 #-------------------------------------------------------------------------------
-  def read(self,alias,count=1):
+  def read(self,alias,count=1,forcequery=False):
     if self._cache.has_key(alias): #has cache data
       if self.__isExpired(alias) or count != len(self._cache[alias]['data']):
-        return self.__refreshData(alias,count)
+        return self.__refreshData(alias,count,forcequery)
       else:
         return self._cache[alias]['data']
     else: #no cache data
-      return self.__addCacheData(alias,count)
+      return self.__addCacheData(alias,count,forcequery)
 
 #-------------------------------------------------------------------------------
   def record(self,alias,entries):

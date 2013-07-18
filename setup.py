@@ -5,9 +5,9 @@ with open('requirements.txt') as f:
 
 setup(name='pyonep',
       version='0.7.0',
-      url='http://github.com/dweaver/pyonep',
+      url='http://github.com/exosite-labs/pyonep',
       author='Exosite',
-      author_email='danweaver@exosite.com',
+      author_email='labs@exosite.com',
       description='Python bindings for Exosite API over HTTP JSON RPC.',
       long_description = open('README.md').read() + '\n\n' +
                          open('HISTORY.md').read(),

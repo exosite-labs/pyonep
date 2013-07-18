@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 #==============================================================================
 # onep.py
 # Main API library class for Exosite's Data Platform as exposed over HTTP JSON
@@ -109,6 +108,8 @@ class OnepV1():
     except Exception:
       if self.verbose: print sys.exc_info()[0]
       raise JsonRPCResponseException("Failed to get response for request.")
+    finally:
+      conn.close()
     try:
       res = json.loads(read)
       if self.verbose: print("Response JSON: {0}".format(res))

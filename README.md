@@ -72,5 +72,3 @@ sub-folder).
 For more information on the API, see:
 
 http://developers.exosite.com
-
-reference Exosite online documentation.
