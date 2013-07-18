@@ -10,7 +10,7 @@
 ##
 # vim: tabstop=2 expandtab shiftwidth=2 softtabstop=2 smarttab
 
-import urllib, urllib2, socket
+import urllib, urllib2, socket, logging
 from urllib2 import Request, urlopen, URLError, HTTPError
 # timeout in seconds
 timeout = 5
@@ -22,6 +22,8 @@ PROVISION_MANAGE           = PROVISION_BASE + '/manage'
 PROVISION_MANAGE_MODEL     = PROVISION_MANAGE + '/model/'
 PROVISION_MANAGE_CONTENT   = PROVISION_MANAGE + '/content/'
 PROVISION_REGISTER         = PROVISION_BASE + '/register'
+
+log = logging.getLogger(__name__)
 
 class Provision(object):
   def __init__(self, host='http://m2.exosite.com', manage_by_cik=True):
@@ -57,11 +59,11 @@ class Provision(object):
       resp.close()
       return resp_data
     except HTTPError, e:
-      print 'Http error code: ' + str(e.code)
+      log.error('HTTP error code: {0}'.format(e.code))
     except URLError, e:
-      print 'Failed to reach server! Reason: ' + str(e.reason)
+      log.error('Failed to reach server! Reason: {0}'.format(e.reason))
     except Exception,e:
-      print "Caught exception from provision:", e
+      log.exception("Caught exception from provision:")
     return None
 
   def content_create(self, key, model, contentid, description):

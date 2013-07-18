@@ -28,13 +28,7 @@ datastore_config = {'write_buffer_size':1024,
                     'read_cache_expire_time':5,
                     'log_level':'debug'}
 
-logdict = {'debug':logging.DEBUG, 'info':logging.INFO, 'warn':logging.WARN, 'error':logging.ERROR}
-logger = logging.getLogger("Datastore")
-ch = logging.StreamHandler()
-formatter = logging.Formatter("[%(levelname)s %(asctime)s %(funcName)s:%(lineno)d] %(message)s")
-ch.setFormatter(formatter)
-logger.addHandler(ch)
-
+log = logging.getLogger(__name__)
 lock = threading.Lock()
 
 #==============================================================================
@@ -57,7 +51,6 @@ class Datastore():
     if interval < 1:
       interval = 1
     self._interval = interval
-    logger.setLevel(logdict[self._config['log_level']])
 
 #-------------------------------------------------------------------------------
   def __bufferCount(self):
@@ -141,10 +134,10 @@ class Datastore():
         return True
       else:
         self._conn.drop(self._cik,rid)
-        logger.error(map_message)
+        log.error(map_message)
         return False
     else:
-      logger.error(rid)
+      log.error(rid)
       return False
 
 #-------------------------------------------------------------------------------
@@ -157,7 +150,7 @@ class Datastore():
           raise OneException("Fail to create dataport.")
         return True
       else:
-        logger.warn("Data source does not exist while not in AUTO_CREATE mode.")
+        log.warn("Data source does not exist while not in AUTO_CREATE mode.")
         return False
 
 #==============================================================================
@@ -177,7 +170,7 @@ class Datastore():
           try:
             if self.__checkDataportExist(alias): # create datasource if necessary
               livedata.append([alias,value]) # Move to live data
-              logger.debug("Data to be written (alias,value): ('%s',%s)" % (alias,value) )
+              log.debug("Data to be written (alias,value): ('%s',%s)" % (alias,value) )
           except OneException: #catch exception, add to recordBuffer
             if not self._recordBuffer.has_key(alias):
                 self._recordBuffer[alias] = list()
@@ -193,9 +186,9 @@ class Datastore():
         timestamp = int(time.time())
         try:
           self.__writegroup(livedata)
-          logger.info("[Live] Written to 1p:" + str(livedata))
+          log.info("[Live] Written to 1p:" + str(livedata))
         except OneException,e: # go to historical data when write live data failure
-          logger.warn(e.message)
+          log.exception(e.message)
           lock.acquire()
           try:
             for (alias,value) in livedata:
@@ -207,7 +200,7 @@ class Datastore():
           finally:
             lock.release()
         except Exception,e:
-          print sys.exc_info()[0]
+          log.exception("Unknown Exception While Writing Data")
       ## write historical data
       lock.acquire()
       try:
@@ -227,18 +220,18 @@ class Datastore():
               if recentry:
                 try:
                   self.__record(alias,recentry)
-                  logger.info("[Historical] Written to 1p: " + alias + ", " + str(recentry))
+                  log.info("[Historical] Written to 1p: " + alias + ", " + str(recentry))
                   self._recordCount -= len(entries)
                   del self._recordBuffer[alias]
                 except OneException,e:
                   if e.message.find("datapoint") != -1:
-                    print e.message
+                    log.excption(e.message)
                     self._recordCount -= len(entries)
                     del self._recordBuffer[alias]
             else:
               del self._recordBuffer[alias]
           except OneException,e:
-            logger.warn(e.message)
+            log.error(e.message)
             continue
       finally:
         lock.release()
@@ -284,10 +277,9 @@ class Datastore():
       self._cache[alias]['time'] = int(time.time())
       return data
     except OneException,e:
-      logger.warn(e.message)
+      log.error(e.message)
     except Exception,e:
-      print sys.exc_info()[0]
-      logger.error("Unknown error when reading data.")
+      log.excpetion("Unknown Exception While Refreshing Data")
     return False
 
 #==============================================================================
@@ -369,12 +361,12 @@ class Datastore():
       try:
         if self._liveBuffer.has_key(alias):
           self._liveBuffer[alias] = value
-          logger.debug("Update the (alias,value) in buffer:%s,%s" % (alias,value))
+          log.debug("Update the (alias,value) in buffer:%s,%s" % (alias,value))
           return False
         else:
           self._liveBuffer[alias] = value
       finally:
         lock.release()
-      logger.debug("Current buffer count: %s" % self.__bufferCount())
-      logger.debug("Add to buffer:%s,%s" % (alias,value))
+      log.debug("Current buffer count: %s" % self.__bufferCount())
+      log.debug("Add to buffer:%s,%s" % (alias,value))
       return True

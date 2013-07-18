@@ -10,9 +10,10 @@
 ## All rights reserved.
 ##
 # vim: tabstop=2 expandtab shiftwidth=2 softtabstop=2 smarttab
-import sys
-import httplib
+import sys, httplib, logging
 from exceptions import *
+
+log = logging.getLogger(__name__)
 
 try:
   if sys.version_info < (2 , 6):
@@ -22,7 +23,7 @@ try:
     json_module= 'python-json'
     import json
 except ImportError:
-  print "The package '%s' is required." % json_module
+  log.critical("The package '{0}' is required.".format(json_module))
   sys.exit(1)
 
 class DeferredRequests():
@@ -73,17 +74,16 @@ class ConnectionFactory():
 class OnepV1():
   headers = {'Content-Type': 'application/json; charset=utf-8'}
 
-  def __init__(self,host='logicpd.m2.exosite.com',port='80',url='/api:v1/rpc/process',https=False,httptimeout=3,verbose=False):
+  def __init__(self,host='logicpd.m2.exosite.com',port='80',url='/api:v1/rpc/process',https=False,httptimeout=3):
     self.host        = host + ':' + port
     self.url         = url
     self.https       = https
     self.httptimeout = int(httptimeout)
     self._clientid   = None
     self._resourceid = None
-    self.verbose     = verbose
     self.deferred    = DeferredRequests()
 
-  def _callJsonRPC(self, cik, callrequests, returnreq=False, showhttp=False):
+  def _callJsonRPC(self, cik, callrequests, returnreq=False):
     '''Calls the Exosite One Platform RPC API.
       If returnreq is False, result is a tuple with this structure:
         (success (boolean), response)
@@ -96,23 +96,23 @@ class OnepV1():
     jsonreq = {"auth":auth,"calls":callrequests}
     conn = ConnectionFactory.make_conn(self.host, self.https, self.httptimeout)
     param = json.dumps(jsonreq)
-    if self.verbose: print("Request JSON: {0}".format(param))
+    log.debug("Request JSON: {0}".format(param))
     try:
-      if showhttp: print("POST {}\nBody: {}\nHeaders: {}".format(self.url, param, self.headers))
+      log.debug("POST {}\nBody: {}\nHeaders: {}".format(self.url, param, self.headers))
       conn.request("POST", self.url, param, self.headers)
     except Exception:
       raise JsonRPCRequestException("Failed to make http request.")
     try:
       read = conn.getresponse().read()
-      if showhttp: print("Response: {}".format(read))
+      log.debug("Response: {}".format(read))
     except Exception:
-      if self.verbose: print sys.exc_info()[0]
+      log.exception("Exception While Reading Response")
       raise JsonRPCResponseException("Failed to get response for request.")
     finally:
       conn.close()
     try:
       res = json.loads(read)
-      if self.verbose: print("Response JSON: {0}".format(res))
+      log.debug("Response JSON: {0}".format(res))
     except:
       raise OnePlatformException("Return invalid response value.")
     if isinstance(res, dict) and res.has_key('error'):
