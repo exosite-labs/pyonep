@@ -13,7 +13,7 @@
 # vim: tabstop=2 expandtab shiftwidth=2 softtabstop=2 smarttab
 import sys
 import httplib
-from onep_exceptions import *
+from exceptions import *
 
 try:
   if sys.version_info < (2 , 6):
