@@ -26,9 +26,10 @@ PROVISION_REGISTER         = PROVISION_BASE + '/register'
 log = logging.getLogger(__name__)
 
 class Provision(object):
-  def __init__(self, host='http://m2.exosite.com', manage_by_cik=True):
+  def __init__(self, host='http://m2.exosite.com', manage_by_cik=False, verbose=False):
     self._host = host
     self._manage_by_cik = manage_by_cik
+    self._verbose=verbose
 
   def _filter_options(self, aliases=True, comments= True, historical=True):
     options = []
@@ -37,14 +38,14 @@ class Provision(object):
     if not historical: options.append('nohistorical')
     return options
 
-  def _request(self, path, key, data, method, is_cik=True, extra_headers={}):
+  def _request(self, path, key, data, method, key_is_cik=False, extra_headers={}):
     if method == "GET":
       url = self._host + path + '?' + data
       req = urllib2.Request(url)
     else:
       url = self._host + path
       req = urllib2.Request(url, data)
-    if is_cik:
+    if key_is_cik:
       req.add_header('X-Exosite-CIK',key)
     else:
       req.add_header('X-Exosite-Token',key)
@@ -53,6 +54,10 @@ class Provision(object):
     for name in extra_headers.keys():
       req.add_header(name, extra_headers[name])
     req.get_method = lambda : method
+    if self._verbose:
+      print('URL: ' + req.get_full_url())
+      print('HEADERS: ' + str(req.header_items()))
+      print('DATA: ' + str(req.data))
     try:
       resp = urllib2.urlopen(req)
       resp_data = resp.read()
@@ -67,8 +72,8 @@ class Provision(object):
       log.exception("Caught exception from provision:")
     return None
 
-  def content_create(self, key, model, contentid, description):
-    data = urllib.urlencode({'id':contentid, 'description':description})
+  def content_create(self, key, model, contentid, meta):
+    data = urllib.urlencode({'id':contentid, 'meta':meta})
     path = PROVISION_MANAGE_CONTENT + model + '/'
     return self._request(path, key, data, 'POST', self._manage_by_cik) != None
 
@@ -178,7 +183,7 @@ class Provision(object):
 
   def vendor_register(self, key, vendor):
     data = urllib.urlencode({'vendor':vendor})
-    return self._request(PROVISION_REGISTER, key, data, 'POST') != None
+    return self._request(PROVISION_REGISTER, key, data, 'POST', self._manage_by_cik) != None
 
   def vendor_show(self, key):
     return self._request(PROVISION_REGISTER, key, '', 'GET')
