@@ -60,6 +60,7 @@ class Provision(object):
       return resp_data
     except HTTPError, e:
       log.error('HTTP error code: {0}'.format(e.code))
+      log.debug("On Request To: {0}  With Data: {1}".format(url, data))
     except URLError, e:
       log.error('Failed to reach server! Reason: {0}'.format(e.reason))
     except Exception,e:

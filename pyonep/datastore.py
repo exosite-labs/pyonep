@@ -188,7 +188,8 @@ class Datastore():
           self.__writegroup(livedata)
           log.info("[Live] Written to 1p:" + str(livedata))
         except OneException,e: # go to historical data when write live data failure
-          log.exception(e.message)
+          log.error("Exception While Writing Live Data: {0}".format(e.message))
+          log.debug("Previous Exception For: {0}".format(livedata))
           lock.acquire()
           try:
             for (alias,value) in livedata:

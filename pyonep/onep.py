@@ -98,7 +98,7 @@ class OnepV1():
     param = json.dumps(jsonreq)
     log.debug("Request JSON: {0}".format(param))
     try:
-      log.debug("POST {}\nBody: {}\nHeaders: {}".format(self.url, param, self.headers))
+      log.debug("POST {}\nHeaders: {}\nBody: {}".format(self.url, self.headers, param))
       conn.request("POST", self.url, param, self.headers)
     except Exception:
       raise JsonRPCRequestException("Failed to make http request.")
