@@ -1,6 +1,15 @@
 History
 =======
 
+0.7.2 (2013-7-19)
+-----------------
+
+- updated provisioning library for api change to use "meta" field
+- updated provisioning library to use vendor token by default
+- improved logging 
+- fixed issue record offset is 0 in datastore
+- reverted back to using distutils for python 2.6 support
+
 0.7.1 (2013-7-18)
 -----------------
 
