@@ -1,6 +1,13 @@
 History
 =======
 
+0.7.1 (2013-7-18)
+-----------------
+
+- merge a few bug fixes from Exosite internal repo
+- remove comment command
+- fix multiple command example 
+
 0.7.0 (2013-7-18)
 -----------------
 

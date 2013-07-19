@@ -197,9 +197,6 @@ class OnepV1():
   def activate(self, cik, codetype, code, defer=False):
     return self._call('activate', cik, [codetype, code], defer)
 
-  def comment(self, cik, rid, visibility, comment, defer=False):
-    return self._call('comment', cik, [rid, visibility, comment], defer)
-
   def create(self, cik, type, desc, defer=False):
     return self._call('create', cik, [type, desc], defer)
 
