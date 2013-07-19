@@ -1,4 +1,4 @@
-from setuptools import setup
+from distutils.core import setup
 
 setup(name='pyonep',
       version='0.7.1',
@@ -11,5 +11,4 @@ setup(name='pyonep',
       packages=['pyonep'],
       package_dir={'exoline': 'exoline'},
       keywords=['exosite', 'onep', 'one platform', 'm2m'],
-      zip_safe=False,
       )
