@@ -215,6 +215,7 @@ class Datastore():
               for entry in entries:
                 if True == entry[2]: #offset mode
                   offset = entry[0] - curtime
+                  if offset == 0: offset = -1 #Must be a negative number.
                   recentry.append([offset, entry[1]])
                 else:
                   recentry.append([entry[0], entry[1]])
