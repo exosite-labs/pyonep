@@ -15,9 +15,10 @@ from pyonep import onep
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Upload script to Exosite')
+    parser = argparse.ArgumentParser(
+        description='Demonstrate sending two commands in one request')
     parser.add_argument('cik', help='CIK of device')
-    parser.add_argument('alias', help='alias')
+    parser.add_argument('alias', help='alias of float format datasource')
     args = parser.parse_args()
 
     o = onep.OnepV1()
@@ -29,7 +30,7 @@ if __name__ == '__main__':
             defer=True)
     o.read(
         args.cik,
-        {'alias': 'config'},
+        {'alias': args.alias},
         {'limit': 1, 'sort': 'desc', 'selection': 'all'},
         defer=True)
 

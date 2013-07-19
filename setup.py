@@ -4,12 +4,12 @@ with open('requirements.txt') as f:
     required = f.read().splitlines()
 
 setup(name='pyonep',
-      version='0.7.0',
+      version='0.7.1',
       url='http://github.com/exosite-labs/pyonep',
       author='Exosite',
       author_email='labs@exosite.com',
       description='Python bindings for Exosite API over HTTP JSON RPC.',
-      long_description = open('README.md').read() + '\n\n' +
+      long_description=open('README.md').read() + '\n\n' +
                          open('HISTORY.md').read(),
       packages=['pyonep'],
       package_dir={'exoline': 'exoline'},
