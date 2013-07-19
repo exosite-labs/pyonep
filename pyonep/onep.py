@@ -10,7 +10,7 @@
 ## All rights reserved.
 ##
 # vim: tabstop=2 expandtab shiftwidth=2 softtabstop=2 smarttab
-import sys, httplib, logging
+import sys, httplib, logging, random
 from exceptions import *
 
 log = logging.getLogger(__name__)
@@ -155,7 +155,7 @@ class OnepV1():
 
   def _composeCalls(self, method_args_pairs):
     calls = []
-    i = 1
+    i = random.randint(1,99)
     for method, args in method_args_pairs:
       calls.append({'id': i,
                     'procedure': method,
