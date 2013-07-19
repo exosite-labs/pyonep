@@ -1,8 +1,5 @@
 from setuptools import setup
 
-with open('requirements.txt') as f:
-    required = f.read().splitlines()
-
 setup(name='pyonep',
       version='0.7.1',
       url='http://github.com/exosite-labs/pyonep',
@@ -14,6 +11,5 @@ setup(name='pyonep',
       packages=['pyonep'],
       package_dir={'exoline': 'exoline'},
       keywords=['exosite', 'onep', 'one platform', 'm2m'],
-      install_requires=required,
       zip_safe=False,
       )
