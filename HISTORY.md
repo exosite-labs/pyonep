@@ -1,6 +1,12 @@
 History
 =======
 
+0.7.3 (2013-7-19)
+-----------------
+
+- fixed issue with format in python 2.6
+- fixed exception messages
+
 0.7.2 (2013-7-19)
 -----------------
 

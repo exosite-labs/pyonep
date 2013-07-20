@@ -1,7 +1,7 @@
 from distutils.core import setup
 
 setup(name='pyonep',
-      version='0.7.2',
+      version='0.7.3',
       url='http://github.com/exosite-labs/pyonep',
       author='Exosite',
       author_email='labs@exosite.com',
