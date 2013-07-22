@@ -87,6 +87,29 @@ RPC API, which may offer better performance in some cases.
 See examples/read\_write\_record.py for more details. 
 
 
+Migration from version 0.3
+--------------------------
+
+If you were previously using version 0.3 and want to upgrade to 0.7.4,
+you will need to update the package name in your scripts. The package name
+was updated from onepv1lib to pyonep. For example:
+
+```bash
+
+from onepv1lib import pyonep
+```
+
+...should be changed to:
+
+```bash
+
+from pyonep import onep
+```
+
+A global search and replace of onepv1lib to pyonep in your scripts should 
+work.
+
+
 Example Scripts
 ---------------
 
