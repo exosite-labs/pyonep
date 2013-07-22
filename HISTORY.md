@@ -1,6 +1,12 @@
 History
 =======
 
+0.7.4 (2013-7-22)
+-----------------
+
+- fixed support for python 2.5
+- added example of using onep.py directly
+
 0.7.3 (2013-7-19)
 -----------------
 
