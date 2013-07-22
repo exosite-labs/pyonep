@@ -2,9 +2,15 @@ About pyonep
 ============
 
 The pyonep package is an API library with python bindings to the 
-Exosite One Platform API.
+following Exosite One Platform APIs:
 
-http://developers.exosite.com/display/OP/API
+- RPC: http://developers.exosite.com/display/OP/Remote+Procedure+Call+API
+- Provisioning/Device Management: http://developers.exosite.com/pages/viewpage.action?pageId=1179705
+
+Note that this library does not yet support the HTTP Data Interface, 
+which is a minimal HTTP API best suited for reading and writing data on 
+resource-constrained devices. More info on that here: 
+http://developers.exosite.com/display/OP/HTTP+Data+Interface+API
 
 Supports python 2.5 through 2.7
 
