@@ -13,6 +13,15 @@ License is BSD, Copyright 2011, Exosite LLC (see LICENSE file)
 Installation
 ------------
 
+Install from python package index: 
+
+```bash
+
+    $ pip install pyonep
+```
+
+Or install from source:
+
 ```bash
 
     $ git clone https://github.com/exosite-labs/pyonep
