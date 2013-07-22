@@ -136,7 +136,7 @@ was updated from onepv1lib to pyonep. For example:
 
 ```bash
 
-from onepv1lib import pyonep
+from onepv1lib import onep
 ```
 
 ...should be changed to:
