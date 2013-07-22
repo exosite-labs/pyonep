@@ -190,7 +190,7 @@ The HTTP Data Interface is a minimal HTTP API best suited to resource-constraine
 devices or networks. It is limited to reading and writing data one point at a 
 time. An example of using Python to access this interface is here:
 
-https://github.com/exosite-garage/python\_helloworld/blob/master/python\_helloworld.py
+https://github.com/exosite-garage/python_helloworld
 
 Here is a description of the API:
 
