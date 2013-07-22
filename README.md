@@ -1,13 +1,14 @@
 About pyonep
 ============
 
-This project contains a package called "pyonep".  The pyonep package is an
-API library with python bindings to the Exosite One Platform API.  The API is 
-exposed over HTTP in a JSON RPC style interface.
+The pyonep package is an API library with python bindings to the 
+Exosite One Platform API.
+
+http://developers.exosite.com/display/OP/API
 
 Supports python 2.5 through 2.7
 
-License is BSD, Copyright 2011, Exosite LLC (see LICENSE file)
+License is BSD, Copyright 2013, Exosite LLC (see LICENSE file)
 
 
 Installation
