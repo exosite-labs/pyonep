@@ -1,77 +1,118 @@
- ========================================
 About pyonep
-========================================
-This project contains a package called "onepv1lib".  The onepv1lib package is an
+============
+
+This project contains a package called "pyonep".  The pyonep package is an
 API library with python bindings to the Exosite One Platform API.  The API is 
 exposed over HTTP in a JSON RPC style interface.
 
-Recommended with python 2.6 or later.
+Supports python 2.5 through 2.7
 
 License is BSD, Copyright 2011, Exosite LLC (see LICENSE file)
 
-========================================
-Required Python Packages
-========================================
-****************************************
-1) python-simplejson  (python 2.5 and earlier only)
-****************************************
-https://github.com/simplejson/simplejson
 
-Simplejson only necessary for python version 2.5 and earlier.  For python 2.6 
-and later, the library uses the native "python-json" package.
-
-========================================
 Installation
-========================================
-1.) Unpack the distribution archive (if necessary)
+------------
 
-2.) Navigate into the root "pyonep" directory
+Install from python package index: 
 
-3.) Install the package:<br>
-	python setup.py install
+```bash
 
-4.) If you do not want to install the package, or cannot due to system 
-limitations, simply copy the ./onepv1lib folder into the same folder as your
-script.  Or, alternatively, add the ./onepv1lib folder to your sys.path.
+    $ pip install pyonep
+```
 
-========================================
-Quick Start
-========================================
-To use the pyonep Exosite API, import per:<br>
-	from onepv1lib.datastore import Datastore
+Or install from source:
 
-This library requires you to initialize with the following parameters:<br>
---) cik: a 40 character "client interface key" that authenticates your 
-        application with the One Platform<br>
---) interval: number of seconds between One Platform publish activity.  Even if
-        your application calls the "write" function more often than this 
-        interval, the data will be grouped to be published at this interval<br>
---) autocreate: dataport parameter setup - see the One Platform documentation
-        for more information about dataport parameters.<br>
---) datastore_config: local write buffer and read cache parameter setup<br>
---) transport_config: Exosite server parameter setup<br>
+```bash
 
-For examples, reference example scripts in the ./onepv1lib/examples/ folder.  
+    $ git clone https://github.com/exosite-labs/pyonep
+    $ cd pyonep
+	$ python setup.py install
+```
+
+Note: If you'd rather not install the package, you can also copy the 
+./pyonep/pyonep folder into the same folder as your script, or 
+add the ./pyonep/pyonep folder to your sys.path. 
+
+If you're running a version of python earlier than 2.6 you'll need the 
+python-simplejson package, available here: 
+
+https://pypi.python.org/pypi/simplejson/
+
+
+Getting A CIK
+-------------
+
+Access to the Exosite API requires a Client Information Key (CIK). If 
+you're just getting started with the API and have signed up with a 
+community portal, here's how you can find a CIK:
+
+1.) Log in: https://portals.exosite.com
+
+2.) Click on "devices" on the menu on the left
+
+3.) Click on a device to open its properties
+
+4.) The device's CIK is displayed on the left
+
+Once you have a CIK, you can substitute it in the examples below.
+
+
+Usage
+-----
+
+Here's how to get information about a device:
+
+```python
+
+from pyonep import onep
+from pprint import pprint
+
+o = onep.OnepV1()
+
+cik = 'INSERT_CIK'
+
+pprint(o.info(
+    cik,
+    {'alias': ''}))
+```
+
+
+Buffered Access
+---------------
+
+The pyonep library includes a module that provides buffered access to the
+RPC API, which may offer better performance in some cases.
+
+See examples/read\_write\_record.py for more details. 
+
+
+Example Scripts
+---------------
+
+Examples are located in examples/. To run them, first modify them with your
+device information.
+
+- get_info.py - uses the onep module to send a single command
+
+- mult_cmd.py - uses the onep module to send
+
+- read_write_record.py - demonstrates use of the datastore module
+
+- provisioning.py - uses the provision module to provision some 
+
 Note that to run the examples without installing the pyonep package, the 
-example script must be located in the root folder (with ./onepv1lib as a 
+example script must be located in the root folder (with ./pyonep as a 
 sub-folder).
 
-For more information on the API, reference Exosite online documentation.
+For a example that fully exercises the RPC interface, see the exosite command
+line interface: 
 
-========================================
-Release Info
-========================================
-----------------------------------------
-Release 0.3
-----------------------------------------
---) add provisioning library<br>
+http://github.com/dweaver/exoline
 
-----------------------------------------
-Release 0.2
-----------------------------------------
---) updated example code<br>
 
-----------------------------------------
-Release 0.1
-----------------------------------------
---) initial version<br>
+General API Information
+-----------------------
+
+For more information on the API, see:
+
+http://developers.exosite.com

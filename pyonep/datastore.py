@@ -1,7 +1,7 @@
 #==============================================================================
 # datastore.py
 # Buffering, caching and batch functions for access to the Exosite Data Platform
-# using the JSON RPC API over HTTP.  
+# using the JSON RPC API over HTTP.
 # This layer was written so that a system with many subcriber/provider tasks
 # could simulataneously access the platform efficiently.
 #==============================================================================
@@ -11,6 +11,7 @@
 ## Copyright (c) 2010, Exosite LLC
 ## All rights reserved.
 ##
+# vim: tabstop=2 expandtab shiftwidth=2 softtabstop=2 smarttab
 
 import threading,time,sys,logging
 from onep import OnepV1
@@ -20,23 +21,18 @@ from exceptions import *
 transport_config = {'host':'m2.exosite.com',
                     'port':'80',
                     'url':'/api:v1/rpc/process',
+                    'https':False,
                     'timeout':3}
 datastore_config = {'write_buffer_size':1024,
                     'read_cache_size':1024,
                     'read_cache_expire_time':5,
                     'log_level':'debug'}
 
-logdict = {'debug':logging.DEBUG, 'info':logging.INFO, 'warn':logging.WARN, 'error':logging.ERROR}
-logger = logging.getLogger("Datastore")
-ch = logging.StreamHandler()
-formatter = logging.Formatter("[%(levelname)s %(asctime)s %(funcName)s:%(lineno)d] %(message)s")
-ch.setFormatter(formatter)
-logger.addHandler(ch)
-
+log = logging.getLogger(__name__)
 lock = threading.Lock()
 
 #==============================================================================
-class Datastore():  
+class Datastore():
 #==============================================================================
 #-------------------------------------------------------------------------------
   def __init__(self,cik,interval,autocreate=False,config=datastore_config,transport=transport_config):
@@ -48,12 +44,13 @@ class Datastore():
     self._recordCount = 0
     self._auto = autocreate
     self._config = config
-    self._conn = OnepV1(transport['host'],transport['port'],transport['url'],transport['timeout'])
+    if not transport.has_key('https'):
+        transport['https'] = False
+    self._conn = OnepV1(transport['host'],transport['port'],transport['url'],transport['https'],transport['timeout'])
     self._cik  = cik
     if interval < 1:
       interval = 1
     self._interval = interval
-    logger.setLevel(logdict[self._config['log_level']])    
 
 #-------------------------------------------------------------------------------
   def __bufferCount(self):
@@ -68,7 +65,7 @@ class Datastore():
     if self._liveBuffer:
       return False
     else:
-      return True    
+      return True
 
 #-------------------------------------------------------------------------------
   def __forceTerminate(self):
@@ -95,17 +92,17 @@ class Datastore():
         return res
 
 #-------------------------------------------------------------------------------
-  def __read(self,alias,count=1,sort='desc',starttime=None,endtime=None):
-    rid = self.__lookup(alias)
+  def __read(self,alias,count=1,forcequery=False,sort='desc',starttime=None,endtime=None):
+    rid = self.__lookup(alias,forcequery)
     if None != starttime and None != endtime:
       status,res = self._conn.read(self._cik,rid,{"starttime":starttime,"endtime":endtime,"limit":count,"sort":sort})
     else:
       status,res = self._conn.read(self._cik,rid,{"limit":count,"sort":sort})
     if not status:
-      raise OneException("Error message from one platform (read): %s" % res) 
+      raise OneException("Error message from one platform (read): %s" % res)
     return res
 
-#------------------------------------------------------------------------------- 
+#-------------------------------------------------------------------------------
   def __record(self,alias,entries):
     rid = self.__lookup(alias)
     record_status,record_message = self._conn.record(self._cik,rid,entries)
@@ -117,11 +114,11 @@ class Datastore():
   def __writegroup(self,entries):
     data = list()
     for (alias,value) in entries:
-      rid = self.__lookup(alias)     
+      rid = self.__lookup(alias)
       data.append([rid,value])
     write_status,write_message = self._conn.writegroup(self._cik,data)
     if not (True == write_status and 'ok' == write_message):
-      raise OneException("Error message from one platform (write): %s,%s" % (value,write_message))    
+      raise OneException("Error message from one platform (write): %s,%s" % (value,write_message))
     return True
 
 #-------------------------------------------------------------------------------
@@ -137,10 +134,10 @@ class Datastore():
         return True
       else:
         self._conn.drop(self._cik,rid)
-        logger.error(map_message)
+        log.error(map_message)
         return False
     else:
-      logger.error(rid)
+      log.error(rid)
       return False
 
 #-------------------------------------------------------------------------------
@@ -152,8 +149,8 @@ class Datastore():
         if not self.__createDataport(alias=alias,format=self._auto['format'],preprocess=self._auto['preprocess'],count=self._auto['count'],duration=self._auto['duration'],visibility=self._auto['visibility']):
           raise OneException("Fail to create dataport.")
         return True
-      else: 
-        logger.warn("Data source does not exist while not in AUTO_CREATE mode.")
+      else:
+        log.warn("Data source does not exist while not in AUTO_CREATE mode.")
         return False
 
 #==============================================================================
@@ -162,7 +159,7 @@ class Datastore():
 #-------------------------------------------------------------------------------
   def __processJsonRPC(self):
     while not self.__forceTerminate():
-      time.sleep(self._interval)      
+      time.sleep(self._interval)
       livedata = list()
       lock.acquire()
       try:
@@ -173,27 +170,28 @@ class Datastore():
           try:
             if self.__checkDataportExist(alias): # create datasource if necessary
               livedata.append([alias,value]) # Move to live data
-              logger.debug("Data to be written (alias,value): ('%s',%s)" % (alias,value) )
+              log.debug("Data to be written (alias,value): ('%s',%s)" % (alias,value) )
           except OneException: #catch exception, add to recordBuffer
             if not self._recordBuffer.has_key(alias):
                 self._recordBuffer[alias] = list()
             self._recordBuffer[alias].append([timestamp,value,True])
             self._recordCount += 1
-          finally:   
+          finally:
             del self._liveBuffer[alias]
       finally:
         self._liveBuffer.clear()
-        lock.release() 
+        lock.release()
       # write live data
       if livedata:
         timestamp = int(time.time())
         try:
           self.__writegroup(livedata)
-          logger.info("[Live] Written to 1p:" + str(livedata))
+          log.info("[Live] Written to 1p:" + str(livedata))
         except OneException,e: # go to historical data when write live data failure
-          print e.message
+          log.error("Exception While Writing Live Data: {0}".format(e.message))
+          log.debug("Previous Exception For: {0}".format(livedata))
           lock.acquire()
-          try:             
+          try:
             for (alias,value) in livedata:
               if not self._recordBuffer.has_key(alias):
                 self._recordBuffer[alias] = list()
@@ -203,7 +201,7 @@ class Datastore():
           finally:
             lock.release()
         except Exception,e:
-          print sys.exc_info()[0]         
+          log.exception("Unknown Exception While Writing Data")
       ## write historical data
       lock.acquire()
       try:
@@ -212,38 +210,45 @@ class Datastore():
         for alias in aliases:
           entries = self._recordBuffer[alias]
           try:
-            if self.__checkDataportExist(alias):  
+            if self.__checkDataportExist(alias):
               recentry = list()
               for entry in entries:
                 if True == entry[2]: #offset mode
                   offset = entry[0] - curtime
+                  if offset == 0: offset = -1 #Must be a negative number.
                   recentry.append([offset, entry[1]])
                 else:
-                  recentry.append([entry[0], entry[1]])   
+                  recentry.append([entry[0], entry[1]])
               if recentry:
-                self.__record(alias,recentry)
-                logger.info("[Historical] Written to 1p: " + alias + ", " + str(recentry))
-                self._recordCount -= len(entries)          
-                del self._recordBuffer[alias]
+                try:
+                  self.__record(alias,recentry)
+                  log.info("[Historical] Written to 1p: " + alias + ", " + str(recentry))
+                  self._recordCount -= len(entries)
+                  del self._recordBuffer[alias]
+                except OneException,e:
+                  if e.message.find("datapoint") != -1:
+                    log.excption(e.message)
+                    self._recordCount -= len(entries)
+                    del self._recordBuffer[alias]
             else:
               del self._recordBuffer[alias]
           except OneException,e:
-            logger.error(e.message)
-            continue    
+            log.error(e.message)
+            continue
       finally:
-        lock.release()     
+        lock.release()
       if self._killed and not self._recordBuffer:
-        self._forceterminate = True   
+        self._forceterminate = True
 
 #==============================================================================
 # Read cache routines below
 #==============================================================================
 #-------------------------------------------------------------------------------
-  def __addCacheData(self,alias,count):
+  def __addCacheData(self,alias,count,forcequery=False):
     if self.__isCacheFull():
       self.__clearCache()
-    self._cache[alias] = dict()  
-    data = self.__refreshData(alias,count)
+    self._cache[alias] = dict()
+    data = self.__refreshData(alias,count,forcequery)
     if data:
       self._cacheCount += 1
     return data
@@ -266,18 +271,17 @@ class Datastore():
     self._cacheCount = 0
 
 #-------------------------------------------------------------------------------
-  def __refreshData(self,alias,count):
+  def __refreshData(self,alias,count,forcequery=False):
     try:
       time.sleep(1)
-      data = self.__read(alias,count)
+      data = self.__read(alias,count,forcequery)
       self._cache[alias]['data'] = data
-      self._cache[alias]['time'] = int(time.time())     
+      self._cache[alias]['time'] = int(time.time())
       return data
     except OneException,e:
-      logger.error(e.message)
+      log.error(e.message)
     except Exception,e:
-      print sys.exc_info()[0]
-      logger.error("Unknown error when reading data.")
+      log.excpetion("Unknown Exception While Refreshing Data")
     return False
 
 #==============================================================================
@@ -308,14 +312,14 @@ class Datastore():
         return False,"Failed to create Dataport."
 
 #-------------------------------------------------------------------------------
-  def read(self,alias,count=1):
+  def read(self,alias,count=1,forcequery=False):
     if self._cache.has_key(alias): #has cache data
       if self.__isExpired(alias) or count != len(self._cache[alias]['data']):
-        return self.__refreshData(alias,count)
+        return self.__refreshData(alias,count,forcequery)
       else:
         return self._cache[alias]['data']
     else: #no cache data
-      return self.__addCacheData(alias,count)
+      return self.__addCacheData(alias,count,forcequery)
 
 #-------------------------------------------------------------------------------
   def record(self,alias,entries):
@@ -327,7 +331,7 @@ class Datastore():
         self._recordBuffer[alias] = list()
       for (t,value) in entries:
         recentry = [t,value,False]
-        self._recordBuffer[alias].append(recentry)      
+        self._recordBuffer[alias].append(recentry)
     finally:
       lock.release()
 
@@ -354,17 +358,17 @@ class Datastore():
   def write(self,alias,value):
     if self.__isBufferFull() or not (self._auto or self.__lookup(alias)):
       return False
-    else:      
+    else:
       lock.acquire()
       try:
         if self._liveBuffer.has_key(alias):
           self._liveBuffer[alias] = value
-          logger.debug("Update the (alias,value) in buffer:%s,%s" % (alias,value))
-          return False 
+          log.debug("Update the (alias,value) in buffer:%s,%s" % (alias,value))
+          return False
         else:
-          self._liveBuffer[alias] = value        
+          self._liveBuffer[alias] = value
       finally:
         lock.release()
-      logger.debug("Current buffer count: %s" % self.__bufferCount())
-      logger.debug("Add to buffer:%s,%s" % (alias,value))
+      log.debug("Current buffer count: %s" % self.__bufferCount())
+      log.debug("Add to buffer:%s,%s" % (alias,value))
       return True
