@@ -1,18 +1,16 @@
 About pyonep
 ============
 
-The pyonep package is an API library with python bindings to the 
+The pyonep package is an API library with Python bindings to the 
 following Exosite One Platform APIs:
 
 - RPC: http://developers.exosite.com/display/OP/Remote+Procedure+Call+API
 - Provisioning/Device Management: http://developers.exosite.com/pages/viewpage.action?pageId=1179705
 
-Note that this library does not yet support the HTTP Data Interface, 
-which is a minimal HTTP API best suited for reading and writing data on 
-resource-constrained devices. More info on that here: 
-http://developers.exosite.com/display/OP/HTTP+Data+Interface+API
+Note that this library does not yet support the HTTP Data Interface. See
+below for more information.
 
-Supports python 2.5 through 2.7
+Supports Python 2.5 through 2.7
 
 License is BSD, Copyright 2013, Exosite LLC (see LICENSE file)
 
@@ -20,7 +18,7 @@ License is BSD, Copyright 2013, Exosite LLC (see LICENSE file)
 Installation
 ------------
 
-Install from python package index: 
+Install from Python package index: 
 
 ```bash
 
@@ -40,7 +38,7 @@ Note: If you'd rather not install the package, you can also copy the
 ./pyonep/pyonep folder into the same folder as your script, or 
 add the ./pyonep/pyonep folder to your sys.path. 
 
-If you're running a version of python earlier than 2.6 you'll need the 
+If you're running a version of Python earlier than 2.6 you'll need the 
 python-simplejson package, available here: 
 
 https://pypi.python.org/pypi/simplejson/
@@ -138,7 +136,7 @@ was updated from onepv1lib to pyonep. For example:
 
 ```bash
 
-from onepv1lib import pyonep
+from onepv1lib import onep
 ```
 
 ...should be changed to:
@@ -184,3 +182,16 @@ General API Information
 For more information on the API, see:
 
 http://developers.exosite.com
+
+HTTP Data Interface
+-------------------
+
+The HTTP Data Interface is a minimal HTTP API best suited to resource-constrained 
+devices or networks. It is limited to reading and writing data one point at a 
+time. An example of using Python to access this interface is here:
+
+https://github.com/exosite-garage/python\_helloworld/blob/master/python\_helloworld.py
+
+Here is a description of the API:
+
+http://developers.exosite.com/display/OP/HTTP+Data+Interface+API
