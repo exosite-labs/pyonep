@@ -61,7 +61,38 @@ Once you have a CIK, you can substitute it in the examples below.
 Usage
 -----
 
-Here's how to get information about a device:
+Write and read from a device dataport:
+
+```python
+
+from pyonep import onep
+
+o = onep.OnepV1()
+
+cik = 'INSERT_CIK'
+dataport_alias = 'INSERT_ALIAS'
+val_to_write = '1'
+
+o.write(
+    cik,
+    {"alias": dataport_alias},
+    val_to_write,
+    {})
+
+isok, response = o.read(
+    cik,
+    {'alias': dataport_alias},
+    {'limit': 1, 'sort': 'desc', 'selection': 'all'})
+
+if isok:
+    # expect Read back [[1374522992, 1]]
+    print("Read back %s" % response)
+else:
+    print("Read failed: %s" % response)
+
+```
+
+Get information about a device:
 
 ```python
 
@@ -71,12 +102,17 @@ from pprint import pprint
 o = onep.OnepV1()
 
 cik = 'INSERT_CIK'
+dataport_alias = 'INSERT_ALIAS'
+val_to_write = '1'
 
+# get information about the client 
 pprint(o.info(
     cik,
     {'alias': ''}))
 ```
 
+RPC API documentation:
+http://developers.exosite.com/display/OP/Remote+Procedure+Call+API
 
 Buffered Access
 ---------------
@@ -116,13 +152,15 @@ Example Scripts
 Examples are located in examples/. To run them, first modify them with your
 device information.
 
-- get_info.py - uses the onep module to send a single command
+- read_write_direct.py - writes to a resource and then reads back
+
+- get_info.py - gets information about a client
 
 - mult_cmd.py - uses the onep module to send
 
-- read_write_record.py - demonstrates use of the datastore module
+- read_write_buffered.py - demonstrates use of the datastore module
 
-- provisioning.py - uses the provision module to provision some 
+- provisioning.py - demonstrates use of the provisioning API
 
 Note that to run the examples without installing the pyonep package, the 
 example script must be located in the root folder (with ./pyonep as a 
