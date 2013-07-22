@@ -9,34 +9,25 @@ Recommended with python 2.6 or later.
 
 License is BSD, Copyright 2011, Exosite LLC (see LICENSE file)
 
-Required Python Packages
-------------------------
-
-1.) python-simplejson  (python 2.5 and earlier only)
-
-https://github.com/simplejson/simplejson
-
-Simplejson only necessary for python version 2.5 and earlier.  For python 2.6 
-and later, the library uses the native "python-json" package.
 
 Installation
 ------------
 
-1.) Unpack the distribution archive (if necessary)
-
-2.) Navigate into the root "pyonep" directory
-
-3.) Install the package:
-
 ```bash
 
-    git clone https://github.com/exosite-labs/pyonep
-	python setup.py install
+    $ git clone https://github.com/exosite-labs/pyonep
+    $ cd pyonep
+	$ python setup.py install
 ```
 
-If you'd rather not install the package, you can also copy the 
+Note: If you'd rather not install the package, you can also copy the 
 ./pyonep/pyonep folder into the same folder as your script, or 
-add the ./pyonep/pyonep folder to your sys.path.
+add the ./pyonep/pyonep folder to your sys.path. 
+
+If you're running a version of python earlier than 2.6 you'll need the 
+python-simplejson package, available here: 
+
+https://pypi.python.org/pypi/simplejson/
 
 
 Getting A CIK
@@ -48,11 +39,11 @@ community portal, here's how you can find a CIK:
 
 1.) Log in: https://portals.exosite.com
 
-2.) Click on *devices* on the left
+2.) Click on "devices" on the menu on the left
 
 3.) Click on a device to open its properties
 
-4.) The device's CIK is a 40 character alphanumeric identifier labeled CIK:
+4.) The device's CIK is displayed on the left
 
 Once you have a CIK, you can substitute it in the examples below.
 

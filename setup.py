@@ -1,5 +1,20 @@
 from distutils.core import setup
 
+required = []
+
+try:
+    import json
+except ImportError:
+    try:
+        import simplejson
+        print("###### running python version earlier than 2.6 but simplejson is present")
+    except ImportError:
+
+        print("######")
+        print("###### pyonep requires python-simplejson for use with Python 2.5")
+        print("###### It may be found here: https://pypi.python.org/pypi/simplejson/")
+        print("######")
+
 setup(name='pyonep',
       version='0.7.3',
       url='http://github.com/exosite-labs/pyonep',
@@ -10,5 +25,7 @@ setup(name='pyonep',
                          open('HISTORY.md').read(),
       packages=['pyonep'],
       package_dir={'exoline': 'exoline'},
-      keywords=['exosite', 'onep', 'one platform', 'm2m'],
+      keywords=['exosite', 'onep', 'one platform', 'm2m']
+      # Not supported by distutils
+      # install_requires=required
       )

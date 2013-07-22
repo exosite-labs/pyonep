@@ -15,6 +15,11 @@ from exceptions import *
 
 log = logging.getLogger(__name__)
 
+# log errors stderr, don't log anything else
+h = logging.StreamHandler()
+h.setLevel(logging.ERROR)
+log.addHandler(h)
+
 try:
   if sys.version_info < (2 , 6):
     json_module= 'python-simplejson'
@@ -23,7 +28,7 @@ try:
     json_module= 'python-json'
     import json
 except ImportError:
-  log.critical("The package '{0}' is required.".format(json_module))
+  log.critical("The package '%s' is required." % json_module)
   sys.exit(1)
 
 class DeferredRequests():
@@ -96,15 +101,15 @@ class OnepV1():
     jsonreq = {"auth":auth,"calls":callrequests}
     conn = ConnectionFactory.make_conn(self.host, self.https, self.httptimeout)
     param = json.dumps(jsonreq)
-    log.debug("Request JSON: {0}".format(param))
+    log.debug("Request JSON: %s" % param)
     try:
-      log.debug("POST {0}\nHeaders: {1}\nBody: {2}".format(self.url, self.headers, param))
+      log.debug("POST %s\nHeaders: %s\nBody: %s" % (self.url, self.headers, param))
       conn.request("POST", self.url, param, self.headers)
-    except Exception as ex:
-      raise JsonRPCRequestException("Failed to make http request: {0}".format(str(ex)))
+    except Exception, ex:
+      raise JsonRPCRequestException("Failed to make http request: %s" % str(ex))
     try:
       read = conn.getresponse().read()
-      log.debug("Response: {0}".format(read))
+      log.debug("Response: %s" % read)
     except Exception:
       log.exception("Exception While Reading Response")
       raise JsonRPCResponseException("Failed to get response for request.")
@@ -112,7 +117,7 @@ class OnepV1():
       conn.close()
     try:
       res = json.loads(read)
-      log.debug("Response JSON: {0}".format(res))
+      log.debug("Response JSON: %s" % res)
     except:
       raise OnePlatformException("Return invalid response value.")
     if isinstance(res, dict) and res.has_key('error'):
