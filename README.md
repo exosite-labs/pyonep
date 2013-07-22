@@ -10,7 +10,11 @@ following Exosite One Platform APIs:
 Note that this library does not yet support the HTTP Data Interface, 
 which is a minimal HTTP API best suited for reading and writing data on 
 resource-constrained devices. More info on that here: 
+
 http://developers.exosite.com/display/OP/HTTP+Data+Interface+API
+
+Here is an example of using that interface from python:
+https://github.com/exosite-garage/python\_helloworld/blob/master/python\_helloworld.py
 
 Supports python 2.5 through 2.7
 
