@@ -1,13 +1,14 @@
 About pyonep
 ============
 
-This project contains a package called "pyonep".  The pyonep package is an
-API library with python bindings to the Exosite One Platform API.  The API is 
-exposed over HTTP in a JSON RPC style interface.
+The pyonep package is an API library with python bindings to the 
+Exosite One Platform API.
+
+http://developers.exosite.com/display/OP/API
 
 Supports python 2.5 through 2.7
 
-License is BSD, Copyright 2011, Exosite LLC (see LICENSE file)
+License is BSD, Copyright 2013, Exosite LLC (see LICENSE file)
 
 
 Installation
@@ -84,6 +85,29 @@ The pyonep library includes a module that provides buffered access to the
 RPC API, which may offer better performance in some cases.
 
 See examples/read\_write\_record.py for more details. 
+
+
+Migration from version 0.3
+--------------------------
+
+If you were previously using version 0.3 and want to upgrade to 0.7.4,
+you will need to update the package name in your scripts. The package name
+was updated from onepv1lib to pyonep. For example:
+
+```bash
+
+from onepv1lib import pyonep
+```
+
+...should be changed to:
+
+```bash
+
+from pyonep import onep
+```
+
+A global search and replace of onepv1lib to pyonep in your scripts should 
+work.
 
 
 Example Scripts
