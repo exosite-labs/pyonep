@@ -87,8 +87,7 @@ device information.
 
 - mult_cmd.py - uses the onep module to send
 
-- read_write_record.py - uses the datastore module for buffered access to the API,
-    which can be higher performance in some scenarios 
+- read_write_record.py - demonstrates use of the datastore module
 
 - provisioning.py - uses the provision module to provision some 
 
