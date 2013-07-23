@@ -1,12 +1,16 @@
 About pyonep
 ============
 
-The pyonep package is an API library with python bindings to the 
-Exosite One Platform API.
+The pyonep package is an API library with Python bindings to the 
+following Exosite One Platform APIs:
 
-http://developers.exosite.com/display/OP/API
+- RPC: http://developers.exosite.com/display/OP/Remote+Procedure+Call+API
+- Provisioning/Device Management: http://developers.exosite.com/pages/viewpage.action?pageId=1179705
 
-Supports python 2.5 through 2.7
+Note that this library does not yet support the HTTP Data Interface. See
+below for more information.
+
+Supports Python 2.5 through 2.7
 
 License is BSD, Copyright 2013, Exosite LLC (see LICENSE file)
 
@@ -14,7 +18,7 @@ License is BSD, Copyright 2013, Exosite LLC (see LICENSE file)
 Installation
 ------------
 
-Install from python package index: 
+Install from Python package index: 
 
 ```bash
 
@@ -34,7 +38,7 @@ Note: If you'd rather not install the package, you can also copy the
 ./pyonep/pyonep folder into the same folder as your script, or 
 add the ./pyonep/pyonep folder to your sys.path. 
 
-If you're running a version of python earlier than 2.6 you'll need the 
+If you're running a version of Python earlier than 2.6 you'll need the 
 python-simplejson package, available here: 
 
 https://pypi.python.org/pypi/simplejson/
@@ -61,7 +65,38 @@ Once you have a CIK, you can substitute it in the examples below.
 Usage
 -----
 
-Here's how to get information about a device:
+Write and read from a device dataport:
+
+```python
+
+from pyonep import onep
+
+o = onep.OnepV1()
+
+cik = 'INSERT_CIK'
+dataport_alias = 'INSERT_ALIAS'
+val_to_write = '1'
+
+o.write(
+    cik,
+    {"alias": dataport_alias},
+    val_to_write,
+    {})
+
+isok, response = o.read(
+    cik,
+    {'alias': dataport_alias},
+    {'limit': 1, 'sort': 'desc', 'selection': 'all'})
+
+if isok:
+    # expect Read back [[1374522992, 1]]
+    print("Read back %s" % response)
+else:
+    print("Read failed: %s" % response)
+
+```
+
+Get information about a device:
 
 ```python
 
@@ -71,12 +106,17 @@ from pprint import pprint
 o = onep.OnepV1()
 
 cik = 'INSERT_CIK'
+dataport_alias = 'INSERT_ALIAS'
+val_to_write = '1'
 
+# get information about the client 
 pprint(o.info(
     cik,
     {'alias': ''}))
 ```
 
+RPC API documentation:
+http://developers.exosite.com/display/OP/Remote+Procedure+Call+API
 
 Buffered Access
 ---------------
@@ -96,7 +136,7 @@ was updated from onepv1lib to pyonep. For example:
 
 ```bash
 
-from onepv1lib import pyonep
+from onepv1lib import onep
 ```
 
 ...should be changed to:
@@ -116,13 +156,15 @@ Example Scripts
 Examples are located in examples/. To run them, first modify them with your
 device information.
 
-- get_info.py - uses the onep module to send a single command
+- read_write_direct.py - writes to a resource and then reads back
+
+- get_info.py - gets information about a client
 
 - mult_cmd.py - uses the onep module to send
 
-- read_write_record.py - demonstrates use of the datastore module
+- read_write_buffered.py - demonstrates use of the datastore module
 
-- provisioning.py - uses the provision module to provision some 
+- provisioning.py - demonstrates use of the provisioning API
 
 Note that to run the examples without installing the pyonep package, the 
 example script must be located in the root folder (with ./pyonep as a 
@@ -140,3 +182,16 @@ General API Information
 For more information on the API, see:
 
 http://developers.exosite.com
+
+HTTP Data Interface
+-------------------
+
+The HTTP Data Interface is a minimal HTTP API best suited to resource-constrained 
+devices or networks. It is limited to reading and writing data one point at a 
+time. An example of using Python to access this interface is here:
+
+https://github.com/exosite-garage/python_helloworld
+
+Here is a description of the API:
+
+http://developers.exosite.com/display/OP/HTTP+Data+Interface+API
