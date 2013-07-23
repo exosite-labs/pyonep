@@ -250,5 +250,5 @@ class OnepV1():
   def write(self, cik, rid, value, options={}, defer=False):
     return self._call('write', cik, [rid, value, options], defer)
 
-  def writegroup(self, cik, entries, options={}, defer=False):
-    return self._call('writegroup', cik, [entries, options], defer)
+  def writegroup(self, cik, entries, defer=False):
+    return self._call('writegroup', cik, [entries], defer)
