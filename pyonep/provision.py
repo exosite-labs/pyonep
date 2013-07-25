@@ -26,7 +26,7 @@ PROVISION_REGISTER         = PROVISION_BASE + '/register'
 log = logging.getLogger(__name__)
 
 class Provision(object):
-  def __init__(self, host='http://m2.exosite.com', manage_by_cik=False, verbose=False):
+  def __init__(self, host='http://m2.exosite.com', manage_by_cik=True, verbose=False):
     self._host = host
     self._manage_by_cik = manage_by_cik
     self._verbose=verbose
@@ -38,7 +38,7 @@ class Provision(object):
     if not historical: options.append('nohistorical')
     return options
 
-  def _request(self, path, key, data, method, key_is_cik=False, extra_headers={}):
+  def _request(self, path, key, data, method, key_is_cik, extra_headers={}):
     if method == "GET":
       url = self._host + path + '?' + data
       req = urllib2.Request(url)
@@ -89,7 +89,7 @@ class Provision(object):
     else: ## if provide vendor name, key can be the device one
       data = urllib.urlencode({'vendor':vendor, 'model': model, \
               'id':contentid, 'info':'true'})
-      return self._request(PROVISION_DOWNLOAD, key, data, 'GET')
+      return self._request(PROVISION_DOWNLOAD, key, data, 'GET', self._manage_by_cik)
 
   def content_list(self, key, model):
     path = PROVISION_MANAGE_CONTENT + model + '/'
@@ -131,7 +131,7 @@ class Provision(object):
 
   def serialnumber_activate(self, model, serialnumber, vendor):
     data = urllib.urlencode({'vendor':vendor, 'model':model, 'sn':serialnumber})
-    return self._request(PROVISION_ACTIVATE, '', data, 'POST')
+    return self._request(PROVISION_ACTIVATE, '', data, 'POST', self._manage_by_cik)
 
   def serialnumber_add(self, key, model, sn):
     data = urllib.urlencode({'add':'true', 'sn':sn})
@@ -186,8 +186,8 @@ class Provision(object):
     return self._request(PROVISION_REGISTER, key, data, 'POST', self._manage_by_cik) != None
 
   def vendor_show(self, key):
-    return self._request(PROVISION_REGISTER, key, '', 'GET')
+    return self._request(PROVISION_REGISTER, key, '', 'GET', False)
 
   def vendor_unregister(self, key, vendor):
     data = urllib.urlencode({'delete':'true','vendor':vendor})
-    return self._request(PROVISION_REGISTER, key, data, 'POST') != None
+    return self._request(PROVISION_REGISTER, key, data, 'POST', False) != None
