@@ -22,9 +22,9 @@ setup(name='pyonep',
       author_email='labs@exosite.com',
       description='Python bindings for Exosite API over HTTP JSON RPC.',
       long_description=open('README.md').read() + '\n\n' +
-                         open('HISTORY.md').read(),
+                       open('HISTORY.md').read(),
       packages=['pyonep'],
-      package_dir={'exoline': 'exoline'},
+      package_dir={'pyonep': 'pyonep'},
       keywords=['exosite', 'onep', 'one platform', 'm2m']
       # Not supported by distutils
       # install_requires=required
