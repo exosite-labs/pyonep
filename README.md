@@ -47,8 +47,8 @@ https://pypi.python.org/pypi/simplejson/
 Getting A CIK
 -------------
 
-Access to the Exosite API requires a Client Information Key (CIK). If 
-you're just getting started with the API and have signed up with a 
+Access to the Exosite API requires a Client Identification Key (CIK). 
+If you're just getting started with the API and have signed up with a 
 community portal, here's how you can find a CIK:
 
 1.) Log in: https://portals.exosite.com
