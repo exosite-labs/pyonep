@@ -1,6 +1,15 @@
 History
 =======
 
+0.7.5 (2013-8-12)
+-----------------
+
+- changed provisioning interface to manage by CIK 
+  rather than vendor token by default
+- fixed writegroup command
+- added example code
+- improved documentation 
+
 0.7.4 (2013-7-22)
 -----------------
 

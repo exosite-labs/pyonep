@@ -16,7 +16,7 @@ except ImportError:
         print("######")
 
 setup(name='pyonep',
-      version='0.7.4',
+      version='0.7.5',
       url='http://github.com/exosite-labs/pyonep',
       author='Exosite',
       author_email='labs@exosite.com',
