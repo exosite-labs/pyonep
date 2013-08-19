@@ -101,23 +101,33 @@ class OnepV1():
     jsonreq = {"auth":auth,"calls":callrequests}
     conn = ConnectionFactory.make_conn(self.host, self.https, self.httptimeout)
     param = json.dumps(jsonreq)
-    log.debug("Request JSON: %s" % param)
     try:
-      log.debug("POST %s\nHeaders: %s\nBody: %s" % (self.url, self.headers, param))
+      log.debug("POST %s\nHost: %s\nHeaders: %s\nBody: %s" % (self.url, self.host, self.headers, param))
       conn.request("POST", self.url, param, self.headers)
     except Exception, ex:
       raise JsonRPCRequestException("Failed to make http request: %s" % str(ex))
     try:
-      read = conn.getresponse().read()
-      log.debug("Response: %s" % read)
-    except Exception:
+      response = conn.getresponse()
+      read = response.read()
+      if response.version == 10:
+        version = 'HTTP/1.0'
+      elif response.version == 11:
+        version = 'HTTP/1.1'
+      else:
+        version = '%d' % response.version
+      log.debug("%s %s %s\nHeaders: %s\nBody: %s" % (version,
+                                                                     response.status,
+                                                                     response.reason,
+                                                                     response.getheaders(),
+                                                                     read))
+
+    except Exception, ex:
       log.exception("Exception While Reading Response")
-      raise JsonRPCResponseException("Failed to get response for request.")
+      raise JsonRPCResponseException("Failed to get response for request: %s" % str(ex))
     finally:
       conn.close()
     try:
       res = json.loads(read)
-      log.debug("Response JSON: %s" % res)
     except:
       raise OnePlatformException("Return invalid response value.")
     if isinstance(res, dict) and res.has_key('error'):
