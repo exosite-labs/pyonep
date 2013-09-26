@@ -79,7 +79,13 @@ class ConnectionFactory():
 class OnepV1():
   headers = {'Content-Type': 'application/json; charset=utf-8'}
 
-  def __init__(self,host='logicpd.m2.exosite.com',port='80',url='/api:v1/rpc/process',https=False,httptimeout=3):
+  def __init__(self,
+               host='logicpd.m2.exosite.com',
+               port='80',
+               url='/api:v1/rpc/process',
+               https=False,
+               httptimeout=10,
+               agent=None):
     self.host        = host + ':' + port
     self.url         = url
     self.https       = https
@@ -87,6 +93,8 @@ class OnepV1():
     self._clientid   = None
     self._resourceid = None
     self.deferred    = DeferredRequests()
+    if agent is not None:
+      self.headers['User-Agent'] = agent
 
   def _callJsonRPC(self, cik, callrequests, returnreq=False):
     '''Calls the Exosite One Platform RPC API.
