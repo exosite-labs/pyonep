@@ -4,8 +4,8 @@ About pyonep
 The pyonep package is an API library with Python bindings to the 
 following Exosite One Platform APIs:
 
-- RPC: http://developers.exosite.com/display/OP/Remote+Procedure+Call+API
-- Provisioning/Device Management: http://developers.exosite.com/pages/viewpage.action?pageId=1179705
+- RPC: https://github.com/exosite/api/tree/master/provision
+- Provisioning/Device Management: https://github.com/exosite/api/tree/master/rpc
 
 Note that this library does not yet support the HTTP Data Interface. See
 below for more information.
@@ -116,7 +116,7 @@ pprint(o.info(
 ```
 
 RPC API documentation:
-http://developers.exosite.com/display/OP/Remote+Procedure+Call+API
+https://github.com/exosite/api/tree/master/rpc
 
 Buffered Access
 ---------------
@@ -181,7 +181,7 @@ General API Information
 
 For more information on the API, see:
 
-http://developers.exosite.com
+https://github.com/exosite/api
 
 HTTP Data Interface
 -------------------
@@ -192,6 +192,6 @@ time. An example of using Python to access this interface is here:
 
 https://github.com/exosite-garage/python_helloworld
 
-Here is a description of the API:
+The API is documented here:
 
-http://developers.exosite.com/display/OP/HTTP+Data+Interface+API
+https://github.com/exosite/api/tree/master/data
