@@ -85,7 +85,8 @@ class OnepV1():
                url='/api:v1/rpc/process',
                https=False,
                httptimeout=10,
-               agent=None):
+               agent=None,
+               reuseconnection=False):
     self.host        = host + ':' + port
     self.url         = url
     self.https       = https
@@ -95,6 +96,16 @@ class OnepV1():
     self.deferred    = DeferredRequests()
     if agent is not None:
       self.headers['User-Agent'] = agent
+    self.reuseconnection = reuseconnection
+    self.conn = None
+
+  def close(self):
+    '''Closes any open connection. This should only need to be called if
+    reuseconnection is set to True. Once it's closed, the connection may be
+    reopened by making another API called.'''
+    if self.conn is not None:
+      self.conn.close()
+      self.conn = None
 
   def _callJsonRPC(self, cik, callrequests, returnreq=False):
     '''Calls the Exosite One Platform RPC API.
@@ -106,16 +117,18 @@ class OnepV1():
         (request, success, response)
         '''
     auth = self._getAuth(cik)
-    jsonreq = {"auth":auth,"calls":callrequests}
-    conn = ConnectionFactory.make_conn(self.host, self.https, self.httptimeout)
+    jsonreq = {"auth": auth, "calls": callrequests}
     param = json.dumps(jsonreq)
+    if self.conn is None or self.reuseconnection == False:
+      self.close()
+      self.conn = ConnectionFactory.make_conn(self.host, self.https, self.httptimeout)
     try:
       log.debug("POST %s\nHost: %s\nHeaders: %s\nBody: %s" % (self.url, self.host, self.headers, param))
-      conn.request("POST", self.url, param, self.headers)
+      self.conn.request("POST", self.url, param, self.headers)
     except Exception, ex:
       raise JsonRPCRequestException("Failed to make http request: %s" % str(ex))
     try:
-      response = conn.getresponse()
+      response = self.conn.getresponse()
       read = response.read()
       if response.version == 10:
         version = 'HTTP/1.0'
@@ -124,16 +137,17 @@ class OnepV1():
       else:
         version = '%d' % response.version
       log.debug("%s %s %s\nHeaders: %s\nBody: %s" % (version,
-                                                                     response.status,
-                                                                     response.reason,
-                                                                     response.getheaders(),
-                                                                     read))
-
+                                                     response.status,
+                                                     response.reason,
+                                                     response.getheaders(),
+                                                     read))
     except Exception, ex:
       log.exception("Exception While Reading Response")
       raise JsonRPCResponseException("Failed to get response for request: %s" % str(ex))
+      self.conn.close()
     finally:
-      conn.close()
+      if not self.reuseconnection:
+        self.conn.close()
     try:
       res = json.loads(read)
     except:
