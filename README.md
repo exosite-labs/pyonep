@@ -170,10 +170,10 @@ Note that to run the examples without installing the pyonep package, the
 example script must be located in the root folder (with ./pyonep as a 
 sub-folder).
 
-For a example that fully exercises the RPC interface, see the exosite command
-line interface: 
+For a Python example that fully exercises the RPC interface using the pyonep 
+library, see the Exosite command line interface: 
 
-http://github.com/dweaver/exoline
+http://github.com/exosite/exoline
 
 
 General API Information
