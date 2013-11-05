@@ -43,7 +43,7 @@ if __name__ == '__main__':
         print("Failed to look up clone RID")
     else:
         print("clonerid: '{}'".format(clonerid))
-    provision = Provision('http://m2.exosite.com', managed_by_cik=False, verbose=False)
+    provision = Provision('http://m2.exosite.com', manage_by_cik=False, verbose=False)
     print("model_create()")
     provision.model_create(vendortoken, model, clonerid, aliases=False)
 
