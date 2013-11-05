@@ -153,18 +153,18 @@ work.
 Example Scripts
 ---------------
 
-Examples are located in examples/. To run them, first modify them with your
+Examples are located in [examples/](examples). To run them, first modify them with your
 device information.
 
-- read_write_direct.py - writes to a resource and then reads back
+- [read_write_direct.py](examples/read_write_direct.py) - writes to a resource and then reads back
 
-- get_info.py - gets information about a client
+- [get_info.py](examples/get_info.py) - gets information about a client
 
-- mult_cmd.py - uses the onep module to send
+- [mult_cmd.py](examples/mult_cmd.py) - uses the onep module to send
 
-- read_write_buffered.py - demonstrates use of the datastore module
+- [read_write_buffered.py](examples/read_write_buffered.py) - demonstrates use of the datastore module
 
-- provisioning.py - demonstrates use of the provisioning API
+- [provisioning.py](examples/provisioning.py) - demonstrates use of the provisioning API
 
 Note that to run the examples without installing the pyonep package, the 
 example script must be located in the root folder (with ./pyonep as a 
