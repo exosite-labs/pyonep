@@ -4,8 +4,8 @@ About pyonep
 The pyonep package is an API library with Python bindings to the 
 following Exosite One Platform APIs:
 
-- RPC: https://github.com/exosite/api/tree/master/provision
-- Provisioning/Device Management: https://github.com/exosite/api/tree/master/rpc
+- RPC: https://github.com/exosite/api/tree/master/rpc
+- Provisioning/Device Management: https://github.com/exosite/api/tree/master/provision
 
 Note that this library does not yet support the HTTP Data Interface. See
 below for more information.
