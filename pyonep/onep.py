@@ -10,8 +10,16 @@
 ## All rights reserved.
 ##
 # vim: tabstop=2 expandtab shiftwidth=2 softtabstop=2 smarttab
-import sys, httplib, logging, random
-from exceptions import *
+import sys
+try:
+  import httplib
+except:
+  # python 3
+  from http import client as httplib
+
+import logging
+import random
+from .exceptions import OneException, OnePlatformException, JsonRPCRequestException, JsonRPCResponseException, JsonStringException
 
 log = logging.getLogger(__name__)
 
@@ -45,7 +53,7 @@ class DeferredRequests():
   def has_requests(self, cik):
     '''Returns True if there are any deferred requests for CIK, False
     otherwise.'''
-    return (self._requests.has_key(cik)
+    return (cik in self._requests
         and len(self._requests[cik]) > 0)
   def get_method_args_pairs(self, cik):
     '''Returns a list of method/arguments pairs corresponding to deferred
@@ -125,11 +133,12 @@ class OnepV1():
     try:
       log.debug("POST %s\nHost: %s\nHeaders: %s\nBody: %s" % (self.url, self.host, self.headers, param))
       self.conn.request("POST", self.url, param, self.headers)
-    except Exception, ex:
+    except Exception:
+      ex = sys.exc_info()[1]
       raise JsonRPCRequestException("Failed to make http request: %s" % str(ex))
     try:
       response = self.conn.getresponse()
-      read = response.read()
+      read = response.read().decode()
       if response.version == 10:
         version = 'HTTP/1.0'
       elif response.version == 11:
@@ -141,7 +150,8 @@ class OnepV1():
                                                      response.reason,
                                                      response.getheaders(),
                                                      read))
-    except Exception, ex:
+    except Exception:
+      ex = sys.exc_info()[1]
       log.exception("Exception While Reading Response")
       raise JsonRPCResponseException("Failed to get response for request: %s" % str(ex))
       self.conn.close()
@@ -152,7 +162,7 @@ class OnepV1():
       res = json.loads(read)
     except:
       raise OnePlatformException("Return invalid response value.")
-    if isinstance(res, dict) and res.has_key('error'):
+    if isinstance(res, dict) and 'error' in res:
       raise OnePlatformException(str(res['error']))
     if isinstance(res, list):
       ret = []
@@ -163,15 +173,15 @@ class OnepV1():
         for call in callrequests:
           if call['id'] == r['id']:
             request = call
-        if r.has_key('status'):
+        if 'status' in r:
           if 'ok'  == r['status']:
-            if r.has_key('result'):
+            if 'result' in r:
               ret.append((request, True, r['result']))
             else:
               ret.append((request, True, 'ok'))
           else:
             ret.append((request, False, r['status']))
-        elif r.has_key('error'):
+        elif 'error' in r:
           raise OnePlatformException(str(r['error']))
       if returnreq:
         return ret

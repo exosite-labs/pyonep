@@ -187,7 +187,8 @@ class Datastore():
         try:
           self.__writegroup(livedata)
           log.info("[Live] Written to 1p:" + str(livedata))
-        except OneException,e: # go to historical data when write live data failure
+        except OneException: # go to historical data when write live data failure
+          e = sys.exc_info()[1]
           log.error("Exception While Writing Live Data: {0}".format(e.message))
           log.debug("Previous Exception For: {0}".format(livedata))
           lock.acquire()
@@ -200,7 +201,8 @@ class Datastore():
               self._recordCount += 1
           finally:
             lock.release()
-        except Exception,e:
+        except Exception:
+          e = sys.exc_info()[1]
           log.exception("Unknown Exception While Writing Data")
       ## write historical data
       lock.acquire()
@@ -225,14 +227,16 @@ class Datastore():
                   log.info("[Historical] Written to 1p: " + alias + ", " + str(recentry))
                   self._recordCount -= len(entries)
                   del self._recordBuffer[alias]
-                except OneException,e:
+                except OneException:
+                  e = sys.exc_info()[1]
                   if e.message.find("datapoint") != -1:
                     log.excption(e.message)
                     self._recordCount -= len(entries)
                     del self._recordBuffer[alias]
             else:
               del self._recordBuffer[alias]
-          except OneException,e:
+          except OneException:
+            e = sys.exc_info()[1]
             log.error(e.message)
             continue
       finally:
@@ -278,9 +282,11 @@ class Datastore():
       self._cache[alias]['data'] = data
       self._cache[alias]['time'] = int(time.time())
       return data
-    except OneException,e:
+    except OneException:
+      e = sys.exc_info()[1]
       log.error(e.message)
-    except Exception,e:
+    except Exception:
+      e = sys.exc_info()[1]
       log.excpetion("Unknown Exception While Refreshing Data")
     return False
 

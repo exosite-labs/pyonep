@@ -10,6 +10,7 @@
 ##
 # vim: tabstop=2 expandtab shiftwidth=2 softtabstop=2 smarttab
 
+import sys
 import urllib, urllib2, socket, logging
 from urllib2 import Request, urlopen, URLError, HTTPError
 # timeout in seconds
@@ -63,12 +64,14 @@ class Provision(object):
       resp_data = resp.read()
       resp.close()
       return resp_data
-    except HTTPError, e:
+    except HTTPError:
+      e = sys.exc_info()[1]
       log.error('HTTP error code: {0}'.format(e.code))
       log.debug("On Request To: {0}  With Data: {1}".format(url, data))
-    except URLError, e:
+    except URLError:
+      e = sys.exc_info()[1]
       log.error('Failed to reach server! Reason: {0}'.format(e.reason))
-    except Exception,e:
+    except Exception:
       log.exception("Caught exception from provision:")
     return None
 
