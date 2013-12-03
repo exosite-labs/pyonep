@@ -1,6 +1,17 @@
 History
 =======
 
+0.7.9 (2013-12-03)
+-----------------
+
+- add support for Python 3.x
+
+0.7.8 (2013-10-28)
+-----------------
+
+- add reuseconnection for performance
+
+
 0.7.7 (2013-9-26)
 -----------------
 

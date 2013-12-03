@@ -4,8 +4,6 @@
 # RPC
 #==============================================================================
 ##
-## Tested with python 2.6
-##
 ## Copyright (c) 2010, Exosite LLC
 ## All rights reserved.
 ##
