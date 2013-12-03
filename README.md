@@ -10,7 +10,7 @@ following Exosite One Platform APIs:
 Note that this library does not yet support the HTTP Data Interface. See
 below for more information.
 
-Supports Python 2.5 through 2.7 and 3.x.
+Supports Python 2.5 through 3.3.
 
 License is BSD, Copyright 2013, Exosite LLC (see LICENSE file)
 
