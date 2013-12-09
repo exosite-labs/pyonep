@@ -1,8 +1,13 @@
 History
 =======
 
+0.7.10 (2013-12-07)
+-------------------
+
+- add support for logging all request JSON
+
 0.7.9 (2013-12-03)
------------------
+------------------
 
 - add support for Python 3.x
 

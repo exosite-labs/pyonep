@@ -58,10 +58,9 @@ class DeferredRequests():
     requests for this CIK'''
     return self._requests[cik]
 
-#===============================================================================
+
 class ConnectionFactory():
   """Builds the correct kind of HTTPConnection object."""
-#===============================================================================
   @staticmethod
   def make_conn(hostport, https, timeout):
     """Returns a HTTPConnection(-like) instance.
@@ -81,7 +80,7 @@ class ConnectionFactory():
 
     return conn
 
-#===============================================================================
+
 class OnepV1():
   headers = {'Content-Type': 'application/json; charset=utf-8'}
 
@@ -92,7 +91,8 @@ class OnepV1():
                https=False,
                httptimeout=10,
                agent=None,
-               reuseconnection=False):
+               reuseconnection=False,
+               logrequests=False):
     self.host        = host + ':' + port
     self.url         = url
     self.https       = https
@@ -104,6 +104,7 @@ class OnepV1():
       self.headers['User-Agent'] = agent
     self.reuseconnection = reuseconnection
     self.conn = None
+    self.logrequests = logrequests
 
   def close(self):
     '''Closes any open connection. This should only need to be called if
@@ -112,6 +113,11 @@ class OnepV1():
     if self.conn is not None:
       self.conn.close()
       self.conn = None
+
+  _loggedrequests = []
+  def loggedrequests(self):
+    '''Returns a list of request bodies made by this instance of OnepV1'''
+    return self._loggedrequests
 
   def _callJsonRPC(self, cik, callrequests, returnreq=False):
     '''Calls the Exosite One Platform RPC API.
@@ -124,6 +130,8 @@ class OnepV1():
         '''
     auth = self._getAuth(cik)
     jsonreq = {"auth": auth, "calls": callrequests}
+    if self.logrequests:
+      self._loggedrequests.append(jsonreq)
     param = json.dumps(jsonreq)
     if self.conn is None or self.reuseconnection == False:
       self.close()
@@ -238,7 +246,6 @@ class OnepV1():
     self._clientid = None
 
   # API methods
-
   def activate(self, cik, codetype, code, defer=False):
     return self._call('activate', cik, [codetype, code], defer)
 
