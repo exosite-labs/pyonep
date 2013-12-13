@@ -264,8 +264,12 @@ class OnepV1():
   def info(self, cik, rid, options={}, defer=False):
     return self._call('info', cik,  [rid, options], defer)
 
-  def listing(self, cik, types, defer=False):
-    return self._call('listing', cik, [types], defer)
+  def listing(self, cik, types, options=None, defer=False):
+    if options is None:
+      # This variant is deprecated
+      return self._call('listing', cik, [types], defer)
+    else:
+      return self._call('listing', cik, [types, options], defer)
 
   def lookup(self, cik, type, mapping, defer=False):
     return self._call('lookup', cik, [type, mapping], defer)
@@ -277,13 +281,16 @@ class OnepV1():
     return self._call('read', cik, [rid, options], defer)
 
   def record(self, cik, rid, entries, options={}, defer=False):
-    return self._call('record', cik, [rid, entries,options], defer)
+    return self._call('record', cik, [rid, entries, options], defer)
 
   def revoke(self, cik, codetype, code, defer=False):
     return self._call('revoke', cik, [codetype, code], defer)
 
   def share(self, cik, rid, options={}, defer=False):
     return self._call('share', cik, [rid, options], defer)
+
+  def tag(self, cik, rid, action, tag, defer=False):
+    return self._call('tag', cik, [rid, action, tag], defer)
 
   def unmap(self, cik, alias, defer=False):
     return self._call('unmap', cik, ['alias', alias], defer)
