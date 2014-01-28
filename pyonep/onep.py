@@ -85,7 +85,7 @@ class OnepV1():
   headers = {'Content-Type': 'application/json; charset=utf-8'}
 
   def __init__(self,
-               host='logicpd.m2.exosite.com',
+               host='m2.exosite.com',
                port='80',
                url='/api:v1/rpc/process',
                https=False,
