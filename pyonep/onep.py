@@ -258,8 +258,11 @@ class OnepV1():
   def drop(self, cik, rid, defer=False):
     return self._call('drop', cik, [rid], defer)
 
-  def flush(self, cik, rid, defer=False):
-    return self._call('flush', cik, [rid], defer)
+  def flush(self, cik, rid, options=None, defer=False):
+    args = [rid]
+    if options is not None:
+      args.append(options)
+    return self._call('flush', cik, args, defer)
 
   def info(self, cik, rid, options={}, defer=False):
     return self._call('info', cik,  [rid, options], defer)
