@@ -9,7 +9,7 @@ following Exosite One Platform APIs:
 
 __Warning__: version 0.8.0 requires changes to applications that used 
 earlier versions of the provision module. See below for information about 
-migrating your applications from 0.7.x to 0.8.0.
+[migrating your applications from 0.7.x to 0.8.0](#migrating-to-080)
 
 Note that this library does not yet support the HTTP Data Interface. See
 below for more information.
