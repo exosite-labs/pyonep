@@ -203,12 +203,12 @@ https://github.com/exosite/api/tree/master/data
 Migrating to 0.8.0
 ------------------
 
-Version 0.8.0 includes some breaking changes to provision module API that will require changing applications. By following this guide these changes should not be too difficult.
+Version 0.8.0 includes some breaking changes to provision module API to provide more consistent return values and error information. To migrate an existing application to pyonep 0.8.0 you will need to make a few changes to the way functions are called.
 
 - Previously, methods in provision module either returned a.) `True` (success) or `False` (failure) or b.) `<response body string>` (success) or `None` (failure). HTTP response details (e.g. status code) were not available to the caller without turning on logging and parsing stdout. With 0.8.0 all methods return a `ProvisionResponse` object with the following properties:
 
-    - `ProvisionResponse.body` the response body, a string. The contents of this depend on the specific call, and may be of length 0. See [provision API documentation](https://github.com/exosite/api/tree/master/provision) for details.
-    - `ProvisionResponse.status` the HTTP status code
+    - `ProvisionResponse.body` is the response body, a string. The contents of this depend on the specific call, and may be of length 0. See [provision API documentation](https://github.com/exosite/api/tree/master/provision) for details.
+    - `ProvisionResponse.status` is the HTTP status code
     - `ProvisionResponse.isok` is a boolean representing whether the call succeeded (i.e. if the status code is < 400)
 
 - Previously all exceptions associated with a call were being caught but not rethrown. With 0.8.0, HTTP exceptions are thrown to the caller. For example, if no connection is available, previously this would have written a message to the log and returned `None`. Now, a subclass of [`HTTPException`](http://docs.python.org/2/library/httplib.html#httplib.HTTPException) is thrown to the caller. This allows the caller to take appropriate action based on exactly what happened.
