@@ -256,7 +256,8 @@ try:
         print(response.body)
     else:
         print('Error in model_list: {0} {1}'.format(response.status(), response.reason()))
-except httplib.HTTPException ex:
+except httplib.HTTPException:
+    ex = sys.exc_info()[1]
     print('HTTPException: {0}'.format(ex))
 ```
 
