@@ -234,10 +234,10 @@ else:
 Here's how that would be written to work with 0.8.0+:
 ```
 try:
-  import httplib
+    import httplib
 except:
-  # python 3
-  from http import client as httplib
+    # python 3
+    from http import client as httplib
 
 import pyonep
 
