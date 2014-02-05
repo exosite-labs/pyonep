@@ -203,7 +203,7 @@ https://github.com/exosite/api/tree/master/data
 Migrating to 0.8.0
 ------------------
 
-Version 0.8.0 includes some breaking changes to provision module API to provide more consistent return values and error information. To migrate an existing application to pyonep 0.8.0 you will need to make a few changes to the way functions are called.
+Version 0.8.0 includes some breaking changes to provision module API to provide more consistent return values and error information. To migrate an existing application to pyonep 0.8.0 you will need to make a few changes to the way provision methods are called.
 
 - Previously, methods in provision module either returned a.) `True` (success) or `False` (failure) or b.) `<response body string>` (success) or `None` (failure). HTTP response details (e.g. status code) were not available to the caller without turning on logging and parsing stdout. With 0.8.0 all methods return a `ProvisionResponse` object with the following properties:
 
