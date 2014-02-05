@@ -233,12 +233,8 @@ else:
 
 Here's how that would be written to work with 0.8.0+:
 ```
-try:
-    import httplib
-except:
-    # python 3
-    from http import client as httplib
-
+import sys
+import httplib
 import pyonep
 
 # the leading 'http://' is now optional but should be omitted
