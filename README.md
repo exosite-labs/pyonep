@@ -248,14 +248,14 @@ try:
     # create a model
     response = provision.model_create(vendortoken, model, clonerid, aliases=False)
     if not response.isok:
-        print('Error in model_create: {0} {1}'.format(response.status, response.reason))
+        print('Error in model_create: {0} {1}'.format(response.status(), response.reason()))
 
     # list models
     response = provision.model_list(vendortoken)
     if response.isok:
         print(response.body)
     else:
-        print('Error in model_list: {0} {1}'.format(response.status, response.reason))
+        print('Error in model_list: {0} {1}'.format(response.status(), response.reason()))
 except httplib.HTTPException ex:
     print('HTTPException: {0}'.format(ex))
 ```
