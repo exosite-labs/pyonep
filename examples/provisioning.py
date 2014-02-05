@@ -33,15 +33,15 @@ if __name__ == '__main__':
     # Vendor token and name are listed at the top of
     # https://<your domain>.exosite.com/admin/managemodels
     # (Vendor token is also available on the domain admin home page)
-    vendorname = 'weaver'
-    vendortoken = '55f5e9bbb7f3e7898aae087b2dbb203eb39d936b'
+    vendorname = 'YOUR_VENDOR_NAME'
+    vendortoken = 'YOUR_VENDOR_TOKEN'
     # CIK of client to clone for model
-    clonecik = '68f080d449808a1e4bfb91487623330d437b0214'
+    clonecik = 'YOUR_CLONE_CIK'
     # CIK of parent of clonecik client. In the case of Portals,
     # this is the CIK of the portal. It can be found in your portal under
     # Account > Portals
     # Look for: Key: 123abc...
-    portalcik = '5de0cfcf7b5bed2ea7a802ebe0679b9c8a0a3e2c'
+    portalcik = 'YOUR_PORTAL_CIK'
 
     print('pyonep version ' + pyonep.__version__)
     r = random.randint(1, 10000000)
