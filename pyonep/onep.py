@@ -4,19 +4,15 @@
 # RPC
 #==============================================================================
 ##
-## Copyright (c) 2010, Exosite LLC
+## Copyright (c) 2014, Exosite LLC
 ## All rights reserved.
 ##
 # vim: tabstop=2 expandtab shiftwidth=2 softtabstop=2 smarttab
 import sys
-try:
-  import httplib
-except:
-  # python 3
-  from http import client as httplib
-
 import logging
 import random
+
+import onephttp
 from .exceptions import OneException, OnePlatformException, JsonRPCRequestException, JsonRPCResponseException, JsonStringException
 
 log = logging.getLogger(__name__)
@@ -59,28 +55,6 @@ class DeferredRequests():
     return self._requests[cik]
 
 
-class ConnectionFactory():
-  """Builds the correct kind of HTTPConnection object."""
-  @staticmethod
-  def make_conn(hostport, https, timeout):
-    """Returns a HTTPConnection(-like) instance.
-
-       hostport: the host and port to connect to, joined by a colon
-       https: boolean indicating whether to use HTTPS
-       timeout: number of seconds to wait for a response before HTTP timeout"""
-    if https:
-      cls = httplib.HTTPSConnection
-    else:
-      cls = httplib.HTTPConnection
-
-    if sys.version_info < (2, 6):
-      conn = cls(hostport)
-    else:
-      conn = cls(hostport, timeout=timeout)
-
-    return conn
-
-
 class OnepV1():
   headers = {'Content-Type': 'application/json; charset=utf-8'}
 
@@ -93,26 +67,25 @@ class OnepV1():
                agent=None,
                reuseconnection=False,
                logrequests=False):
-    self.host        = host + ':' + port
     self.url         = url
-    self.https       = https
-    self.httptimeout = int(httptimeout)
     self._clientid   = None
     self._resourceid = None
     self.deferred    = DeferredRequests()
     if agent is not None:
       self.headers['User-Agent'] = agent
-    self.reuseconnection = reuseconnection
-    self.conn = None
     self.logrequests = logrequests
+    self.onephttp = onephttp.OnePHTTP(host + ':' + port,
+                                      https=https,
+                                      httptimeout=int(httptimeout),
+                                      headers=self.headers,
+                                      reuseconnection=reuseconnection,
+                                      log=log)
 
   def close(self):
     '''Closes any open connection. This should only need to be called if
     reuseconnection is set to True. Once it's closed, the connection may be
     reopened by making another API called.'''
-    if self.conn is not None:
-      self.conn.close()
-      self.conn = None
+    self.onephttp.close()
 
   _loggedrequests = []
   def loggedrequests(self):
@@ -132,42 +105,29 @@ class OnepV1():
     jsonreq = {"auth": auth, "calls": callrequests}
     if self.logrequests:
       self._loggedrequests.append(jsonreq)
-    param = json.dumps(jsonreq)
-    if self.conn is None or self.reuseconnection == False:
-      self.close()
-      self.conn = ConnectionFactory.make_conn(self.host, self.https, self.httptimeout)
-    try:
-      log.debug("POST %s\nHost: %s\nHeaders: %s\nBody: %s" % (self.url, self.host, self.headers, param))
-      self.conn.request("POST", self.url, param, self.headers)
-    except Exception:
-      ex = sys.exc_info()[1]
-      raise JsonRPCRequestException("Failed to make http request: %s" % str(ex))
-    try:
-      response = self.conn.getresponse()
-      read = response.read().decode()
-      if response.version == 10:
-        version = 'HTTP/1.0'
-      elif response.version == 11:
-        version = 'HTTP/1.1'
-      else:
-        version = '%d' % response.version
-      log.debug("%s %s %s\nHeaders: %s\nBody: %s" % (version,
-                                                     response.status,
-                                                     response.reason,
-                                                     response.getheaders(),
-                                                     read))
-    except Exception:
-      ex = sys.exc_info()[1]
+    body = json.dumps(jsonreq)
+
+    def handle_request_exception(exception):
+      raise JsonRPCRequestException("Failed to make http request: %s" % str(
+        exception))
+
+    self.onephttp.request('POST',
+                          self.url,
+                          body,
+                          self.headers,
+                          exception_fn=handle_request_exception)
+
+    def handle_response_exception(exception):
       log.exception("Exception While Reading Response")
-      raise JsonRPCResponseException("Failed to get response for request: %s" % str(ex))
-      self.conn.close()
-    finally:
-      if not self.reuseconnection:
-        self.conn.close()
+      raise JsonRPCResponseException("Failed to get response for request: %s" % str(exception))
+
+    body, response = self.onephttp.getresponse(exception_fn=handle_response_exception)
+
     try:
-      res = json.loads(read)
+      res = json.loads(body)
     except:
-      raise OnePlatformException("Return invalid response value.")
+      ex = sys.exc_info()[1]
+      raise OnePlatformException("Exception while parsing JSON response: %s\n%s" % (body, ex))
     if isinstance(res, dict) and 'error' in res:
       raise OnePlatformException(str(res['error']))
     if isinstance(res, list):

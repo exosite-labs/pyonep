@@ -2,35 +2,71 @@
 # provision.py
 # This is API library for Exosite's One-Platform provision interface.
 #==============================================================================
-##
-## Tested with python 2.6
-##
-## Copyright (c) 2011, Exosite LLC
-## All rights reserved.
-##
+#
+# Warning: Version pyonep version 0.8.0 introduces breaking change to the
+#          provisioning interface. See README.md for details.
+#
+# Copyright (c) 2014, Exosite LLC
+# All rights reserved.
+#
 # vim: tabstop=2 expandtab shiftwidth=2 softtabstop=2 smarttab
 
 import sys
-import urllib, urllib2, socket, logging
-from urllib2 import Request, urlopen, URLError, HTTPError
-# timeout in seconds
-timeout = 5
-socket.setdefaulttimeout(timeout)
+import urllib
+import logging
+
+import onephttp
+import exceptions
+
 PROVISION_BASE = '/provision'
-PROVISION_ACTIVATE         = PROVISION_BASE +  '/activate'
-PROVISION_DOWNLOAD         = PROVISION_BASE + '/download'
-PROVISION_MANAGE           = PROVISION_BASE + '/manage'
-PROVISION_MANAGE_MODEL     = PROVISION_MANAGE + '/model/'
-PROVISION_MANAGE_CONTENT   = PROVISION_MANAGE + '/content/'
-PROVISION_REGISTER         = PROVISION_BASE + '/register'
+PROVISION_ACTIVATE = PROVISION_BASE + '/activate'
+PROVISION_DOWNLOAD = PROVISION_BASE + '/download'
+PROVISION_MANAGE = PROVISION_BASE + '/manage'
+PROVISION_MANAGE_MODEL = PROVISION_MANAGE + '/model/'
+PROVISION_MANAGE_CONTENT = PROVISION_MANAGE + '/content/'
+PROVISION_REGISTER = PROVISION_BASE + '/register'
 
 log = logging.getLogger(__name__)
 
+
+class ProvisionResponse:
+  def __init__(self, body, response):
+    self.body = body
+    self.response = response
+    self.isok = self.response.status < 400
+  def status(self):
+    return self.response.status
+  def reason(self):
+    return self.response.reason
+  def __repr__(self):
+    return self.body
+  def __str__(self):
+    return "Status: {0}, Reason: {1}, Body: {2}".format(
+      self.response.status,
+      self.response.reason,
+      self.body)
+
+
 class Provision(object):
-  def __init__(self, host='http://m2.exosite.com', manage_by_cik=True, verbose=False):
-    self._host = host
+  def __init__(self,
+               host='m2.exosite.com',
+               port='80',
+               manage_by_cik=True,
+               verbose=False,
+               httptimeout=5,
+               raise_api_exceptions=False):
+    # backward compatibility
+    protocol = 'http://'
+    if host.startswith(protocol):
+      host = host[len(protocol):]
     self._manage_by_cik = manage_by_cik
-    self._verbose=verbose
+    self._verbose = verbose
+    self._onephttp = onephttp.OnePHTTP(host + ':' + port,
+                                      https=False,
+                                      httptimeout=int(httptimeout),
+                                      reuseconnection=False,
+                                      log=log)
+    self._raise_api_exceptions = raise_api_exceptions
 
   def _filter_options(self, aliases=True, comments= True, historical=True):
     options = []
@@ -40,45 +76,40 @@ class Provision(object):
     return options
 
   def _request(self, path, key, data, method, key_is_cik, extra_headers={}):
-    if method == "GET":
-      url = self._host + path + '?' + data
-      req = urllib2.Request(url)
+    if method == 'GET':
+      if len(data) > 0:
+        url = path + '?' + data
+      else:
+        url = path
+      body = None
     else:
-      url = self._host + path
-      req = urllib2.Request(url, data)
+      url = path
+      body = data
+
+    headers = {}
     if key_is_cik:
-      req.add_header('X-Exosite-CIK',key)
+      headers['X-Exosite-CIK'] = key
     else:
-      req.add_header('X-Exosite-Token',key)
-    req.add_header('Accept',
-                   'text/plain, text/csv, application/x-www-form-urlencoded')
-    for name in extra_headers.keys():
-      req.add_header(name, extra_headers[name])
-    req.get_method = lambda : method
-    if self._verbose:
-      print('URL: ' + req.get_full_url())
-      print('HEADERS: ' + str(req.header_items()))
-      print('DATA: ' + str(req.data))
-    try:
-      resp = urllib2.urlopen(req)
-      resp_data = resp.read()
-      resp.close()
-      return resp_data
-    except HTTPError:
-      e = sys.exc_info()[1]
-      log.error('HTTP error code: {0}'.format(e.code))
-      log.debug("On Request To: {0}  With Data: {1}".format(url, data))
-    except URLError:
-      e = sys.exc_info()[1]
-      log.error('Failed to reach server! Reason: {0}'.format(e.reason))
-    except Exception:
-      log.exception("Caught exception from provision:")
-    return None
+      headers['X-Exosite-Token'] = key
+    if method == 'POST':
+      headers['Content-Type'] = 'application/x-www-form-urlencoded; charset=utf-8'
+    headers['Accept'] = 'text/plain, text/csv, application/x-www-form-urlencoded'
+    headers.update(extra_headers)
+
+    self._onephttp.request(method,
+                           url,
+                           body,
+                           headers)
+    body, response = self._onephttp.getresponse()
+    pr = ProvisionResponse(body, response)
+    if self._raise_api_exceptions and not pr.isok:
+      raise exceptions.ProvisionException(pr)
+    return pr
 
   def content_create(self, key, model, contentid, meta):
     data = urllib.urlencode({'id':contentid, 'meta':meta})
     path = PROVISION_MANAGE_CONTENT + model + '/'
-    return self._request(path, key, data, 'POST', self._manage_by_cik) != None
+    return self._request(path, key, data, 'POST', self._manage_by_cik)
 
   def content_download(self, cik, vendor, model, contentid):
     data = urllib.urlencode({'vendor':vendor, 'model': model, 'id':contentid})
@@ -100,19 +131,19 @@ class Provision(object):
 
   def content_remove(self, key, model, contentid):
     path = PROVISION_MANAGE_CONTENT + model + '/' + contentid
-    return self._request(path, key, '', 'DELETE', self._manage_by_cik) != None
+    return self._request(path, key, '', 'DELETE', self._manage_by_cik)
 
   def content_upload(self, key, model, contentid, data, mimetype):
     headers = {"Content-Type":mimetype}
     path = PROVISION_MANAGE_CONTENT + model + '/' + contentid
-    return self._request(path, key, data  , 'POST', self._manage_by_cik, headers) != None
+    return self._request(path, key, data  , 'POST', self._manage_by_cik, headers)
 
   def model_create(self, key, model ,clonerid,
                    aliases=True, comments=True, historical=True):
     options = self._filter_options(aliases, comments, historical)
     data = urllib.urlencode({'model': model, 'rid': clonerid,
                             'options[]':options}, doseq=True)
-    return self._request(PROVISION_MANAGE_MODEL, key, data, 'POST', self._manage_by_cik) != None
+    return self._request(PROVISION_MANAGE_MODEL, key, data, 'POST', self._manage_by_cik)
 
   def model_info(self, key, model):
     return self._request(PROVISION_MANAGE_MODEL + model, key, '', 'GET', self._manage_by_cik)
@@ -123,14 +154,14 @@ class Provision(object):
   def model_remove(self, key, model):
     data = urllib.urlencode({ 'delete':'true', 'model':model, 'confirm':'true'})
     path = PROVISION_MANAGE_MODEL + model
-    return self._request(path, key, data, 'DELETE', self._manage_by_cik) != None
+    return self._request(path, key, data, 'DELETE', self._manage_by_cik)
 
   def model_update(self, key, model, clonerid,
                    aliases=True, comments= True, historical=True):
     options = self._filter_options(aliases, comments, historical)
     data = urllib.urlencode({'rid':clonerid, 'options[]':options}, doseq=True)
     path = PROVISION_MANAGE_MODEL + model
-    return self._request(path, key, data, 'PUT', self._manage_by_cik) != None
+    return self._request(path, key, data, 'PUT', self._manage_by_cik)
 
   def serialnumber_activate(self, model, serialnumber, vendor):
     data = urllib.urlencode({'vendor':vendor, 'model':model, 'sn':serialnumber})
@@ -139,12 +170,12 @@ class Provision(object):
   def serialnumber_add(self, key, model, sn):
     data = urllib.urlencode({'add':'true', 'sn':sn})
     path = PROVISION_MANAGE_MODEL + model + '/'
-    return self._request(path, key, data, 'POST', self._manage_by_cik) != None
+    return self._request(path, key, data, 'POST', self._manage_by_cik)
 
   def serialnumber_add_batch(self, key, model, sns=[]):
     data = urllib.urlencode({'add':'true', 'sn[]':sns}, doseq=True)
     path = PROVISION_MANAGE_MODEL + model + '/'
-    return self._request(path, key, data, 'POST', self._manage_by_cik) != None
+    return self._request(path, key, data, 'POST', self._manage_by_cik)
 
   def serialnumber_disable(self, key, model, serialnumber):
     data = urllib.urlencode({'disable':'true'})
@@ -173,24 +204,24 @@ class Provision(object):
   def serialnumber_remap(self, key, model, serialnumber, oldsn):
     data = urllib.urlencode({'enable':'true', 'oldsn':oldsn})
     path = PROVISION_MANAGE_MODEL + model + '/' + serialnumber
-    return self._request(path, key, data, 'POST', self._manage_by_cik) != None
+    return self._request(path, key, data, 'POST', self._manage_by_cik)
 
   def serialnumber_remove(self, key, model, serialnumber):
     path = PROVISION_MANAGE_MODEL + model + '/' + serialnumber
-    return self._request(path, key, '', 'DELETE', self._manage_by_cik) != None
+    return self._request(path, key, '', 'DELETE', self._manage_by_cik)
 
   def serialnumber_remove_batch(self, key, model, sns):
     path = PROVISION_MANAGE_MODEL + model + '/'
     data = urllib.urlencode({'remove':'true', 'sn[]':sns}, doseq=True)
-    return self._request(path, key, data, 'POST', self._manage_by_cik) != None
+    return self._request(path, key, data, 'POST', self._manage_by_cik)
 
   def vendor_register(self, key, vendor):
     data = urllib.urlencode({'vendor':vendor})
-    return self._request(PROVISION_REGISTER, key, data, 'POST', self._manage_by_cik) != None
+    return self._request(PROVISION_REGISTER, key, data, 'POST', self._manage_by_cik)
 
   def vendor_show(self, key):
     return self._request(PROVISION_REGISTER, key, '', 'GET', False)
 
   def vendor_unregister(self, key, vendor):
     data = urllib.urlencode({'delete':'true','vendor':vendor})
-    return self._request(PROVISION_REGISTER, key, data, 'POST', False) != None
+    return self._request(PROVISION_REGISTER, key, data, 'POST', False)

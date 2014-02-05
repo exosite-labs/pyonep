@@ -1,6 +1,6 @@
 from distutils.core import setup
 
-required = []
+from pyonep import __version__ as version
 
 try:
     import json
@@ -16,7 +16,7 @@ except ImportError:
         print("######")
 
 setup(name='pyonep',
-      version='0.7.13',
+      version=version,
       url='http://github.com/exosite-labs/pyonep',
       author='Exosite',
       author_email='labs@exosite.com',
@@ -26,6 +26,4 @@ setup(name='pyonep',
       packages=['pyonep'],
       package_dir={'pyonep': 'pyonep'},
       keywords=['exosite', 'onep', 'one platform', 'm2m']
-      # Not supported by distutils
-      # install_requires=required
       )

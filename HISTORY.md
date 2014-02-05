@@ -1,6 +1,14 @@
 History
 =======
 
+0.8.0 (2013-02-05)
+------------------
+
+- return ProvisionResult from provision methods to provide more 
+  information about success/failure (breaking change)
+- refactor provision.py to use httplib, and share code with onep.py.
+- make version string available in pyonep.__version__, per PEP 396
+
 0.7.13 (2013-01-31)
 -------------------
 

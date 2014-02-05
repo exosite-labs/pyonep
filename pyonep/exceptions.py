@@ -24,3 +24,7 @@ class JsonRPCResponseException(OneException):
 
 class JsonStringException(OneException):
   pass
+
+class ProvisionException(OneException):
+  def __init__(self, provision_response):
+    self.response = provision_response
