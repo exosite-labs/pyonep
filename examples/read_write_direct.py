@@ -6,14 +6,14 @@ cik = 'INSERT_CIK'
 dataport_alias = 'INSERT_ALIAS'
 val_to_write = '1'
 
-# http://developers.exosite.com/display/OP/Remote+Procedure+Call+API#RemoteProcedureCallAPI-write
+# https://github.com/exosite/api/tree/master/rpc#write
 o.write(
     cik,
     {"alias": dataport_alias},
     val_to_write,
     {})
 
-# http://developers.exosite.com/display/OP/Remote+Procedure+Call+API#RemoteProcedureCallAPI-read
+# https://github.com/exosite/api/tree/master/rpc#read
 isok, response = o.read(
     cik,
     {'alias': dataport_alias},
@@ -24,4 +24,3 @@ if isok:
     print("Read back %s" % response)
 else:
     print("Read failed: %s" % response)
-

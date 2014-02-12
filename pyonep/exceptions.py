@@ -11,20 +11,20 @@
 # vim: tabstop=2 expandtab shiftwidth=2 softtabstop=2 smarttab
 
 class OneException(Exception):
-  pass
+    pass
 
 class OnePlatformException(OneException):
-  pass
+    pass
 
 class JsonRPCRequestException(OneException):
-  pass
+    pass
 
 class JsonRPCResponseException(OneException):
-  pass
+    pass
 
 class JsonStringException(OneException):
-  pass
+    pass
 
 class ProvisionException(OneException):
-  def __init__(self, provision_response):
-    self.response = provision_response
+    def __init__(self, provision_response):
+        self.response = provision_response

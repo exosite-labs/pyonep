@@ -4,6 +4,7 @@ from pprint import pprint
 
 cik = 'YOUR CIK HERE'
 
+
 def print_info(cik, alias='', httptimeout=30, repetitions=1):
     o = onep.OnepV1(httptimeout=httptimeout)
     try:
@@ -21,14 +22,18 @@ def print_info(cik, alias='', httptimeout=30, repetitions=1):
     except pyonep.exceptions.OnePlatformException as ex:
         print('OnePlatformException: {0}'.format(ex))
 
-print('Calling with good CIK, good alias, but too small timeout (expect JsonRPCResponseException)')
+print('Valid CIK, valid alias, but too small timeout')
+print('(expect JsonRPCResponseException)')
 print_info(cik, httptimeout=1, repetitions=100)
 
-print('Calling with bad CIK (expect OnePlatformException)')
+print('\nInvalid CIK')
+print('(expect OnePlatformException)')
 print_info('INTENTIONALLY BAD CIK')
 
-print('Calling with good CIK, bad alias (expect no exception, just error response)')
+print('\nValid CIK, invalid alias')
+print('(expect no exception, just error response)')
 print_info(cik, alias='this alias probably won\'t exist')
 
-print('Calling with good CIK, good alias, good timeout (expect no exception, just good result)')
+print('\nValid CIK, valid alias, good timeout')
+print('(expect no exception, just good result)')
 print_info(cik)

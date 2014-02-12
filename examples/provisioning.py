@@ -2,21 +2,20 @@
 # provisioning.py
 # Demonstrates use of the provision API
 #==========================================================================
-##
-## Tested with python 2.7.2
-##
-## Copyright (c) 2014, Exosite LLC
-## All rights reserved.
-##
+#
+# Tested with python 2.7.2
+#
+# Copyright (c) 2014, Exosite LLC
+# All rights reserved.
+#
 import sys
 import random
 import logging
 try:
-  import httplib
+    import httplib
 except:
-  # python 3
-  from http import client as httplib
-
+    # python 3
+    from http import client as httplib
 
 import pyonep
 from pyonep.provision import Provision
@@ -61,7 +60,12 @@ if __name__ == '__main__':
         exit()
     else:
         print("clonerid: '{}'".format(clonerid))
-        provision = Provision('m2.exosite.com', https=True, port=443, manage_by_cik=False, verbose=False, raise_api_exceptions=True)
+        provision = Provision('m2.exosite.com',
+                              https=True,
+                              port=443,
+                              manage_by_cik=False,
+                              verbose=False,
+                              raise_api_exceptions=True)
     try:
         print("model_create()")
         provision.model_create(vendortoken, model, clonerid, aliases=False)
@@ -78,24 +82,34 @@ if __name__ == '__main__':
         provision.serialnumber_remove_batch(vendortoken, model, [sn2, sn3])
         print provision.serialnumber_list(vendortoken, model).body
         print("serialnumber_enable()")
-        provision.serialnumber_enable(vendortoken, model, sn1, portalrid)  # return clientid
-        print "AFTER ENABLE:", provision.serialnumber_info(vendortoken, model, sn1).body
+        provision.serialnumber_enable(
+            vendortoken, model, sn1,
+            portalrid)  # return clientid
+        print "AFTER ENABLE:", provision.serialnumber_info(vendortoken,
+                                                           model, sn1).body
         print("serialnumber_disable()")
         provision.serialnumber_disable(vendortoken, model, sn1)
-        print "AFTER DISABLE:", provision.serialnumber_info(vendortoken, model, sn1).body
+        print "AFTER DISABLE:", provision.serialnumber_info(vendortoken,
+                                                            model, sn1).body
         print("serialnumber_reenable()")
         provision.serialnumber_reenable(vendortoken, model, sn1)
-        print "AFTER REENABLE:", provision.serialnumber_info(vendortoken, model, sn1).body
+        print "AFTER REENABLE:", provision.serialnumber_info(vendortoken,
+                                                             model, sn1).body
         print("serialnumber_activate()")
-        sn_cik = provision.serialnumber_activate(model, sn1, vendorname).body  # return client key
-        print "AFTER ACTIVATE:", provision.serialnumber_info(vendortoken, model, sn1).body
+
+        # return client key,
+        sn_cik = provision.serialnumber_activate(model, sn1, vendorname).body
+        print "AFTER ACTIVATE:", provision.serialnumber_info(vendortoken,
+                                                             model, sn1).body
         content_id = "a.txt"
         content_data = "This is content data"
         print("content_create()")
-        provision.content_create(vendortoken, model, content_id, "This is text")
+        provision.content_create(vendortoken, model, content_id,
+                                 "This is text")
         print provision.content_list(vendortoken, model)
         print("content_upload()")
-        print provision.content_upload(vendortoken, model, content_id, content_data, "text/plain")
+        print provision.content_upload(vendortoken, model, content_id,
+                                       content_data, "text/plain")
         print provision.content_list(vendortoken, model)
         print provision.content_info(vendortoken, model, content_id)
         print("content_download()")
@@ -106,7 +120,8 @@ if __name__ == '__main__':
         provision.model_remove(vendortoken, model)
     except ProvisionException:
         ex = sys.exc_info()[1]
-        print('API Error: {0} {1}'.format(ex.response.status(), ex.response.reason()))
+        print('API Error: {0} {1}'.format(ex.response.status(),
+                                          ex.response.reason()))
     except httplib.HTTPException:
         ex = sys.exc_info()[1]
         print('HTTPException: {0}'.format(ex))

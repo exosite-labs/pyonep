@@ -1,6 +1,11 @@
 History
 =======
 
+0.8.2 (2014-02-11)
+------------------
+
+- update formatting to fit Python style guide (PEP 8)
+
 0.8.1 (2014-02-11)
 ------------------
 

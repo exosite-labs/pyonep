@@ -2,11 +2,10 @@
 #==============================================================================
 # mult_cmd.py
 # Demonstrates running two commands in one HTTP request using the RPC
-#
 #==============================================================================
-##
-## Tested with python 2.7.2
-##
+#
+# Tested with python 2.7.2
+#
 
 import argparse
 import random
