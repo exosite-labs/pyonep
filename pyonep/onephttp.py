@@ -6,8 +6,8 @@
 
    Usage:
        1. create an instance
-       2. call request
-       3. call getresponse to get a HTTPResponse object
+       2. call request()
+       3. call getresponse() to get a HTTPResponse object
 
    Copyright (c) 2014, Exosite LLC'''
 

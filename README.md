@@ -131,6 +131,52 @@ RPC API, which may offer better performance in some cases.
 See examples/read\_write\_record.py for more details. 
 
 
+
+Example Scripts
+---------------
+
+Examples are located in [examples/](examples). To run them, first modify them with your
+device information.
+
+- [read_write_direct.py](examples/read_write_direct.py) - writes to a resource and then reads back
+
+- [get_info.py](examples/get_info.py) - gets information about a client, and demonstrates error handling
+
+- [mult_cmd.py](examples/mult_cmd.py) - uses the onep module to send
+
+- [read_write_buffered.py](examples/read_write_buffered.py) - demonstrates use of the datastore module
+
+- [provisioning.py](examples/provisioning.py) - demonstrates use of the provisioning API
+
+Note that to run the examples without installing the pyonep package, the 
+example script must be located in the root folder (with ./pyonep as a 
+sub-folder).
+
+For a Python example that fully exercises the RPC interface using the pyonep 
+library, see the Exosite command line interface: 
+
+http://github.com/exosite/exoline
+
+General API Information
+-----------------------
+
+For more information on the API, see:
+
+https://github.com/exosite/api
+
+HTTP Data Interface
+-------------------
+
+The HTTP Data Interface is a minimal HTTP API best suited to resource-constrained 
+devices or networks. It is limited to reading and writing data one point at a 
+time. An example of using Python to access this interface is here:
+
+https://github.com/exosite-garage/python_helloworld
+
+The API is documented here:
+
+https://github.com/exosite/api/tree/master/data
+
 Migration from version 0.3
 --------------------------
 
@@ -152,53 +198,6 @@ from pyonep import onep
 
 A global search and replace of onepv1lib to pyonep in your scripts should 
 work.
-
-
-Example Scripts
----------------
-
-Examples are located in [examples/](examples). To run them, first modify them with your
-device information.
-
-- [read_write_direct.py](examples/read_write_direct.py) - writes to a resource and then reads back
-
-- [get_info.py](examples/get_info.py) - gets information about a client
-
-- [mult_cmd.py](examples/mult_cmd.py) - uses the onep module to send
-
-- [read_write_buffered.py](examples/read_write_buffered.py) - demonstrates use of the datastore module
-
-- [provisioning.py](examples/provisioning.py) - demonstrates use of the provisioning API
-
-Note that to run the examples without installing the pyonep package, the 
-example script must be located in the root folder (with ./pyonep as a 
-sub-folder).
-
-For a Python example that fully exercises the RPC interface using the pyonep 
-library, see the Exosite command line interface: 
-
-http://github.com/exosite/exoline
-
-
-General API Information
------------------------
-
-For more information on the API, see:
-
-https://github.com/exosite/api
-
-HTTP Data Interface
--------------------
-
-The HTTP Data Interface is a minimal HTTP API best suited to resource-constrained 
-devices or networks. It is limited to reading and writing data one point at a 
-time. An example of using Python to access this interface is here:
-
-https://github.com/exosite-garage/python_helloworld
-
-The API is documented here:
-
-https://github.com/exosite/api/tree/master/data
 
 Migrating to 0.8.0
 ------------------

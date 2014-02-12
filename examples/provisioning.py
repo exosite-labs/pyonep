@@ -27,7 +27,7 @@ from pyonep.exceptions import ProvisionException
 logging.basicConfig(stream=sys.stderr)
 # change these to logging.DEBUG for verbose debug output
 logging.getLogger("pyonep.onep").setLevel(logging.ERROR)
-logging.getLogger("pyonep.provision").setLevel(logging.DEBUG)
+logging.getLogger("pyonep.provision").setLevel(logging.ERROR)
 
 if __name__ == '__main__':
     # Vendor token and name are listed at the top of
@@ -61,7 +61,7 @@ if __name__ == '__main__':
         exit()
     else:
         print("clonerid: '{}'".format(clonerid))
-        provision = Provision('http://m2.exosite.com', manage_by_cik=False, verbose=False, raise_api_exceptions=True)
+        provision = Provision('m2.exosite.com', https=True, port=443, manage_by_cik=False, verbose=False, raise_api_exceptions=True)
     try:
         print("model_create()")
         provision.model_create(vendortoken, model, clonerid, aliases=False)

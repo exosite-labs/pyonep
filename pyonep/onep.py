@@ -12,7 +12,7 @@ import sys
 import logging
 import random
 
-import onephttp
+from pyonep import onephttp
 from .exceptions import OneException, OnePlatformException, JsonRPCRequestException, JsonRPCResponseException, JsonStringException
 
 log = logging.getLogger(__name__)
@@ -74,7 +74,7 @@ class OnepV1():
     if agent is not None:
       self.headers['User-Agent'] = agent
     self.logrequests = logrequests
-    self.onephttp = onephttp.OnePHTTP(host + ':' + port,
+    self.onephttp = onephttp.OnePHTTP(host + ':' + str(port),
                                       https=https,
                                       httptimeout=int(httptimeout),
                                       headers=self.headers,
@@ -118,7 +118,6 @@ class OnepV1():
                           exception_fn=handle_request_exception)
 
     def handle_response_exception(exception):
-      log.exception("Exception While Reading Response")
       raise JsonRPCResponseException("Failed to get response for request: %s" % str(exception))
 
     body, response = self.onephttp.getresponse(exception_fn=handle_response_exception)

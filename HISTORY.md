@@ -1,7 +1,14 @@
 History
 =======
 
-0.8.0 (2013-02-05)
+0.8.1 (2014-02-11)
+------------------
+
+- support https, reuseconnection in provision.py
+- don't log exceptions in onep.py, just raise them
+- add example of onep.py error handling in examples/get_info.py
+
+0.8.0 (2014-02-05)
 ------------------
 
 - return ProvisionResult from provision methods to provide more 
@@ -9,12 +16,12 @@ History
 - refactor provision.py to use httplib, and share code with onep.py.
 - make version string available in pyonep.__version__, per PEP 396
 
-0.7.13 (2013-01-31)
+0.7.13 (2014-01-31)
 -------------------
 
 - add support for flush options
 
-0.7.12 (2013-01-27)
+0.7.12 (2014-01-27)
 -------------------
 
 - use generic RPC address

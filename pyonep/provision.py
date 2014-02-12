@@ -15,7 +15,7 @@ import sys
 import urllib
 import logging
 
-import onephttp
+from pyonep import onephttp
 import exceptions
 
 PROVISION_BASE = '/provision'
@@ -54,6 +54,8 @@ class Provision(object):
                manage_by_cik=True,
                verbose=False,
                httptimeout=5,
+               https=False,
+               reuseconnection=False,
                raise_api_exceptions=False):
     # backward compatibility
     protocol = 'http://'
@@ -61,10 +63,10 @@ class Provision(object):
       host = host[len(protocol):]
     self._manage_by_cik = manage_by_cik
     self._verbose = verbose
-    self._onephttp = onephttp.OnePHTTP(host + ':' + port,
-                                      https=False,
+    self._onephttp = onephttp.OnePHTTP(host + ':' + str(port),
+                                      https=https,
                                       httptimeout=int(httptimeout),
-                                      reuseconnection=False,
+                                      reuseconnection=reuseconnection,
                                       log=log)
     self._raise_api_exceptions = raise_api_exceptions
 
@@ -105,6 +107,12 @@ class Provision(object):
     if self._raise_api_exceptions and not pr.isok:
       raise exceptions.ProvisionException(pr)
     return pr
+
+  def close(self):
+    '''Closes any open connection. This should only need to be called if
+    reuseconnection is set to True. Once it's closed, the connection may be
+    reopened by making another API called.'''
+    self.onephttp.close()
 
   def content_create(self, key, model, contentid, meta):
     data = urllib.urlencode({'id':contentid, 'meta':meta})
