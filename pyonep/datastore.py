@@ -22,7 +22,7 @@ from exceptions import OneException
 # setup default configurations
 transport_config = {'host': 'm2.exosite.com',
                     'port': '80',
-                    'url': '/api:v1/rpc/process',
+                    'url': '/onep:v1/rpc/process',
                     'https': False,
                     'timeout': 3}
 datastore_config = {'write_buffer_size': 1024,

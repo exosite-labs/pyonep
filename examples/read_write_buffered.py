@@ -44,7 +44,7 @@ transport_config = {
     # Whether to use https (if True set port to 443)
     'https': False,
     # URL that the API handler is on
-    'url': '/api:v1/rpc/process',
+    'url': '/onep:v1/rpc/process',
     # API server port for HTTP
     'timeout': 3
 }
