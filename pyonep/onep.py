@@ -200,9 +200,11 @@ class OnepV1():
         if self.deferred.has_requests(cik):
             calls = self._composeCalls(
                 self.deferred.get_method_args_pairs(cik))
-            r = self._callJsonRPC(cik, calls, returnreq=True)
-            # remove deferred calls
-            self.deferred.reset(cik)
+            try:
+                r = self._callJsonRPC(cik, calls, returnreq=True)
+            finally:
+                # remove deferred calls
+                self.deferred.reset(cik)
             return r
         raise JsonRPCRequestException('No deferred requests to send.')
 
