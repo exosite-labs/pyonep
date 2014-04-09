@@ -257,6 +257,9 @@ class OnepV1():
     def record(self, cik, rid, entries, options={}, defer=False):
         return self._call('record', cik, [rid, entries, options], defer)
 
+    def recordbatch(self, cik, rid, entries, defer=False):
+        return self._call('recordbatch', cik, [rid, entries], defer)
+
     def revoke(self, cik, codetype, code, defer=False):
         return self._call('revoke', cik, [codetype, code], defer)
 

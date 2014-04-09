@@ -4,8 +4,8 @@ About pyonep
 The pyonep package is an API library with Python bindings to the 
 following Exosite One Platform APIs:
 
-- RPC: https://github.com/exosite/api/tree/master/rpc
-- Provisioning/Device Management: https://github.com/exosite/api/tree/master/provision
+- RPC: https://github.com/exosite/docs/tree/master/rpc
+- Provisioning/Device Management: https://github.com/exosite/docs/tree/master/provision
 
 __Warning__: version 0.8.0 requires changes to applications that used 
 earlier versions of the provision module. See below for information about 
@@ -120,7 +120,7 @@ pprint(o.info(
 ```
 
 RPC API documentation:
-https://github.com/exosite/api/tree/master/rpc
+https://github.com/exosite/docs/tree/master/rpc
 
 Buffered Access
 ---------------
@@ -162,7 +162,7 @@ General API Information
 
 For more information on the API, see:
 
-https://github.com/exosite/api
+https://github.com/exosite/docs
 
 HTTP Data Interface
 -------------------
@@ -175,7 +175,7 @@ https://github.com/exosite-garage/python_helloworld
 
 The API is documented here:
 
-https://github.com/exosite/api/tree/master/data
+https://github.com/exosite/docs/tree/master/data
 
 Migration from version 0.3
 --------------------------
@@ -206,7 +206,7 @@ Version 0.8.0 includes some breaking changes to provision module API to provide 
 
 - Previously, methods in provision module either returned a.) `True` (success) or `False` (failure) or b.) `<response body string>` (success) or `None` (failure). HTTP response details (e.g. status code) were not available to the caller without turning on logging and parsing stdout. With 0.8.0 all methods return a `ProvisionResponse` object with the following properties:
 
-    - `ProvisionResponse.body` is the response body, a string. The contents of this depend on the specific call, and may be of length 0. See [provision API documentation](https://github.com/exosite/api/tree/master/provision) for details.
+    - `ProvisionResponse.body` is the response body, a string. The contents of this depend on the specific call, and may be of length 0. See [provision API documentation](https://github.com/exosite/docs/tree/master/provision) for details.
     - `ProvisionResponse.status` is the HTTP status code
     - `ProvisionResponse.isok` is a boolean representing whether the call succeeded (i.e. if the status code is < 400)
 
