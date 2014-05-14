@@ -199,6 +199,19 @@ from pyonep import onep
 A global search and replace of onepv1lib to pyonep in your scripts should 
 work.
 
+Tests
+-----
+
+To run the tests:
+
+```
+$ cd test
+$ pip install -r requirements.txt
+$ cp testconfig.py.template testconfig.py
+$ # insert test config values
+$ ./test.sh
+```
+
 Migrating to 0.8.0
 ------------------
 
