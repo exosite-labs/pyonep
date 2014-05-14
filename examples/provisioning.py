@@ -28,19 +28,11 @@ logging.basicConfig(stream=sys.stderr)
 logging.getLogger("pyonep.onep").setLevel(logging.ERROR)
 logging.getLogger("pyonep.provision").setLevel(logging.ERROR)
 
-if __name__ == '__main__':
-    # Vendor token and name are listed at the top of
-    # https://<your domain>.exosite.com/admin/managemodels
-    # (Vendor token is also available on the domain admin home page)
-    vendorname = 'YOUR_VENDOR_NAME'
-    vendortoken = 'YOUR_VENDOR_TOKEN'
-    # CIK of client to clone for model
-    clonecik = 'YOUR_CLONE_CIK'
-    # CIK of parent of clonecik client. In the case of Portals,
-    # this is the CIK of the portal. It can be found in your portal under
-    # Account > Portals
-    # Look for: Key: 123abc...
-    portalcik = 'YOUR_PORTAL_CIK'
+def provision_example(options):
+    vendorname = options['vendorname']
+    vendortoken = options['vendortoken']
+    clonecik = options['clonecik']
+    portalcik = options['portalcik']
 
     print('pyonep version ' + pyonep.__version__)
     r = random.randint(1, 10000000)
@@ -101,27 +93,54 @@ if __name__ == '__main__':
         sn_cik = provision.serialnumber_activate(model, sn1, vendorname).body
         print "AFTER ACTIVATE:", provision.serialnumber_info(vendortoken,
                                                              model, sn1).body
-        content_id = "a.txt"
-        content_data = "This is content data"
-        print("content_create()")
-        provision.content_create(vendortoken, model, content_id,
-                                 "This is text")
-        print provision.content_list(vendortoken, model)
-        print("content_upload()")
-        print provision.content_upload(vendortoken, model, content_id,
-                                       content_data, "text/plain")
-        print provision.content_list(vendortoken, model)
-        print provision.content_info(vendortoken, model, content_id)
-        print("content_download()")
-        print provision.content_download(sn_cik, vendorname, model, content_id)
-        print("content_remove()")
-        provision.content_remove(vendortoken, model, content_id)
+
+        def test_content(content_id, content_data, content_type, content_meta):
+            print("content_create()")
+            provision.content_create(vendortoken, model, content_id,
+                                    content_meta)
+            print provision.content_list(vendortoken, model)
+            print("content_upload()")
+            print provision.content_upload(vendortoken, model, content_id,
+                                        content_data, content_type)
+            print provision.content_list(vendortoken, model)
+            print provision.content_info(vendortoken, model, content_id)
+            print("content_download()")
+            print provision.content_download(sn_cik, vendorname, model, content_id)
+            print("content_remove()")
+            provision.content_remove(vendortoken, model, content_id)
+
+        test_content("a.txt", "This is content data", "text/plain", "This is text")
+
+        # TODO: binary content
+
         print("model_remove()")
         provision.model_remove(vendortoken, model)
     except ProvisionException:
         ex = sys.exc_info()[1]
         print('API Error: {0} {1}'.format(ex.response.status(),
                                           ex.response.reason()))
+        return False
     except httplib.HTTPException:
         ex = sys.exc_info()[1]
         print('HTTPException: {0}'.format(ex))
+        return False
+
+    # no error
+    return True
+
+if __name__ == '__main__':
+    config = {
+        # Vendor token and name are listed at the top of
+        # https://<your domain>.exosite.com/admin/managemodels
+        # (Vendor token is also available on the domain admin home page)
+        'vendorname': '<VENDOR NAME HERE>',
+        'vendortoken': '<VENDOR TOKEN HERE>',
+        # CIK of client to clone for model
+        'clonecik': '<CLONE DEVICE CIK HERE>',
+        # CIK of parent of clonecik client. In the case of Portals,
+        # this is the CIK of the portal. It can be found in your portal under
+        # Account > Portals
+        # Look for: Key: 123abc...
+        'portalcik': '<PORTAL CIK HERE>'
+    }
+    provision_example(config)
