@@ -106,7 +106,7 @@ class OnePHTTP:
                                 response.status,
                                 response.reason,
                                 response.getheaders()))
-                        body = response.read().decode()
+                        body = response.read().decode('utf_8')
                         self.log.debug("Body: %s" % body)
                         return body, response
                 except Exception:
