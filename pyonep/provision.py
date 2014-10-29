@@ -3,7 +3,7 @@
 # This is API library for Exosite's One-Platform provision interface.
 #==============================================================================
 #
-# Warning: Version pyonep version 0.8.0 introduces breaking change to the
+# Warning: pyonep version 0.8.0 introduces breaking change to the
 #          provisioning interface. See README.md for details.
 #
 # Copyright (c) 2014, Exosite LLC
@@ -14,7 +14,7 @@ import urllib
 import logging
 
 from pyonep import onephttp
-import exceptions
+from .exceptions import ProvisionException
 
 PROVISION_BASE = '/provision'
 PROVISION_ACTIVATE = PROVISION_BASE + '/activate'
@@ -110,7 +110,7 @@ class Provision(object):
         body, response = self._onephttp.getresponse()
         pr = ProvisionResponse(body, response)
         if self._raise_api_exceptions and not pr.isok:
-            raise exceptions.ProvisionException(pr)
+            raise ProvisionException(pr)
         return pr
 
     def close(self):

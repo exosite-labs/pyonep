@@ -1,6 +1,11 @@
 History
 =======
 
+0.9.1 (2014-10-29)
+------------------
+
+- fix the way provision exceptions are pulled in
+
 0.9.0 (2014-09-19)
 ------------------
 
