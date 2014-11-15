@@ -26,6 +26,11 @@ PROVISION_REGISTER = PROVISION_BASE + '/register'
 
 log = logging.getLogger(__name__)
 
+# log errors stderr, don't log anything else
+h = logging.StreamHandler()
+h.setLevel(logging.ERROR)
+log.addHandler(h)
+
 
 class ProvisionResponse:
     def __init__(self, body, response):
