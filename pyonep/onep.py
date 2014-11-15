@@ -71,7 +71,8 @@ class OnepV1():
                  httptimeout=10,
                  agent=None,
                  reuseconnection=False,
-                 logrequests=False):
+                 logrequests=False,
+                 curldebug=False):
         self.url = url
         self._clientid = None
         self._resourceid = None
@@ -84,7 +85,8 @@ class OnepV1():
                                           httptimeout=int(httptimeout),
                                           headers=self.headers,
                                           reuseconnection=reuseconnection,
-                                          log=log)
+                                          log=log,
+                                          curldebug=curldebug)
 
     def close(self):
         '''Closes any open connection. This should only need to be called if

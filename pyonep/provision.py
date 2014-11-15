@@ -63,7 +63,8 @@ class Provision(object):
                  httptimeout=5,
                  https=False,
                  reuseconnection=False,
-                 raise_api_exceptions=False):
+                 raise_api_exceptions=False,
+                 curldebug=False):
         # backward compatibility
         protocol = 'http://'
         if host.startswith(protocol):
@@ -74,7 +75,8 @@ class Provision(object):
                                            https=https,
                                            httptimeout=int(httptimeout),
                                            reuseconnection=reuseconnection,
-                                           log=log)
+                                           log=log,
+                                           curldebug=curldebug)
         self._raise_api_exceptions = raise_api_exceptions
 
     def _filter_options(self, aliases=True, comments=True, historical=True):

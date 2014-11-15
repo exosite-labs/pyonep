@@ -54,7 +54,8 @@ class OnePHTTP:
                     httptimeout=5,
                     headers={},
                     reuseconnection=False,
-                    log=None):
+                    log=None,
+                    curldebug=False):
         self.host = host
         self.https = https
         self.httptimeout = httptimeout
@@ -62,6 +63,7 @@ class OnePHTTP:
         self.reuseconnection = reuseconnection
         self.conn = None
         self.log = log
+        self.curldebug = curldebug
 
     def request(self, method, path, body=None, headers={}, exception_fn=None):
         '''Wraps HTTPConnection.request. On exception it calls exception_fn
@@ -77,13 +79,26 @@ class OnePHTTP:
                 self.https,
                 self.httptimeout)
         try:
-            self.log.debug("%s %s\nHost: %s\nHeaders: %s" % (
-                method,
-                path,
-                self.host,
-                allheaders))
-            if body is not None:
-                self.log.debug("Body: %s" % body)
+            if self.curldebug:
+                # as a curl call
+                self.log.debug(
+                    "curl {0}://{1}{2} -X {3} --m {4} {5} {6}".format(
+                        'https' if self.https else 'http',
+                        self.host,
+                        path,
+                        method,
+                        ' '.join(['-H \'{0}: {1}\''.format(h, allheaders[h])
+                                  for h in allheaders]),
+                        self.httptimeout,
+                        '' if body is None else '-d \'' + body + '\''))
+            else:
+                self.log.debug("%s %s\nHost: %s\nHeaders: %s" % (
+                    method,
+                    path,
+                    self.host,
+                    allheaders))
+                if body is not None:
+                    self.log.debug("Body: %s" % body)
             self.conn.request(method, path, body, allheaders)
         except Exception:
             self.close()
