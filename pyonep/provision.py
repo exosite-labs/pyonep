@@ -12,9 +12,14 @@
 
 import urllib
 import logging
-
+import sys
 from pyonep import onephttp
 from .exceptions import ProvisionException
+
+if sys.version_info < (3, 0):
+    urlencode = urllib.urlencode
+else:
+    urlencode = urllib.parse.urlencode
 
 PROVISION_BASE = '/provision'
 PROVISION_ACTIVATE = PROVISION_BASE + '/activate'
@@ -127,13 +132,13 @@ class Provision(object):
         self.onephttp.close()
 
     def content_create(self, key, model, contentid, meta):
-        data = urllib.urlencode({'id': contentid, 'meta': meta})
+        data = urlencode({'id': contentid, 'meta': meta})
         path = PROVISION_MANAGE_CONTENT + model + '/'
         return self._request(path,
                              key, data, 'POST', self._manage_by_cik)
 
     def content_download(self, cik, vendor, model, contentid):
-        data = urllib.urlencode({'vendor': vendor,
+        data = urlencode({'vendor': vendor,
                                  'model': model,
                                  'id': contentid})
         headers = {"Accept": "*"}
@@ -145,7 +150,7 @@ class Provision(object):
             path = PROVISION_MANAGE_CONTENT + model + '/' + contentid
             return self._request(path, key, '', 'GET', self._manage_by_cik)
         else:  # if provide vendor name, key can be the device one
-            data = urllib.urlencode({'vendor': vendor,
+            data = urlencode({'vendor': vendor,
                                      'model': model,
                                      'id': contentid,
                                      'info': 'true'})
@@ -168,7 +173,7 @@ class Provision(object):
     def model_create(self, key, model, clonerid,
                      aliases=True, comments=True, historical=True):
         options = self._filter_options(aliases, comments, historical)
-        data = urllib.urlencode({'model': model,
+        data = urlencode({'model': model,
                                  'rid': clonerid,
                                  'options[]': options}, doseq=True)
         return self._request(PROVISION_MANAGE_MODEL,
@@ -183,7 +188,7 @@ class Provision(object):
                              key, '', 'GET', self._manage_by_cik)
 
     def model_remove(self, key, model):
-        data = urllib.urlencode({'delete': 'true',
+        data = urlencode({'delete': 'true',
                                  'model': model,
                                  'confirm': 'true'})
         path = PROVISION_MANAGE_MODEL + model
@@ -192,37 +197,37 @@ class Provision(object):
     def model_update(self, key, model, clonerid,
                      aliases=True, comments=True, historical=True):
         options = self._filter_options(aliases, comments, historical)
-        data = urllib.urlencode({'rid': clonerid,
+        data = urlencode({'rid': clonerid,
                                  'options[]': options}, doseq=True)
         path = PROVISION_MANAGE_MODEL + model
         return self._request(path, key, data, 'PUT', self._manage_by_cik)
 
     def serialnumber_activate(self, model, serialnumber, vendor):
-        data = urllib.urlencode({'vendor': vendor,
+        data = urlencode({'vendor': vendor,
                                  'model': model,
                                  'sn': serialnumber})
         return self._request(PROVISION_ACTIVATE,
                              '', data, 'POST', self._manage_by_cik)
 
     def serialnumber_add(self, key, model, sn):
-        data = urllib.urlencode({'add': 'true',
+        data = urlencode({'add': 'true',
                                  'sn': sn})
         path = PROVISION_MANAGE_MODEL + model + '/'
         return self._request(path, key, data, 'POST', self._manage_by_cik)
 
     def serialnumber_add_batch(self, key, model, sns=[]):
-        data = urllib.urlencode({'add': 'true',
+        data = urlencode({'add': 'true',
                                  'sn[]': sns}, doseq=True)
         path = PROVISION_MANAGE_MODEL + model + '/'
         return self._request(path, key, data, 'POST', self._manage_by_cik)
 
     def serialnumber_disable(self, key, model, serialnumber):
-        data = urllib.urlencode({'disable': 'true'})
+        data = urlencode({'disable': 'true'})
         path = PROVISION_MANAGE_MODEL + model + '/' + serialnumber
         return self._request(path, key, data, 'POST', self._manage_by_cik)
 
     def serialnumber_enable(self, key, model, serialnumber, owner):
-        data = urllib.urlencode({'enable': 'true', 'owner': owner})
+        data = urlencode({'enable': 'true', 'owner': owner})
         path = PROVISION_MANAGE_MODEL + model + '/' + serialnumber
         return self._request(path, key, data, 'POST', self._manage_by_cik)
 
@@ -231,17 +236,17 @@ class Provision(object):
         return self._request(path, key, '', 'GET', self._manage_by_cik)
 
     def serialnumber_list(self, key, model, offset=0, limit=1000):
-        data = urllib.urlencode({'offset': offset, 'limit': limit})
+        data = urlencode({'offset': offset, 'limit': limit})
         path = PROVISION_MANAGE_MODEL + model + '/'
         return self._request(path, key, data, 'GET', self._manage_by_cik)
 
     def serialnumber_reenable(self, key, model, serialnumber):
-        data = urllib.urlencode({'enable': 'true'})
+        data = urlencode({'enable': 'true'})
         path = PROVISION_MANAGE_MODEL + model + '/' + serialnumber
         return self._request(path, key, data, 'POST', self._manage_by_cik)
 
     def serialnumber_remap(self, key, model, serialnumber, oldsn):
-        data = urllib.urlencode({'enable': 'true', 'oldsn': oldsn})
+        data = urlencode({'enable': 'true', 'oldsn': oldsn})
         path = PROVISION_MANAGE_MODEL + model + '/' + serialnumber
         return self._request(path, key, data, 'POST', self._manage_by_cik)
 
@@ -251,11 +256,11 @@ class Provision(object):
 
     def serialnumber_remove_batch(self, key, model, sns):
         path = PROVISION_MANAGE_MODEL + model + '/'
-        data = urllib.urlencode({'remove': 'true', 'sn[]': sns}, doseq=True)
+        data = urlencode({'remove': 'true', 'sn[]': sns}, doseq=True)
         return self._request(path, key, data, 'POST', self._manage_by_cik)
 
     def vendor_register(self, key, vendor):
-        data = urllib.urlencode({'vendor': vendor})
+        data = urlencode({'vendor': vendor})
         return self._request(PROVISION_REGISTER,
                              key, data, 'POST', self._manage_by_cik)
 
@@ -263,6 +268,6 @@ class Provision(object):
         return self._request(PROVISION_REGISTER, key, '', 'GET', False)
 
     def vendor_unregister(self, key, vendor):
-        data = urllib.urlencode({'delete': 'true', 'vendor': vendor})
+        data = urlencode({'delete': 'true', 'vendor': vendor})
         return self._request(PROVISION_REGISTER,
                              key, data, 'POST', False)
