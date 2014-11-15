@@ -80,17 +80,20 @@ class OnePHTTP:
                 self.httptimeout)
         try:
             if self.curldebug:
-                # as a curl call
+                # output request as a curl call
+                def escape(s):
+                    '''escape single quotes for bash'''
+                    return s.replace("'", "'\\''")
                 self.log.debug(
-                    "curl {0}://{1}{2} -X {3} --m {4} {5} {6}".format(
+                    "curl {0}://{1}{2} -X {3} -m {4} {5} {6}".format(
                         'https' if self.https else 'http',
                         self.host,
                         path,
                         method,
-                        ' '.join(['-H \'{0}: {1}\''.format(h, allheaders[h])
-                                  for h in allheaders]),
                         self.httptimeout,
-                        '' if body is None else '-d \'' + body + '\''))
+                        ' '.join(['-H \'{0}: {1}\''.format(escape(h), escape(allheaders[h]))
+                                  for h in allheaders]),
+                        '' if body is None else '-d \'' + escape(body) + '\''))
             else:
                 self.log.debug("%s %s\nHost: %s\nHeaders: %s" % (
                     method,

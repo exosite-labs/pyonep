@@ -1,6 +1,11 @@
 History
 =======
 
+0.9.3 (2014-11-15)
+------------------
+
+- fix timeout and escape body for curl output
+
 0.9.2 (2014-11-15)
 ------------------
 
