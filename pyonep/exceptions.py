@@ -28,3 +28,5 @@ class JsonStringException(OneException):
 class ProvisionException(OneException):
     def __init__(self, provision_response):
         self.response = provision_response
+    def __str__(self):
+        return "{0} {1}".format(self.response.status(), self.response.reason())

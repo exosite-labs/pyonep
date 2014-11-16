@@ -1,6 +1,11 @@
 History
 =======
 
+0.9.6 (2014-11-16)
+------------------
+
+- sensible output when printing ProvisionException
+
 0.9.5 (2014-11-16)
 ------------------
 
