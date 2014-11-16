@@ -126,7 +126,10 @@ class OnePHTTP:
                 response.status,
                 response.reason,
                 response.getheaders()))
-            body = response.read().decode('utf_8')
+            if response.getheader('Content-Type', '').endswith('charset=utf-8'):
+                body = response.read().decode('utf_8')
+            else:
+                body = response.read()
             self.log.debug("Body: %s" % body)
             return body, response
         except Exception:

@@ -1,6 +1,12 @@
 History
 =======
 
+0.9.5 (2014-11-16)
+------------------
+
+- turn off response body encoding for non utf-8 responses
+  (e.g. for model content)
+
 0.9.4 (2014-11-15)
 ------------------
 
