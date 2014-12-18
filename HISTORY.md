@@ -1,6 +1,12 @@
 History
 =======
 
+0.9.7 (2014-12-18)
+------------------
+
+- set __repr__ for ProvisionException, too
+- support passing entire auth dict in place of CIK
+
 0.9.6 (2014-11-16)
 ------------------
 

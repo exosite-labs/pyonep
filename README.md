@@ -63,7 +63,7 @@ community portal, here's how you can find a CIK:
 
 4.) The device's CIK is displayed on the left
 
-Once you have a CIK, you can substitute it in the examples below.
+Once you have a CIK, you can substitute it in the examples below. Note that any functions that take a parameter called `auth` can take a string CIK directly, or you can pass an auth dictionary as described [here](http://docs.exosite.com/rpc/#authentication).
 
 
 Usage
