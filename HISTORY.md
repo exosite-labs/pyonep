@@ -1,6 +1,12 @@
 History
 =======
 
+0.9.8 (2015-01-29)
+------------------
+
+- add protected parameter for content_create
+
+
 0.9.7 (2014-12-18)
 ------------------
 

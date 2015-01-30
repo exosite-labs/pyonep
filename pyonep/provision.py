@@ -131,8 +131,11 @@ class Provision(object):
         reopened by making another API called.'''
         self.onephttp.close()
 
-    def content_create(self, key, model, contentid, meta):
-        data = urlencode({'id': contentid, 'meta': meta})
+    def content_create(self, key, model, contentid, meta, protected=False):
+        params = {'id': contentid, 'meta': meta}
+        if protected is not False:
+            params['protected'] = 'true'
+        data = urlencode(params)
         path = PROVISION_MANAGE_CONTENT + model + '/'
         return self._request(path,
                              key, data, 'POST', self._manage_by_cik)
