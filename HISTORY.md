@@ -1,6 +1,12 @@
 History
 =======
 
+0.10.0 (2015-02-19)
+-------------------
+
+- (breaking change) add rid to listing parameters. Pass {'alias': ''}
+  to match previous behavior.
+
 0.9.8 (2015-01-29)
 ------------------
 

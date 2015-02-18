@@ -270,3 +270,20 @@ except httplib.HTTPException:
 ```
 
 You can also ask the provision module to raise an exception for HTTP statuses of 400 and above by passing `raise_api_exceptions=True` to the `Provision` constructore. This can consolidate code that handles API errors for a large number of provision calls. See the [provisioning example](examples/provisioning.py) to see how to do this.
+
+Migrating to 0.10.0
+------------------
+
+The [RPC listing command](http://docs.exosite.com/rpc#listing) now includes a resource identifier, which makes it possible to do multiple listing calls in a single request. The old form of listing is deprecated, and upgrading to pyonep 0.10.0 will require some changes to code. Using the old form will produce an exception. For example:
+
+```
+onep.listing(auth, ['dataport'], options={})
+```
+
+...should be changed to:
+
+```
+onep.listing(auth, {'alias': ''}, ['dataport'], options={})
+```
+
+The `options` parameter is now required, too.

@@ -253,12 +253,10 @@ class OnepV1():
     def info(self, auth, rid, options={}, defer=False):
         return self._call('info', auth,  [rid, options], defer)
 
-    def listing(self, auth, types, options=None, defer=False):
-        if options is None:
-            # This variant is deprecated
-            return self._call('listing', auth, [types], defer)
-        else:
-            return self._call('listing', auth, [types, options], defer)
+    def listing(self, auth, rid, types, options, defer=False):
+        if type(rid) is list:
+            raise Exception('listing without RID or options is no longer supported http://docs.exosite.com/rpc/#listing')
+        return self._call('listing', auth, [rid, types, options], defer)
 
     def lookup(self, auth, type, mapping, defer=False):
         return self._call('lookup', auth, [type, mapping], defer)
