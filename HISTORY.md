@@ -1,6 +1,13 @@
 History
 =======
 
+0.11.0 (2015-02-26)
+-------------------
+
+- (breaking change) Undoes the breaking change to listing() in 0.10.0. All old code will
+  continue to call deprecated listing API. New code should pass `options={}` and 
+  `rid={'alias': ''}`. This only affects anyone who got 0.10.0.
+
 0.10.0 (2015-02-19)
 -------------------
 

@@ -253,10 +253,26 @@ class OnepV1():
     def info(self, auth, rid, options={}, defer=False):
         return self._call('info', auth,  [rid, options], defer)
 
-    def listing(self, auth, rid, types, options, defer=False):
-        if type(rid) is list:
-            raise Exception('listing without RID or options is no longer supported http://docs.exosite.com/rpc/#listing')
-        return self._call('listing', auth, [rid, types, options], defer)
+    def listing(self, auth, types, options=None, rid=None, defer=False):
+        '''This provides backward compatibility with two
+           previous variants of listing. To use the non-deprecated
+           API, pass both options and rid.'''
+        if options is None:
+            # This variant is deprecated
+            return self._call('listing', auth, [types], defer)
+        else:
+            if rid is None:
+                # This variant is deprecated, too
+                return self._call('listing',
+                                  auth,
+                                  [types, options],
+                                  defer)
+            else:
+                # pass rid to use the non-deprecated variant
+                return self._call('listing',
+                                  auth,
+                                  [rid, types, options],
+                                  defer)
 
     def lookup(self, auth, type, mapping, defer=False):
         return self._call('lookup', auth, [type, mapping], defer)
@@ -291,6 +307,9 @@ class OnepV1():
     def usage(self, auth, rid, metric, starttime, endtime, defer=False):
         return self._call('usage', auth,
                           [rid, metric, starttime, endtime], defer)
+
+    def wait(self, auth, rid, options, defer=False):
+        return self._call('wait', auth, [rid, options], defer)
 
     def write(self, auth, rid, value, options={}, defer=False):
         return self._call('write', auth, [rid, value, options], defer)
