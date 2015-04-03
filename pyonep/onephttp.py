@@ -21,7 +21,7 @@ except:
 class ConnectionFactory():
     '''Builds the correct kind of HTTPConnection object.'''
     @staticmethod
-    def make_conn(hostport, https, timeout):
+    def make_conn(hostport, https, timeout=None):
         '''Returns a HTTPConnection(-like) instance.
 
               hostport: the host and port to connect to, joined by a colon
@@ -32,7 +32,7 @@ class ConnectionFactory():
         else:
             cls = httplib.HTTPConnection
 
-        if sys.version_info < (2, 6):
+        if sys.version_info < (2, 6) or timeout is None:
             conn = cls(hostport)
         else:
             conn = cls(hostport, timeout=timeout)
@@ -65,19 +65,32 @@ class OnePHTTP:
         self.log = log
         self.curldebug = curldebug
 
-    def request(self, method, path, body=None, headers={}, exception_fn=None):
+    def request(self,
+                method,
+                path,
+                body=None,
+                headers={},
+                exception_fn=None,
+                notimeout=False):
         '''Wraps HTTPConnection.request. On exception it calls exception_fn
         with the exception object. If exception_fn is None, it re-raises the
-        exception.'''
+        exception. If notimeout is True, create a new connection (regardless of
+        self.reuseconnection setting) that uses the global default timeout for
+        sockets (usually None).'''
         allheaders = {}
         allheaders.update(self.headers)
         allheaders.update(headers)
-        if self.conn is None or not self.reuseconnection:
+        if self.conn is None or not self.reuseconnection or notimeout:
             self.close()
-            self.conn = ConnectionFactory.make_conn(
-                self.host,
-                self.https,
-                self.httptimeout)
+            if notimeout:
+                self.conn = ConnectionFactory.make_conn(
+                    self.host,
+                    self.https)
+            else:
+                self.conn = ConnectionFactory.make_conn(
+                    self.host,
+                    self.https,
+                    self.httptimeout)
         try:
             if self.curldebug:
                 # output request as a curl call

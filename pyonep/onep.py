@@ -37,9 +37,11 @@ except ImportError:
 class DeferredRequests():
     '''Encapsulates a list of deferred requests for each auth/CIK. Once the requests
         are ready to be sent, get_method_args_pairs() returns a list of the
-        method name and arguments for each request.'''
+        method name and arguments for each request and get_notimeout() returns whether
+        the client should time out.'''
     def __init__(self):
         self._requests = {}
+        self._notimeouts = {}
 
     def _authstr(self, auth):
         '''Convert auth to str so that it can be hashed'''
@@ -48,9 +50,13 @@ class DeferredRequests():
         else:
             return auth
 
-    def add(self, auth, method, args):
+    def add(self, auth, method, args, notimeout=False):
         '''Append a deferred request for a particular auth/CIK.'''
-        self._requests.setdefault(self._authstr(auth), []).append((method, args))
+        authstr = self._authstr(auth)
+        self._requests.setdefault(authstr, []).append((method, args))
+        self._notimeouts.setdefault(authstr, False)
+        if notimeout:
+            self._notimeouts[authstr] = notimeout
 
     def reset(self, auth):
         self._requests.pop(self._authstr(auth))
@@ -64,8 +70,13 @@ class DeferredRequests():
 
     def get_method_args_pairs(self, auth):
         '''Returns a list of method/arguments pairs corresponding to deferred
-        requests for this auth/CIK'''
+        calls for this auth/CIK'''
         return self._requests[self._authstr(auth)]
+
+    def get_notimeout(self, auth):
+        '''Returns a boolean representing whether timeout setting should be used
+        for deferred calls for this auth/CIK'''
+        return self._notimeouts[self._authstr(auth)]
 
 
 class OnepV1():
@@ -108,7 +119,7 @@ class OnepV1():
         '''Returns a list of request bodies made by this instance of OnepV1'''
         return self._loggedrequests
 
-    def _callJsonRPC(self, auth, callrequests, returnreq=False):
+    def _callJsonRPC(self, auth, callrequests, returnreq=False, notimeout=False):
         '''Calls the Exosite One Platform RPC API.
             If returnreq is False, result is a tuple with this structure:
                 (success (boolean), response)
@@ -116,6 +127,8 @@ class OnepV1():
             If returnreq is True, result is a list of tuples with
             this structure:
                 (request, success, response)
+            notimeout, if true, ignores reuseconnection setting, creating
+            a new connection with no timeout.
                 '''
         # get full auth (auth could be a CIK str)
         auth = self._getAuth(auth)
@@ -132,7 +145,8 @@ class OnepV1():
                               self.url,
                               body,
                               self.headers,
-                              exception_fn=handle_request_exception)
+                              exception_fn=handle_request_exception,
+                              notimeout=notimeout)
 
         def handle_response_exception(exception):
             raise JsonRPCResponseException(
@@ -199,13 +213,13 @@ class OnepV1():
             i += 1
         return calls
 
-    def _call(self, method, auth, arg, defer):
+    def _call(self, method, auth, arg, defer, notimeout=False):
         if defer:
-            self.deferred.add(auth, method, arg)
+            self.deferred.add(auth, method, arg, notimeout=notimeout)
             return True
         else:
             calls = self._composeCalls([(method, arg)])
-            return self._callJsonRPC(auth, calls)
+            return self._callJsonRPC(auth, calls, notimeout=notimeout)
 
     def has_deferred(self, auth):
         return self.deferred.has_requests(auth)
@@ -213,10 +227,13 @@ class OnepV1():
     def send_deferred(self, auth):
         '''Send all deferred requests for a particular CIK/auth.'''
         if self.deferred.has_requests(auth):
-            calls = self._composeCalls(
-                self.deferred.get_method_args_pairs(auth))
+            method_arg_pairs = self.deferred.get_method_args_pairs(auth)
+            calls = self._composeCalls(method_arg_pairs)
+            # should this call be made with no timeout? (e.g. is there a
+            # wait())
+            notimeout = self.deferred.get_notimeout(auth)
             try:
-                r = self._callJsonRPC(auth, calls, returnreq=True)
+                r = self._callJsonRPC(auth, calls, returnreq=True, notimeout=notimeout)
             finally:
                 # remove deferred calls
                 self.deferred.reset(auth)
@@ -309,7 +326,8 @@ class OnepV1():
                           [rid, metric, starttime, endtime], defer)
 
     def wait(self, auth, rid, options, defer=False):
-        return self._call('wait', auth, [rid, options], defer)
+        # let the server control the timeout
+        return self._call('wait', auth, [rid, options], defer, notimeout=True)
 
     def write(self, auth, rid, value, options={}, defer=False):
         return self._call('write', auth, [rid, value, options], defer)
