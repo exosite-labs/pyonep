@@ -1,4 +1,4 @@
-#==============================================================================
+﻿#==============================================================================
 # provision.py
 # This is API library for Exosite's One-Platform provision interface.
 #==============================================================================
@@ -69,12 +69,14 @@ class Provision(object):
                  https=False,
                  reuseconnection=False,
                  raise_api_exceptions=False,
-                 curldebug=False):
+                 curldebug=False,
+                 manage_by_sharecode=True):
         # backward compatibility
         protocol = 'http://'
         if host.startswith(protocol):
             host = host[len(protocol):]
         self._manage_by_cik = manage_by_cik
+        self._manage_by_sharecode = manage_by_sharecode
         self._verbose = verbose
         self._onephttp = onephttp.OnePHTTP(host + ':' + str(port),
                                            https=https,
@@ -173,11 +175,16 @@ class Provision(object):
         path = PROVISION_MANAGE_CONTENT + model + '/' + contentid
         return self._request(path, key, data, 'POST', self._manage_by_cik, headers)
 
-    def model_create(self, key, model, clonerid,
+    def model_create(self, key, model, sharecode,
                      aliases=True, comments=True, historical=True):
         options = self._filter_options(aliases, comments, historical)
-        data = urlencode({'model': model,
-                                 'rid': clonerid,
+        if self._manage_by_sharecode:
+            data = urlencode({'model': model,
+                                 'code': sharecode,
+                                 'options[]': options}, doseq=True)
+        else:
+            data = urlencode({'model': model,
+                                 'rid': sharecode,
                                  'options[]': options}, doseq=True)
         return self._request(PROVISION_MANAGE_MODEL,
                              key, data, 'POST', self._manage_by_cik)

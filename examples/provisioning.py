@@ -1,4 +1,4 @@
-#==========================================================================
+﻿#==========================================================================
 # provisioning.py
 # Demonstrates use of the provision API
 #==========================================================================
@@ -32,6 +32,7 @@ def provision_example(options):
     vendorname = options['vendorname']
     vendortoken = options['vendortoken']
     clonecik = options['clonecik']
+    cloneportalcik = options['cloneportalcik']
     portalcik = options['portalcik']
 
     print('pyonep version ' + pyonep.__version__)
@@ -57,10 +58,15 @@ def provision_example(options):
                               port=443,
                               manage_by_cik=False,
                               verbose=False,
-                              raise_api_exceptions=True)
+                              raise_api_exceptions=True,
+                              manage_by_sharecode=True)
+        # manage by sharecode
+        option = "[\"" + vendorname + "\", \"" + model +"\"]"
+        meta = {"meta" : option}
+        isok, sharecode = op.share(cloneportalcik, clonerid, meta)
     try:
         print("model_create()")
-        provision.model_create(vendortoken, model, clonerid, aliases=False)
+        provision.model_create(vendortoken, model, sharecode, aliases=False)
 
         # production code should read isok before using body
         print provision.model_list(vendortoken).body
@@ -137,6 +143,9 @@ if __name__ == '__main__':
         'vendortoken': '<VENDOR TOKEN HERE>',
         # CIK of client to clone for model
         'clonecik': '<CLONE DEVICE CIK HERE>',
+        # CIK of portal of client to clone for model
+        # Use only if managing by sharecode
+        'cloneportalcik': '<CLONE PORTAL CIK HERE>',
         # CIK of parent of clonecik client. In the case of Portals,
         # this is the CIK of the portal. It can be found in your portal under
         # Account > Portals
