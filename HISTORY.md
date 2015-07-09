@@ -1,6 +1,13 @@
 History
 =======
 
+
+0.11.2 (2015-07-01)
+-------------------
+
+- add manage_by_sharecode boolean to indicate whether sharecode or RID is used with create model
+- fix provisioning example to use sharecode rather than RID
+
 0.11.1 (2015-04-03)
 -------------------
 
