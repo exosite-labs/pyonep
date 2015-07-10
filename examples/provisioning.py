@@ -135,6 +135,7 @@ def provision_example(options):
     return True
 
 if __name__ == '__main__':
+    # To make tests run, keep test/testconfig.py.template in sync with this.
     config = {
         # Vendor token and name are listed at the top of
         # https://<your domain>.exosite.com/admin/managemodels

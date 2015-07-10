@@ -64,19 +64,8 @@ class TestProvision(TestCase):
     def test_example(self):
         '''Test provisioning example code'''
         from examples import provisioning
-        r = provisioning.provision_example({
-            # Vendor token and name are listed at the top of
-            # https://<your domain>.exosite.com/admin/managemodels
-            # (Vendor token is also available on the domain admin home page)
-            'vendorname': self.vendorname,
-            'vendortoken': self.vendortoken,
-            # CIK of client to clone for model
-            'clonecik': self.cik,
-            # CIK of parent of clonecik client. In the case of Portals,
-            # this is the CIK of the portal. It can be found in your portal under
-            # Account > Portals
-            # Look for: Key: 123abc...
-            'portalcik': self.portalcik
-        })
+        c = config.copy()
+        c['clonecik'] = self.cik
+        c['portalcik'] = self.portalcik
+        r = provisioning.provision_example(c)
         self.assertTrue(r, "provisioning example runs without error")
-
