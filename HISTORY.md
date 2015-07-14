@@ -1,11 +1,16 @@
 History
 =======
 
+0.11.3 (2015-07-14)
+-------------------
+
+- use RID rather than sharecode by default, for backward compatibility.
 
 0.11.2 (2015-07-01)
 -------------------
 
-- add manage_by_sharecode boolean to indicate whether sharecode or RID is used with create model
+- add manage_by_sharecode boolean to indicate whether sharecode or RID is 
+  used with create model
 - fix provisioning example to use sharecode rather than RID
 
 0.11.1 (2015-04-03)
@@ -16,9 +21,10 @@ History
 0.11.0 (2015-02-26)
 -------------------
 
-- (breaking change) Undoes the breaking change to listing() in 0.10.0. All old code will
-  continue to call deprecated listing API. New code should pass `options={}` and 
-  `rid={'alias': ''}`. This only affects anyone who got 0.10.0.
+- (breaking change) Undoes the breaking change to listing() in 0.10.0. All 
+  old code will continue to call deprecated listing API. New code should 
+  pass `options={}` and `rid={'alias': ''}`. This only affects anyone who 
+  used 0.10.0.
 
 0.10.0 (2015-02-19)
 -------------------

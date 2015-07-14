@@ -70,7 +70,7 @@ class Provision(object):
                  reuseconnection=False,
                  raise_api_exceptions=False,
                  curldebug=False,
-                 manage_by_sharecode=True):
+                 manage_by_sharecode=False):
         # backward compatibility
         protocol = 'http://'
         if host.startswith(protocol):
