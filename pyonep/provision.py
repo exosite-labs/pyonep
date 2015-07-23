@@ -242,8 +242,8 @@ class Provision(object):
         return self._request(path, key, data, 'POST', self._manage_by_cik)
 
     def serialnumber_info(self, key, model, serialnumber, actvtn_log=False):
-        path = PROVISION_MANAGE_MODEL + model + '/' + serialnumber
         data = 'show=log' if actvtn_log else ''
+        path = PROVISION_MANAGE_MODEL + model + '/' + serialnumber
         return self._request(path, key, data, 'GET', self._manage_by_cik)
 
     def serialnumber_list(self, key, model, offset=0, limit=1000):
