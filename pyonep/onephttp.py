@@ -98,7 +98,7 @@ class OnePHTTP:
                     '''escape single quotes for bash'''
                     return s.replace("'", "'\\''")
                 self.log.debug(
-                    "curl {0}://{1}{2} -X {3} -m {4} {5} {6}".format(
+                    "curl '{0}://{1}{2}' -X {3} -m {4} {5} {6}".format(
                         'https' if self.https else 'http',
                         self.host,
                         path,
