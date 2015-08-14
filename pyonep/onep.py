@@ -84,9 +84,9 @@ class OnepV1():
 
     def __init__(self,
                  host='m2.exosite.com',
-                 port='80',
+                 port='443',
                  url='/onep:v1/rpc/process',
-                 https=False,
+                 https=True,
                  httptimeout=10,
                  agent=None,
                  reuseconnection=False,
