@@ -90,7 +90,8 @@ class OnepV1():
                  agent=None,
                  reuseconnection=False,
                  logrequests=False,
-                 curldebug=False):
+                 curldebug=False,
+                 startid=0):
         self.url = url
         self._clientid = None
         self._resourceid = None
@@ -98,6 +99,8 @@ class OnepV1():
         if agent is not None:
             self.headers['User-Agent'] = agent
         self.logrequests = logrequests
+        # starting ID for RPC calls
+        self.startid = startid
         self.onephttp = onephttp.OnePHTTP(host + ':' + str(port),
                                           https=https,
                                           httptimeout=int(httptimeout),
@@ -205,12 +208,11 @@ class OnepV1():
 
     def _composeCalls(self, method_args_pairs):
         calls = []
-        i = 0
         for method, args in method_args_pairs:
-            calls.append({'id': i,
+            calls.append({'id': self.startid,
                           'procedure': method,
                           'arguments': args})
-            i += 1
+            self.startid += 1
         return calls
 
     def _call(self, method, auth, arg, defer, notimeout=False):

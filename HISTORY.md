@@ -1,6 +1,12 @@
 History
 =======
 
+0.12.3 (2015-08-30)
+-------------------
+
+- keep consistent ID numbering in RPC calls, again
+  for testability
+
 0.12.2 (2015-08-30)
 -------------------
 
