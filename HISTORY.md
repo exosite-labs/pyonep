@@ -1,6 +1,11 @@
 History
 =======
 
+0.12.2 (2015-08-30)
+-------------------
+
+- use non-random IDs in RPC calls, for testability
+
 0.12.1 (2015-08-30)
 -------------------
 

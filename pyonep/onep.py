@@ -9,7 +9,6 @@
 #
 import sys
 import logging
-import random
 
 from pyonep import onephttp
 from .exceptions import OneException, OnePlatformException
@@ -206,7 +205,7 @@ class OnepV1():
 
     def _composeCalls(self, method_args_pairs):
         calls = []
-        i = random.randint(1, 99)
+        i = 0
         for method, args in method_args_pairs:
             calls.append({'id': i,
                           'procedure': method,
