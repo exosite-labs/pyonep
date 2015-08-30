@@ -132,6 +132,8 @@ class OnePHTTP:
                 version = 'HTTP/1.0'
             elif response.version == 11:
                 version = 'HTTP/1.1'
+            elif response.version is None:
+                version = 'HTTP/?'
             else:
                 version = '%d' % response.version
             self.log.debug("%s %s %s\nHeaders: %s" % (

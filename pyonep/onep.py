@@ -149,8 +149,9 @@ class OnepV1():
                               notimeout=notimeout)
 
         def handle_response_exception(exception):
+
             raise JsonRPCResponseException(
-                "Failed to get response for request: %s" % str(exception))
+                "Failed to get response for request: %s %s" % (type(exception), str(exception)))
 
         body, response = self.onephttp.getresponse(
             exception_fn=handle_response_exception)
