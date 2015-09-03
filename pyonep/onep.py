@@ -299,6 +299,9 @@ class OnepV1():
     def map(self, auth, rid, alias, defer=False):
         return self._call('map', auth, ['alias', rid, alias], defer)
 
+    def move(self, auth, rid, destinationrid, options={"aliases": True}, defer=False):
+        return self._call('move', auth, [rid, destinationrid, options], defer)
+
     def read(self, auth, rid, options, defer=False):
         return self._call('read', auth, [rid, options], defer)
 
