@@ -72,7 +72,7 @@ class Provision(object):
                  curldebug=False,
                  manage_by_sharecode=False):
         # backward compatibility
-        protocol = 'http://'
+        protocol = 'https://'
         if host.startswith(protocol):
             host = host[len(protocol):]
         self._manage_by_cik = manage_by_cik
@@ -121,6 +121,7 @@ class Provision(object):
                                url,
                                body,
                                headers)
+
         pr = ProvisionResponse(body, response)
         if self._raise_api_exceptions and not pr.isok:
             raise ProvisionException(pr)
