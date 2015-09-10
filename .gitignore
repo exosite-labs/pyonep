@@ -40,7 +40,7 @@ pip-delete-this-directory.txt
 
 # Unit test / coverage reports
 htmlcov/
-.tox/
+.tox*/
 .coverage
 .coverage.*
 .cache
@@ -64,3 +64,7 @@ target/
 # Editor swapfiles
 .*sw?
 *~
+
+# Temporary tox stuff
+tox_py*.ini
+tox_failures
