@@ -33,6 +33,12 @@ except ImportError:
     sys.exit(1)
 
 
+class FORMATS:
+    STRING = 'string'
+    FLOAT = 'float'
+    INTEGER = 'integer'
+
+
 class DeferredRequests():
     '''Encapsulates a list of deferred requests for each auth/CIK. Once the requests
         are ready to be sent, get_method_args_pairs() returns a list of the
@@ -101,7 +107,7 @@ class OnepV1():
         self.logrequests = logrequests
         # starting ID for RPC calls
         self.startid = startid
-        self.onephttp = onephttp.OnePHTTP(host + ':' + str(port),
+        self.onephttp = onephttp.OneP_Request(host + ':' + str(port),
                                           https=https,
                                           httptimeout=int(httptimeout),
                                           headers=self.headers,
@@ -143,7 +149,7 @@ class OnepV1():
             raise JsonRPCRequestException(
                 "Failed to make http request: %s" % str(exception))
 
-        self.onephttp.request('POST',
+        body, response = self.onephttp.request('POST',
                               self.url,
                               body,
                               self.headers,
@@ -154,9 +160,6 @@ class OnepV1():
 
             raise JsonRPCResponseException(
                 "Failed to get response for request: %s %s" % (type(exception), str(exception)))
-
-        body, response = self.onephttp.getresponse(
-            exception_fn=handle_response_exception)
 
         try:
             res = json.loads(body)
@@ -256,6 +259,24 @@ class OnepV1():
 
     def create(self, auth, type, desc, defer=False):
         return self._call('create', auth, [type, desc], defer)
+
+    def createDataport(self, auth, desc, defer=False):
+        '''Create a dataport resource.
+           "format" and "retention" are required
+            {
+                "format": "float" | "integer" | "string",
+                "meta": string = "",
+                "name": string = "",
+                "preprocess": list = [],
+                "public": boolean = false,
+                "retention": {
+                    "count": number | "infinity",
+                    "duration": number | "infinity"
+                },
+                "subscribe": <ResourceID> |  null = null
+            }
+        '''
+        return self._call('create', auth, ['dataport', desc], defer)
 
     def deactivate(self, auth, codetype, code, defer=False):
         return self._call('deactivate', auth, [codetype, code], defer)

@@ -58,49 +58,49 @@ def provision_example(vendorname, vendortoken, clonerid, portalcik, portalrid):
 
         # production code should read isok before using body
         print("model_list()")
-        print provision.model_list(vendortoken).body
-        print provision.model_info(vendortoken, model).body
+        print(provision.model_list(vendortoken).body)
+        print(provision.model_info(vendortoken, model).body)
         print("serialnumber_add()")
         provision.serialnumber_add(vendortoken, model, sn1)
         print("serialnumber_add_batch()")
         provision.serialnumber_add_batch(vendortoken, model, [sn2, sn3])
-        print provision.serialnumber_list(vendortoken, model, limit=10).body
+        print(provision.serialnumber_list(vendortoken, model, limit=10).body)
         print("serialnumber_remove_batch()")
         provision.serialnumber_remove_batch(vendortoken, model, [sn2, sn3])
-        print provision.serialnumber_list(vendortoken, model).body
+        print(provision.serialnumber_list(vendortoken, model).body)
         print("serialnumber_enable()")
         provision.serialnumber_enable(
             vendortoken, model, sn1,
             portalrid)  # return clientid
-        print "AFTER ENABLE:", provision.serialnumber_info(vendortoken,
-                                                           model, sn1).body
+        print("AFTER ENABLE:", provision.serialnumber_info(vendortoken,
+                                                           model, sn1).body)
         print("serialnumber_disable()")
         provision.serialnumber_disable(vendortoken, model, sn1)
-        print "AFTER DISABLE:", provision.serialnumber_info(vendortoken,
-                                                            model, sn1).body
+        print("AFTER DISABLE:", provision.serialnumber_info(vendortoken,
+                                                            model, sn1).body)
         print("serialnumber_reenable()")
         provision.serialnumber_reenable(vendortoken, model, sn1)
-        print "AFTER REENABLE:", provision.serialnumber_info(vendortoken,
-                                                             model, sn1).body
+        print("AFTER REENABLE:", provision.serialnumber_info(vendortoken,
+                                                             model, sn1).body)
         print("serialnumber_activate()")
 
         # return client key,
         sn_cik = provision.serialnumber_activate(model, sn1, vendorname).body
-        print "AFTER ACTIVATE:", provision.serialnumber_info(vendortoken,
-                                                             model, sn1).body
+        print("AFTER ACTIVATE:", provision.serialnumber_info(vendortoken,
+                                                             model, sn1).body)
 
         def test_content(content_id, content_data, content_type, content_meta):
             print("content_create()")
             provision.content_create(vendortoken, model, content_id,
                                     content_meta)
-            print provision.content_list(vendortoken, model)
+            print(provision.content_list(vendortoken, model))
             print("content_upload()")
-            print provision.content_upload(vendortoken, model, content_id,
-                                        content_data, content_type)
-            print provision.content_list(vendortoken, model)
-            print provision.content_info(vendortoken, model, content_id)
+            print(provision.content_upload(vendortoken, model, content_id,
+                                        content_data, content_type))
+            print(provision.content_list(vendortoken, model))
+            print(provision.content_info(vendortoken, model, content_id))
             print("content_download()")
-            print provision.content_download(sn_cik, vendorname, model, content_id)
+            print(provision.content_download(sn_cik, vendorname, model, content_id))
             print("content_remove()")
             provision.content_remove(vendortoken, model, content_id)
 
