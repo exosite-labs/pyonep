@@ -5,22 +5,11 @@ from __future__ import unicode_literals
 import json
 from unittest import TestCase
 
-# import vcr
 import requests
 
 from pyonep import onep
 
 CIK_FNTN_URL = 'https://cik.herokuapp.com/api'
-#print(os.path.abspath(__file__))
-#CIK_FNTN_VENDOR_ID = md5.md5(os.path.abspath(__file__)).hexdigest()
-#print("VENDOR_ID: {0}".format(CIK_FNTN_VENDOR_ID))
-# sys.exit()
-#CIK_FNTN_CASS = 'vcr_cassettes/cik_fntn_cassette.yaml'
-# myvcr = vcr.VCR(
-#     match_on=['method', 'scheme', 'uri', 'query', 'body'],
-#     record_mode='new_episodes'
-# )
-
 
 def create_test_client():
     return TestBase.createTestClient()
@@ -53,8 +42,7 @@ class TestBase(TestCase):
     @classmethod
     def setUpClass(cls):
         cls.session = requests.Session()
-        # with myvcr.use_cassette(CIK_FNTN_CASS):
-        r = requests.get(CIK_FNTN_URL+'/create?vendor') #='+CIK_FNTN_VENDOR_ID)
+        r = requests.get(CIK_FNTN_URL+'/create?vendor')
         r.raise_for_status()
         cls.config = r.json()
 
