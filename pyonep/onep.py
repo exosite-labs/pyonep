@@ -358,7 +358,7 @@ class OnepV1():
             resource: Identifed resource to be moved.
             destinationrid: rid of client resource is being moved to.
         """
-        return self._call('move', auth, [rid, destinationrid, options], defer)
+        return self._call('move', auth, [resource, destinationrid, options], defer)
 
     def read(self, auth, resource, options, defer=False):
         """ Read value(s) from a dataport.
