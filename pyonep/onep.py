@@ -101,7 +101,7 @@ class OnepV1():
         self.logrequests = logrequests
         # starting ID for RPC calls
         self.startid = startid
-        self.onephttp = onephttp.OnePHTTP(host + ':' + str(port),
+        self.onephttp = onephttp.OneP_Request(host + ':' + str(port),
                                           https=https,
                                           httptimeout=int(httptimeout),
                                           headers=self.headers,
@@ -143,7 +143,7 @@ class OnepV1():
             raise JsonRPCRequestException(
                 "Failed to make http request: %s" % str(exception))
 
-        self.onephttp.request('POST',
+        body, response = self.onephttp.request('POST',
                               self.url,
                               body,
                               self.headers,
@@ -154,9 +154,6 @@ class OnepV1():
 
             raise JsonRPCResponseException(
                 "Failed to get response for request: %s %s" % (type(exception), str(exception)))
-
-        body, response = self.onephttp.getresponse(
-            exception_fn=handle_response_exception)
 
         try:
             res = json.loads(body)

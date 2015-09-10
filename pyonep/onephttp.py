@@ -10,44 +10,12 @@
        3. call getresponse() to get a HTTPResponse object
 
    Copyright (c) 2014, Exosite LLC'''
+# pylint: disable = W0312
 
 import sys
-try:
-    import httplib
-except:
-    # python 3
-    from http import client as httplib
+from requests import Session, Request
 
-class ConnectionFactory():
-    '''Builds the correct kind of HTTPConnection object.'''
-    @staticmethod
-    def make_conn(hostport, https, timeout=None):
-        '''Returns a HTTPConnection(-like) instance.
-
-              hostport: the host and port to connect to, joined by a colon
-              https: boolean indicating whether to use HTTPS
-              timeout: number of seconds to wait for a response before HTTP timeout'''
-        if https:
-            cls = httplib.HTTPSConnection
-        else:
-            cls = httplib.HTTPConnection
-
-        if sys.version_info < (2, 6) or timeout is None:
-            conn = cls(hostport)
-        else:
-            conn = cls(hostport, timeout=timeout)
-
-        return conn
-
-class OnePHTTPResponse:
-    def __init__(self, exception=None, code=None, reason=None, body=None):
-        self.exception = exception
-        self.code = code
-        self.reason = reason
-        self.body = body
-
-
-class OnePHTTP:
+class OneP_Request:
     def __init__(self,
                     host,
                     https=True,
@@ -56,12 +24,13 @@ class OnePHTTP:
                     reuseconnection=False,
                     log=None,
                     curldebug=False):
-        self.host = host
+        self.host = 'https://'+host if https else host
         self.https = https
         self.httptimeout = httptimeout
         self.headers = headers
         self.reuseconnection = reuseconnection
-        self.conn = None
+        self.session = Session()
+        self.session.headers.update(self.headers)
         self.log = log
         self.curldebug = curldebug
 
@@ -71,26 +40,20 @@ class OnePHTTP:
                 body=None,
                 headers={},
                 exception_fn=None,
-                notimeout=False):
+                notimeout=False,
+                verify=True):
         '''Wraps HTTPConnection.request. On exception it calls exception_fn
         with the exception object. If exception_fn is None, it re-raises the
         exception. If notimeout is True, create a new connection (regardless of
         self.reuseconnection setting) that uses the global default timeout for
         sockets (usually None).'''
-        allheaders = {}
-        allheaders.update(self.headers)
-        allheaders.update(headers)
-        if self.conn is None or not self.reuseconnection or notimeout:
+        allheaders = headers
+        allheaders.update(self.session.headers)
+
+        if not self.reuseconnection or notimeout:
             self.close()
-            if notimeout:
-                self.conn = ConnectionFactory.make_conn(
-                    self.host,
-                    self.https)
-            else:
-                self.conn = ConnectionFactory.make_conn(
-                    self.host,
-                    self.https,
-                    self.httptimeout)
+            self.session = Session()
+
         try:
             if self.curldebug:
                 # output request as a curl call
@@ -115,38 +78,18 @@ class OnePHTTP:
                     allheaders))
                 if body is not None:
                     self.log.debug("Body: %s" % body)
-            self.conn.request(method, path, body, allheaders)
-        except Exception:
-            self.close()
-            ex = sys.exc_info()[1]
-            if exception_fn is not None:
-                exception_fn(ex)
-            else:
-                raise ex
 
-    def getresponse(self, exception_fn=None):
-        '''Wraps HTTPLib.getresponse. Exceptions handled as in request()'''
-        try:
-            response = self.conn.getresponse()
-            if response.version == 10:
-                version = 'HTTP/1.0'
-            elif response.version == 11:
-                version = 'HTTP/1.1'
-            elif response.version is None:
-                version = 'HTTP/?'
-            else:
-                version = '%d' % response.version
-            self.log.debug("%s %s %s\nHeaders: %s" % (
-                version,
-                response.status,
-                response.reason,
-                response.getheaders()))
-            if response.getheader('Content-Type', '').endswith('charset=utf-8'):
-                body = response.read().decode('utf_8')
-            else:
-                body = response.read()
-            self.log.debug("Body: %s" % body)
-            return body, response
+            prepped = self.session.prepare_request(
+                Request(method, self.host+path, data=body, headers=headers)
+            )
+
+            response = self.session.send(
+                prepped,
+                verify=verify,
+                timeout=None if notimeout else self.httptimeout
+            )
+            return response.text, response
+
         except Exception:
             self.close()
             ex = sys.exc_info()[1]
@@ -154,14 +97,11 @@ class OnePHTTP:
                 exception_fn(ex)
             else:
                 raise ex
-        finally:
-            if not self.reuseconnection:
-                self.close()
 
     def close(self):
         '''Closes any open connection. This should only need to be called if
         reuseconnection is set to True. Once it's closed, the connection may be
         reopened by making another API called.'''
-        if self.conn is not None:
-            self.conn.close()
-            self.conn = None
+        if self.session is not None:
+            self.session.close()
+            self.session = None

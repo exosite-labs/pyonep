@@ -5,7 +5,6 @@ from __future__ import unicode_literals
 
 import test_base
 
-
 class TestProvision(test_base.TestBase):
     """
         Test pyonep provisioning methods.
