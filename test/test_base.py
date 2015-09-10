@@ -3,7 +3,6 @@
 '''Test pyonep library.'''
 from __future__ import unicode_literals
 import json
-import md5
 import os
 from unittest import TestCase
 
@@ -14,8 +13,6 @@ from pyonep import onep
 
 CIK_FNTN_URL = 'https://cik.herokuapp.com/api'
 print(os.path.abspath(__file__))
-CIK_FNTN_VENDOR_ID = md5.md5(os.path.abspath(__file__)).hexdigest()
-print("VENDOR_ID: {0}".format(CIK_FNTN_VENDOR_ID))
 # sys.exit()
 CIK_FNTN_CASS = 'vcr_cassettes/cik_fntn_cassette.yaml'
 # myvcr = vcr.VCR(
@@ -35,7 +32,7 @@ class TestBase(TestCase):
     def setUpClass(cls):
         cls.session = requests.Session()
         # with myvcr.use_cassette(CIK_FNTN_CASS):
-        r = requests.get(CIK_FNTN_URL+'/create?vendor') #='+CIK_FNTN_VENDOR_ID)
+        r = requests.get(CIK_FNTN_URL+'/create?vendor')
         print(r.status_code, r.text)
         cls.config = r.json()
         print("Here's the config from CIK Fountain:\n{0}".format(json.dumps(cls.config, indent=2)))

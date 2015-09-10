@@ -3,7 +3,7 @@
 '''Test provisioning module'''
 from __future__ import unicode_literals
 
-import test_base
+from test import test_base
 
 class TestProvision(test_base.TestBase):
     """

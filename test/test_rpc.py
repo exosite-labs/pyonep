@@ -3,7 +3,7 @@
 '''Test pyonep RPC'''
 from __future__ import unicode_literals
 
-import test_base
+from test import test_base
 
 
 class TestRPC(test_base.TestBase):
