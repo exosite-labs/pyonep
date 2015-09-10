@@ -3,13 +3,6 @@
 '''Test pyonep RPC'''
 from __future__ import unicode_literals
 
-#@DEBUG
-import os
-import sys
-f=open("/tmp/whatever", "w")
-f.write("x-alpha: {0}\n".format(os.getcwd()))
-f.write("x-bravo: {0}\n".format(sys.path))
-f.close()
 from test import test_base
 
 
