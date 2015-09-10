@@ -65,6 +65,11 @@ target/
 .*sw?
 *~
 
+# Eclipse nonsense
+.project
+.pydevproject
+.settings/org.eclipse.core.resources.prefs
+
 # Temporary tox stuff
 tox_py*.ini
 tox_failures
