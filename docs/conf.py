@@ -55,6 +55,7 @@ author = u'Exosite'
 # built documents.
 #
 # The short X.Y version.
+sys.path.append('..')
 from pyonep import __version__ as pyonep_version
 version = pyonep_version
 # The full version, including alpha/beta/rc tags.
