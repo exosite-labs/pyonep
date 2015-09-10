@@ -33,6 +33,12 @@ except ImportError:
     sys.exit(1)
 
 
+class FORMATS:
+    STRING = 'string'
+    FLOAT = 'float'
+    INTEGER = 'integer'
+
+
 class DeferredRequests():
     '''Encapsulates a list of deferred requests for each auth/CIK. Once the requests
         are ready to be sent, get_method_args_pairs() returns a list of the
@@ -256,6 +262,24 @@ class OnepV1():
 
     def create(self, auth, type, desc, defer=False):
         return self._call('create', auth, [type, desc], defer)
+
+    def createDataport(self, auth, desc, defer=False):
+        '''Create a dataport resource.
+           "format" and "retention" are required
+            {
+                "format": "float" | "integer" | "string",
+                "meta": string = "",
+                "name": string = "",
+                "preprocess": list = [],
+                "public": boolean = false,
+                "retention": {
+                    "count": number | "infinity",
+                    "duration": number | "infinity"
+                },
+                "subscribe": <ResourceID> |  null = null
+            }
+        '''
+        return self._call('create', auth, ['dataport', desc], defer)
 
     def deactivate(self, auth, codetype, code, defer=False):
         return self._call('deactivate', auth, [codetype, code], defer)

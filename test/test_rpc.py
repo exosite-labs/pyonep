@@ -2,8 +2,9 @@
 # pylint: disable=W0312
 '''Test pyonep RPC'''
 from __future__ import unicode_literals
+import doctest
 
-import test_base
+from test import test_base
 
 
 class TestRPC(test_base.TestBase):
@@ -12,6 +13,10 @@ class TestRPC(test_base.TestBase):
     """
     # yes, test this
     __test__ = True
+
+    def test_doc_examples(self):
+        '''Test documentation examples'''
+        doctest.testfile('../docs/examples.md')
 
     # @myvcr.use_cassette('vcr_cassettes/test_move.yaml')
     def test_move(self):
