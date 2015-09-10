@@ -35,6 +35,9 @@ function test_all_envs() {
 
 
 rm -f tox_failures tox_py*.ini
+if [ -z "$TMPDIR" ]; then
+    export TMPDIR=/tmp
+fi
 if [ "$1" == "full" ]; then
     test_all_envs
 else
