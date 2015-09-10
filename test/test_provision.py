@@ -2,9 +2,14 @@
 # pylint: disable=W0312
 '''Test pyonep library.'''
 from __future__ import unicode_literals
-import requests, json, md5, os, sys
-# import vcr
+import json
+import md5
+import os
 from unittest import TestCase
+
+# import vcr
+import requests
+
 from pyonep import onep
 
 CIK_FNTN_URL = 'https://cik.herokuapp.com/api'
@@ -20,7 +25,7 @@ CIK_FNTN_CASS = 'vcr_cassettes/cik_fntn_cassette.yaml'
 
 class TestProvision(TestCase):
     """
-        TestClase class for testing pyonep provisioning methods.
+        Test pyonep provisioning methods.
     """
     @classmethod
     def setUpClass(cls):
@@ -28,11 +33,13 @@ class TestProvision(TestCase):
         # with myvcr.use_cassette(CIK_FNTN_CASS):
         r = requests.get(CIK_FNTN_URL+'/create?vendor') #='+CIK_FNTN_VENDOR_ID)
         print(r.status_code, r.text)
-        cls.config =r.json()
+        cls.config = r.json()
         print("Here's the config from CIK Fountain:\n{0}".format(json.dumps(cls.config, indent=2)))
+
     @classmethod
     def tearDownClass(cls):
         pass
+
     def setUp(self):
         '''Create a device in the portal to test'''
         self.portalcik = self.config['cik']
@@ -71,7 +78,7 @@ class TestProvision(TestCase):
             {'key': True}
         )
         self.assertTrue(isok, 'got key for test client')
-        self.clonecik = response['key']
+        self.cik = response['key']
 
     def tearDown(self):
         '''Clean up any test client'''
@@ -119,39 +126,34 @@ class TestProvision(TestCase):
     # @myvcr.use_cassette('vcr_cassettes/test_move.yaml')
     def test_move(self):
         '''Test move command'''
-        cik1 = self.config['cik']
-        rid1 = self.config['rid']
-        #      cik1
+        #    self.cik
         #       |
         #      cik2
         #       |
         #      cik3
-        cik2, _ = self.makeClient(cik1)
+        cik2, _ = self.makeClient(self.cik)
         _, rid3 = self.makeClient(cik2)
 
         # move cik3 to self.cik
-        ok, response = self.onep.move(cik1, rid3, rid1)
+        ok, response = self.onep.move(self.cik, rid3, self.rid)
         print(response)
 
         # after move, should be
-        #      cik1
+        #    self.cik
         #     |    |
         #    cik3 cik2
         self.assertTrue(ok, 'move succeeded')
-
-
-
-
-
 
     # @myvcr.use_cassette('vcr_cassettes/test_provision_example.yaml')
     def test_provision_example(self):
         '''Test provisioning example code'''
         from examples import provisioning
-        c = {}
-        c['vendorname'] = self.vendorname
-        c['vendortoken'] = self.vendortoken
-        c['clonecik'] = self.clonecik
-        c['portalcik'] = self.portalcik
-        r = provisioning.provision_example(c)
+        clonecik, clonerid = self.makeClient(self.cik)
+        r = provisioning.provision_example(
+            vendorname=self.vendorname,
+            vendortoken=self.vendortoken,
+            clonerid=clonerid,
+            portalcik=self.cik,
+            portalrid=self.rid
+        )
         self.assertTrue(r, "provisioning example runs without error")
