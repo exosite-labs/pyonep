@@ -28,13 +28,7 @@ logging.basicConfig(stream=sys.stderr)
 logging.getLogger("pyonep.onep").setLevel(logging.ERROR)
 logging.getLogger("pyonep.provision").setLevel(logging.ERROR)
 
-def provision_example(options):
-    vendorname = options['vendorname']
-    vendortoken = options['vendortoken']
-    clonecik = options['clonecik']
-    cloneportalcik = options['cloneportalcik']
-    portalcik = options['portalcik']
-
+def provision_example(vendorname, vendortoken, clonerid, portalcik, portalrid):
     print('pyonep version ' + pyonep.__version__)
     r = random.randint(1, 10000000)
     model = 'MyTestModel' + str(r)
@@ -42,33 +36,28 @@ def provision_example(options):
     sn2 = '002' + str(r)
     sn3 = '003' + str(r)
     op = OnepV1()
-    isok, portalrid = op.lookup(portalcik, 'alias', '')
+
+    provision = Provision('m2.exosite.com',
+                            https=True,
+                            port=443,
+                            manage_by_cik=False,
+                            verbose=False,
+                            raise_api_exceptions=True,
+                            manage_by_sharecode=True)
+    # manage by sharecode
+    option = "[\"" + vendorname + "\", \"" + model +"\"]"
+    meta = {"meta" : option}
+    print("op.share", portalcik, clonerid, meta)
+    isok, sharecode = op.share(portalcik, clonerid, meta)
     if not isok:
-        print("Failed to look up portal RID")
-    else:
-        print("portalrid: '{}'".format(portalrid))
-    isok, clonerid = op.lookup(clonecik, 'alias', '')
-    if not isok:
-        print("Failed to look up clone RID")
-        exit()
-    else:
-        print("clonerid: '{}'".format(clonerid))
-        provision = Provision('m2.exosite.com',
-                              https=True,
-                              port=443,
-                              manage_by_cik=False,
-                              verbose=False,
-                              raise_api_exceptions=True,
-                              manage_by_sharecode=True)
-        # manage by sharecode
-        option = "[\"" + vendorname + "\", \"" + model +"\"]"
-        meta = {"meta" : option}
-        isok, sharecode = op.share(cloneportalcik, clonerid, meta)
+        print("failed to create share code")
+        return False
     try:
-        print("model_create()")
+        print("model_create() ", vendortoken, model, sharecode)
         provision.model_create(vendortoken, model, sharecode, aliases=False)
 
         # production code should read isok before using body
+        print("model_list()")
         print provision.model_list(vendortoken).body
         print provision.model_info(vendortoken, model).body
         print("serialnumber_add()")
@@ -136,21 +125,15 @@ def provision_example(options):
 
 if __name__ == '__main__':
     # To make tests run, keep test/testconfig.py.template in sync with this.
-    config = {
+    provision_example(
         # Vendor token and name are listed at the top of
         # https://<your domain>.exosite.com/admin/managemodels
         # (Vendor token is also available on the domain admin home page)
-        'vendorname': '<VENDOR NAME HERE>',
-        'vendortoken': '<VENDOR TOKEN HERE>',
-        # CIK of client to clone for model
-        'clonecik': '<CLONE DEVICE CIK HERE>',
-        # CIK of portal of client to clone for model
-        # Use only if managing by sharecode
-        'cloneportalcik': '<CLONE PORTAL CIK HERE>',
-        # CIK of parent of clonecik client. In the case of Portals,
-        # this is the CIK of the portal. It can be found in your portal under
-        # Account > Portals
-        # Look for: Key: 123abc...
-        'portalcik': '<PORTAL CIK HERE>'
-    }
-    provision_example(config)
+        vendorname='<VENDOR NAME HERE>',
+        vendortoken='<VENDOR TOKEN HERE>',
+        # RID of client to clone for model
+        clonerid='<CLONE DEVICE RID HERE>',
+        # CIK and RID of portal of client to clone for model
+        portalcik='<PORTAL CIK HERE>',
+        portalrid='<PORTAL RID HERE>',
+    )

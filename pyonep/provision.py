@@ -42,10 +42,10 @@ class ProvisionResponse:
     def __init__(self, body, response):
         self.body = body
         self.response = response
-        self.isok = self.response.status < 400
+        self.isok = self.response.status_code < 400
 
     def status(self):
-        return self.response.status
+        return self.response.status_code
 
     def reason(self):
         return self.response.reason
@@ -55,7 +55,7 @@ class ProvisionResponse:
 
     def __str__(self):
         return "Status: {0}, Reason: {1}, Body: {2}".format(
-            self.response.status,
+            self.response.status_code,
             self.response.reason,
             self.body)
 
@@ -90,13 +90,13 @@ class Provision(object):
                  curldebug=False,
                  manage_by_sharecode=False):
         # backward compatibility
-        protocol = 'http://'
+        protocol = 'https://'
         if host.startswith(protocol):
             host = host[len(protocol):]
         self._manage_by_cik = manage_by_cik
         self._manage_by_sharecode = manage_by_sharecode
         self._verbose = verbose
-        self._onephttp = onephttp.OnePHTTP(host + ':' + str(port),
+        self._onephttp = onephttp.OneP_Request(host + ':' + str(port),
                                            https=https,
                                            httptimeout=int(httptimeout),
                                            reuseconnection=reuseconnection,
@@ -149,11 +149,11 @@ class Provision(object):
         headers['Accept'] = 'text/plain, text/csv, application/x-www-form-urlencoded'
         headers.update(extra_headers)
 
-        self._onephttp.request(method,
+        body, response = self._onephttp.request(method,
                                url,
                                body,
                                headers)
-        body, response = self._onephttp.getresponse()
+
         pr = ProvisionResponse(body, response)
         if self._raise_api_exceptions and not pr.isok:
             raise ProvisionException(pr)
