@@ -79,7 +79,6 @@ class OneP_Request:
                 if body is not None:
                     self.log.debug("Body: %s" % body)
             URI = self.host+path
-            print("Prepping request for: {0}".format(URI))
             prepped = self.session.prepare_request(
                 Request(method, URI, data=body, headers=headers)
             )
