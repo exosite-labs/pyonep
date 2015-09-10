@@ -1,6 +1,6 @@
 To build docs:
 
 ```
-pip install sphinx
+pip install sphinx recommonmark
 make html
 ```

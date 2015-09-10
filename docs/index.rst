@@ -4,7 +4,7 @@
    contain the root `toctree` directive.
 
 pyonep: A Python library for Exosite's ONE Platform API
-==================================
+=======================================================
 
 Contents:
 
@@ -12,6 +12,10 @@ Contents:
    :maxdepth: 2
 
    intro
+   install
+   getcik
+   examples
+   migrations
 
 Indices and tables
 ==================
