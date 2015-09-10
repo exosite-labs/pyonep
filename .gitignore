@@ -60,3 +60,12 @@ docs/_build/
 
 # PyBuilder
 target/
+
+# Temp files
+*~
+
+# Eclipse nonsense
+.project
+.pydevproject
+.settings/org.eclipse.core.resources.prefs
+
