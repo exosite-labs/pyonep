@@ -255,9 +255,24 @@ class OnepV1():
 
     # API methods
     def activate(self, auth, codetype, code, defer=False):
+        """ Given an activation code, activate an entity for the client specified in <ResourceID>. 
+        
+        Args:
+            auth: <cik> 
+            codetype: Type of code being activated.
+            code: Code to activate.
+        """
+
         return self._call('activate', auth, [codetype, code], defer)
 
     def create(self, auth, type, desc, defer=False):
+        """ Create something in Exosite.
+
+        Args:
+            auth: <cik>
+            type: What thing to create.
+            desc: Information about thing.
+        """
         return self._call('create', auth, [type, desc], defer)
 
     def createDataport(self, auth, desc, defer=False):
@@ -282,15 +297,36 @@ class OnepV1():
         return self._call('deactivate', auth, [codetype, code], defer)
 
     def drop(self, auth, rid, defer=False):
+        """ Deletes the specified resource.
+
+        Args:
+            auth: <cik>
+            rid: <ResourceID>
+        """
         return self._call('drop', auth, [rid], defer)
 
-    def flush(self, auth, rid, options=None, defer=False):
-        args = [rid]
+    def flush(self, auth, resource, options=None, defer=False):
+        """ Empties the specified resource of data per specified constraints.
+
+        Args:
+            auth: <cik>
+            resource: resource to empty.
+            options: Time limits.
+        """
+        args = [resource]
         if options is not None:
             args.append(options)
         return self._call('flush', auth, args, defer)
 
     def info(self, auth, rid, options={}, defer=False):
+        """ Request creation and usage information of specified resource according to the specified
+        options.
+
+        Args:
+            auth: <cik>
+            resource: Alias or ID of resource
+            options: Options to define what info you would like returned.
+        """
         return self._call('info', auth,  [rid, options], defer)
 
     def listing(self, auth, types, options=None, rid=None, defer=False):
@@ -315,27 +351,97 @@ class OnepV1():
                                   defer)
 
     def lookup(self, auth, type, mapping, defer=False):
+        """ Look up a Resource ID by alias, owned Resource ID, or share activation code under the
+        client specified in <ClientID>.
+
+        Args:
+            auth: <cik>
+            type: Type of resource to lookup (alias | owner | shared)
+            mapping: Based on resource type defined above.
+        """
         return self._call('lookup', auth, [type, mapping], defer)
 
     def map(self, auth, rid, alias, defer=False):
+        """ Creates an alias for a resource.
+
+        Args:
+            auth: <cik>
+            rid: <ResourceID>
+            alias: alias to create (map)
+        """
         return self._call('map', auth, ['alias', rid, alias], defer)
 
-    def move(self, auth, rid, destinationrid, options={"aliases": True}, defer=False):
-        return self._call('move', auth, [rid, destinationrid, options], defer)
+    def move(self, auth, resource, destinationrid, options={"aliases": True}, defer=False):
+        """ Moves a resource from one parent client to another.
+        
+        Args:
+            auth: <cik>
+            resource: Identifed resource to be moved.
+            destinationrid: rid of client resource is being moved to.
+        """
+        return self._call('move', auth, [resource, destinationrid, options], defer)
 
-    def read(self, auth, rid, options, defer=False):
-        return self._call('read', auth, [rid, options], defer)
+    def read(self, auth, resource, options, defer=False):
+        """ Read value(s) from a dataport.
 
-    def record(self, auth, rid, entries, options={}, defer=False):
-        return self._call('record', auth, [rid, entries, options], defer)
+        Calls a function that builds a request to read the dataport specified by an alias or rid
+        and returns timeseries data as defined by the options.
 
-    def recordbatch(self, auth, rid, entries, defer=False):
-        return self._call('recordbatch', auth, [rid, entries], defer)
+        Args:
+            auth: Takes the device cik
+            resource: Takes the dataport alias or rid. 
+            options: Takes a list of options for what to return.
+        """
+        return self._call('read', auth, [resource, options], defer)
+
+    def record(self, auth, resource, entries, options={}, defer=False):
+        """ Records a list of historical entries to the resource specified.
+        
+        Note: This API is depricated, use recordbatch instead.
+
+        Calls a function that bulids a request that writes a list of historical entries to the
+        specified resource.
+
+        Args:
+            auth: Takes the device cik
+            resource: Takes the dataport alias or rid.
+            entries: A list of entries to write to the resource.
+            options: Currently unused.
+        """
+        return self._call('record', auth, [resource, entries, options], defer)
+
+    def recordbatch(self, auth, resource, entries, defer=False):
+        """ Records a list of historical entries to the resource specified.
+
+        Calls a function that bulids a request that writes a list of historical entries to the
+        specified resource.
+
+        Args:
+            auth: Takes the device cik
+            resource: Takes the dataport alias or rid.
+            entries: A list of entries to write to the resource.
+        """
+        return self._call('recordbatch', auth, [resource, entries], defer)
 
     def revoke(self, auth, codetype, code, defer=False):
+        """ Given an activation code, the associated entity is revoked after which the activation
+        code can no longer be used.
+
+        Args:
+            auth: Takes the owner's cik
+            codetype: The type of code to revoke (client | share)
+            code: Code specified by <codetype> (cik | share-activation-code)
+        """
         return self._call('revoke', auth, [codetype, code], defer)
 
     def share(self, auth, rid, options={}, defer=False):
+        """ Generates a share code for the given resource.
+
+        Args:
+            auth: <cik>
+            rid: The rid of the resource.
+            options: Dictonary of options.
+        """
         return self._call('share', auth, [rid, options], defer)
 
     def tag(self, auth, rid, action, tag, defer=False):
@@ -345,18 +451,58 @@ class OnepV1():
         return self._call('unmap', auth, ['alias', alias], defer)
 
     def update(self, auth, rid, desc={}, defer=False):
+        """ Updates the description of the resource.
+
+        Args:
+            auth: <cik> for authentication
+            resource: Resource to be updated (<rid>)
+            desc: A Dictionary containing the update for the resource.
+        """
         return self._call('update', auth, [rid, desc], defer)
 
     def usage(self, auth, rid, metric, starttime, endtime, defer=False):
+        """ Returns metric usage for client and its subhierarchy.
+
+        Args:
+            auth: <cik> for authentication
+            rid: ResourceID
+            metrics: Metric to measure (as string), it may be an entity or consumable.
+            starttime: Start time of window to measure useage (format is ___).
+            endtime: End time of window to measure useage (format is ___).
+        """
         return self._call('usage', auth,
                           [rid, metric, starttime, endtime], defer)
 
-    def wait(self, auth, rid, options, defer=False):
-        # let the server control the timeout
-        return self._call('wait', auth, [rid, options], defer, notimeout=True)
+    def wait(self, auth, resource, options, defer=False):
+        """ This is a HTTP Long Polling API which allows a user to wait on specific resources to be
+        updated.
 
-    def write(self, auth, rid, value, options={}, defer=False):
-        return self._call('write', auth, [rid, value, options], defer)
+        Args:
+            auth: <cik> for authentication
+            resource: <ResourceID> to specify what resource to wait on.
+            options: Options for the wait including a timeout (in ms), (max 5min) and start time
+            (null acts as when request is recieved)
+        """
+        # let the server control the timeout
+        return self._call('wait', auth, [resource, options], defer, notimeout=True)
+
+    def write(self, auth, resource, value, options={}, defer=False):
+        """ Writes a single value to the resource specified.
+
+        Args:
+            auth: cik for authentication.
+            resource: resource to write to.
+            value: value to write
+            options: options.
+        """
+        return self._call('write', auth, [resource, value, options], defer)
 
     def writegroup(self, auth, entries, defer=False):
+        """ Writes the given values for the respective resources in the list, all writes have same
+        timestamp.
+
+        Args:
+            auth: cik for authentication.
+            entries: List of key, value lists. eg. [[key, value], [k,v],,,]
+        """
         return self._call('writegroup', auth, [entries], defer)
