@@ -16,6 +16,7 @@ Contents:
    getcik
    examples
    migrations
+   api
 
 Indices and tables
 ==================
