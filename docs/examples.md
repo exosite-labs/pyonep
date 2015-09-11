@@ -27,7 +27,6 @@ device information.
 * [read_write_direct.py](https://github.com/exosite-labs/pyonep/blob/master/examples/read_write_direct.py) - writes to a resource and then reads back
 * [get_info.py](https://github.com/exosite-labs/pyonep/blob/master/examples/get_info.py) - gets information about a client, and demonstrates error handling
 * [mult_cmd.py](https://github.com/exosite-labs/pyonep/blob/master/examples/mult_cmd.py) - uses the onep module to send
-* [read_write_buffered.py](https://github.com/exosite-labs/pyonep/blob/master/examples/read_write_buffered.py) - demonstrates use of the datastore module
 * [provisioning.py](https://github.com/exosite-labs/pyonep/blob/master/examples/provisioning.py) - demonstrates use of the provisioning API
 
 Note that to run the examples without installing the pyonep package, the

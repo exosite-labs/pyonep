@@ -26,7 +26,7 @@ class OneP_Request:
                  reuseconnection=False,
                  log=None,
                  curldebug=False):
-        self.host = 'https://' + host if https else host
+        self.host = ('https://' + host) if https else ('http://' + host)
         self.https = https
         self.httptimeout = httptimeout
         self.headers = headers

@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
-# pylint: disable=W0312
 """Test pyonep RPC"""
 from __future__ import unicode_literals
 import doctest
 import re
+
+from pyonep import onep
 
 from test import test_base
 
@@ -19,7 +20,15 @@ class TestRPC(test_base.TestBase):
         """Test documentation examples"""
         doctest.testfile('../docs/examples.md')
 
-    # @myvcr.use_cassette('vcr_cassettes/test_move.yaml')
+    def test_http(self):
+        """Test http switch"""
+        onephttp = onep.OnepV1(port='80', https=False)
+        ok, info = onephttp.info(self.cik,
+                                 {'alias': ''},
+                                 options={'basic': True})
+        self.assertTrue(ok, 'info call succeeded')
+        self.assertEqual(info['basic']['status'], 'activated')
+
     def test_move(self):
         """Test move command"""
         #    self.cik
@@ -32,7 +41,6 @@ class TestRPC(test_base.TestBase):
 
         # move cik3 to self.cik
         ok, response = self.onep.move(self.cik, rid3, self.rid)
-        print(response)
 
         # after move, should be
         #    self.cik

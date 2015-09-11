@@ -27,15 +27,6 @@ Installation
 For installation instructions, check out [Read The Docs](https://pyonep.readthedocs.org/en/latest/install.html).
 
 
-Buffered Access
----------------
-
-The pyonep library includes a module that provides buffered access to the
-RPC API, which may offer better performance in some cases.
-
-See [examples/read_write_record.py](https://github.com/exosite-labs/pyonep/blob/master/examples/read_write_buffered.py) for more details. 
-
-
 Tests
 -----
 

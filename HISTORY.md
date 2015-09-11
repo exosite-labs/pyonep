@@ -1,6 +1,13 @@
 History
 =======
 
+0.13.4 (2015-09-11)
+-------------------
+
+- build docstrings for read the docs site
+- more PEP8 work
+
+
 0.13.3 (2015-09-11)
 -------------------
 
