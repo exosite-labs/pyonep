@@ -1,6 +1,15 @@
 History
 =======
 
+0.13.0 (2015-09-10)
+-------------------
+
+- switch from httplib to requests
+- tests and testing improvements (tox, run in parallel)
+- package-level imports and method docs for a better 
+  interpreter experience
+- documentation site
+
 0.12.4 (2015-09-03)
 -------------------
 
