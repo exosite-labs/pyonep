@@ -1,7 +1,7 @@
-﻿#==============================================================================
+﻿# ==============================================================================
 # provision.py
 # This is API library for Exosite's One-Platform provisioning interface.
-#==============================================================================
+# ==============================================================================
 #
 # Warning: pyonep version 0.8.0 introduces breaking change to the
 #          provisioning interface. See README.md for details.
@@ -39,6 +39,7 @@ log.addHandler(h)
 
 class ProvisionResponse:
     """A basic class for working with responses from the provisioning API."""
+
     def __init__(self, body, response):
         self.body = body
         self.response = response
@@ -78,6 +79,7 @@ class Provision(object):
         manage_by_sharecode: When provisioning default device setups via template, whether or not
             the template is referenced by shared code or by resource ID.  Defaults to False.
     """
+
     def __init__(self,
                  host='m2.exosite.com',
                  port='80',
@@ -97,11 +99,11 @@ class Provision(object):
         self._manage_by_sharecode = manage_by_sharecode
         self._verbose = verbose
         self._onephttp = onephttp.OneP_Request(host + ':' + str(port),
-                                           https=https,
-                                           httptimeout=int(httptimeout),
-                                           reuseconnection=reuseconnection,
-                                           log=log,
-                                           curldebug=curldebug)
+                                               https=https,
+                                               httptimeout=int(httptimeout),
+                                               reuseconnection=reuseconnection,
+                                               log=log,
+                                               curldebug=curldebug)
         self._raise_api_exceptions = raise_api_exceptions
 
     def _filter_options(self, aliases=True, comments=True, historical=True):
@@ -150,9 +152,9 @@ class Provision(object):
         headers.update(extra_headers)
 
         body, response = self._onephttp.request(method,
-                               url,
-                               body,
-                               headers)
+                                                url,
+                                                body,
+                                                headers)
 
         pr = ProvisionResponse(body, response)
         if self._raise_api_exceptions and not pr.isok:
@@ -200,10 +202,10 @@ class Provision(object):
             vendor: The name of the vendor
             model: 
             contentid: The ID used to name the entity bucket
-        """ 
+        """
         data = urlencode({'vendor': vendor,
-                                 'model': model,
-                                 'id': contentid})
+                          'model': model,
+                          'id': contentid})
         headers = {"Accept": "*"}
         return self._request(PROVISION_DOWNLOAD,
                              cik, data, 'GET', True, headers)
@@ -226,9 +228,9 @@ class Provision(object):
             return self._request(path, key, '', 'GET', self._manage_by_cik)
         else:  # if provide vendor name, key can be the device one
             data = urlencode({'vendor': vendor,
-                                     'model': model,
-                                     'id': contentid,
-                                     'info': 'true'})
+                              'model': model,
+                              'id': contentid,
+                              'info': 'true'})
             return self._request(PROVISION_DOWNLOAD,
                                  key, data, 'GET', self._manage_by_cik)
 
@@ -280,12 +282,12 @@ class Provision(object):
         options = self._filter_options(aliases, comments, historical)
         if self._manage_by_sharecode:
             data = urlencode({'model': model,
-                                 'code': sharecode,
-                                 'options[]': options}, doseq=True)
+                              'code': sharecode,
+                              'options[]': options}, doseq=True)
         else:
             data = urlencode({'model': model,
-                                 'rid': sharecode,
-                                 'options[]': options}, doseq=True)
+                              'rid': sharecode,
+                              'options[]': options}, doseq=True)
         return self._request(PROVISION_MANAGE_MODEL,
                              key, data, 'POST', self._manage_by_cik)
 
@@ -299,8 +301,8 @@ class Provision(object):
 
     def model_remove(self, key, model):
         data = urlencode({'delete': 'true',
-                                 'model': model,
-                                 'confirm': 'true'})
+                          'model': model,
+                          'confirm': 'true'})
         path = PROVISION_MANAGE_MODEL + model
         return self._request(path, key, data, 'DELETE', self._manage_by_cik)
 
@@ -308,26 +310,26 @@ class Provision(object):
                      aliases=True, comments=True, historical=True):
         options = self._filter_options(aliases, comments, historical)
         data = urlencode({'rid': clonerid,
-                                 'options[]': options}, doseq=True)
+                          'options[]': options}, doseq=True)
         path = PROVISION_MANAGE_MODEL + model
         return self._request(path, key, data, 'PUT', self._manage_by_cik)
 
     def serialnumber_activate(self, model, serialnumber, vendor):
         data = urlencode({'vendor': vendor,
-                                 'model': model,
-                                 'sn': serialnumber})
+                          'model': model,
+                          'sn': serialnumber})
         return self._request(PROVISION_ACTIVATE,
                              '', data, 'POST', self._manage_by_cik)
 
     def serialnumber_add(self, key, model, sn):
         data = urlencode({'add': 'true',
-                                 'sn': sn})
+                          'sn': sn})
         path = PROVISION_MANAGE_MODEL + model + '/'
         return self._request(path, key, data, 'POST', self._manage_by_cik)
 
     def serialnumber_add_batch(self, key, model, sns=[]):
         data = urlencode({'add': 'true',
-                                 'sn[]': sns}, doseq=True)
+                          'sn[]': sns}, doseq=True)
         path = PROVISION_MANAGE_MODEL + model + '/'
         return self._request(path, key, data, 'POST', self._manage_by_cik)
 

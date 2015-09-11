@@ -8,7 +8,7 @@ History
 - tests and testing improvements (tox, run in parallel)
 - package-level imports and method docs for a better 
   interpreter experience
-- documentation site
+- documentation site (http://pyonep.readthedocs.org)
 
 0.12.4 (2015-09-03)
 -------------------

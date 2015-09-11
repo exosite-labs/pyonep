@@ -1,10 +1,10 @@
-#==============================================================================
+# ==============================================================================
 # datastore.py
 # Buffering, caching and batch functions for access to the Exosite Data
 # Platform using the JSON RPC API over HTTP.
 # This layer was written so that a system with many subcriber/provider tasks
 # could simulataneously access the platform efficiently.
-#==============================================================================
+# ==============================================================================
 #
 # Tested with python 2.6
 #
@@ -157,7 +157,7 @@ class Datastore():
                 "retention": {"count": count,
                               "duration": duration},
                 "preprocess": preprocess}
-        create_status,rid = self._conn.create(self._cik, "dataport", desc)
+        create_status, rid = self._conn.create(self._cik, "dataport", desc)
         if create_status:
             map_status, map_message = self._conn.map(self._cik, rid, alias)
             if map_status:
@@ -211,7 +211,7 @@ class Datastore():
                             log.debug(msg % (alias, value))
                     except OneException:
                         # catch exception, add to recordBuffer
-                        if not alias in self._recordBuffer:
+                        if alias not in self._recordBuffer:
                             self._recordBuffer[alias] = list()
                         self._recordBuffer[alias].append(
                             [timestamp, value, True])
@@ -236,7 +236,7 @@ class Datastore():
                     lock.acquire()
                     try:
                         for (alias, value) in livedata:
-                            if not alias in self._recordBuffer:
+                            if alias not in self._recordBuffer:
                                 self._recordBuffer[alias] = list()
                             offset = True
                             self._recordBuffer[alias].append(
@@ -247,7 +247,7 @@ class Datastore():
                 except Exception:
                     e = sys.exc_info()[1]
                     log.exception("Unknown Exception While Writing Data")
-            ## write historical data
+            # write historical data
             lock.acquire()
             try:
                 aliases = self._recordBuffer.keys()
@@ -258,7 +258,7 @@ class Datastore():
                         if self.__checkDataportExist(alias):
                             recentry = list()
                             for entry in entries:
-                                if True == entry[2]:  # offset mode
+                                if entry[2] is True:  # offset mode
                                     offset = entry[0] - curtime
                                     if offset == 0:
                                         # Must be a negative number.
@@ -389,7 +389,7 @@ class Datastore():
             return False
         lock.acquire()
         try:
-            if not alias in self._recordBuffer:
+            if alias not in self._recordBuffer:
                 self._recordBuffer[alias] = list()
             for (t, value) in entries:
                 recentry = [t, value, False]
