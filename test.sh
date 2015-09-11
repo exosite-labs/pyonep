@@ -1,7 +1,7 @@
 #!/bin/bash
 
 function test_current_env() {
-    nosetests --verbose --with-coverage --cover-erase --cover-package=pyonep --cover-package=examples
+    nosetests --verbose --with-coverage --cover-erase --cover-package=pyonep --cover-package=examples $*
 }
 
 function test_all_envs() {
