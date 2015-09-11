@@ -1,9 +1,16 @@
 from distutils.core import setup
-
-from pyonep import __version__ as version
+import re
 
 with open('requirements.txt') as f:
     required = f.read().splitlines()
+
+version = ''
+with open('pyonep/__init__.py', 'r') as fd:
+    version = re.search(r'^__version__\s*=\s*[\'"]([^\'"]*)[\'"]',
+                        fd.read(), re.MULTILINE).group(1)
+
+if not version:
+    raise RuntimeError('Cannot find version information')
 
 try:
     import json
