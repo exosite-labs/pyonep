@@ -9,16 +9,17 @@ following Exosite One Platform APIs:
 
 Check out our docs on [Read The Docs](https://pyonep.readthedocs.org/).
 
-__Warning__: version 0.8.0 requires changes to applications that used 
-earlier versions of the provision module. See below for information about 
-[migrating your applications from 0.7.x to 0.8.0](#migrating-to-080)
 
-Note that this library does not yet support the HTTP Data Interface. See
+__Warning__: version 0.13.4 requires changes to applications that used 
+earlier versions of pyonep. See below for information about 
+[migrating your applications from 0.12.x to 0.13.4](#migrating-to-0134)
+
+Note that this library does not support the HTTP Data Interface. See
 below for more information.
 
 Supports Python 2.6 through 3.3.
 
-License is BSD, Copyright 2014, Exosite LLC (see LICENSE file)
+License is BSD, Copyright 2015, Exosite LLC (see LICENSE file)
 
 
 Installation
@@ -39,6 +40,17 @@ cp testconfig.py.template testconfig.py
 # insert test config values
 ./test.sh
 ```
+
+
+Migrating to 0.13.4
+-------------------
+
+Version 0.13.4 includes two breaking changes:
+
+- datastore.py is removed
+- `rid` parameter is renamed to `resource`
+
+
 
 Migrating to 0.8.0
 ------------------
