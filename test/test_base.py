@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 # pylint: disable=W0312
-'''Test pyonep library.'''
+"""Test pyonep library."""
 from __future__ import unicode_literals
-import json
 from unittest import TestCase
 
 import requests
 
 from pyonep import onep
+
 
 CIK_FNTN_URL = 'https://cik.herokuapp.com/api'
 
@@ -51,7 +51,7 @@ class TestBase(TestCase):
         pass
 
     def setUp(self):
-        '''Create a device in the portal to test'''
+        """Create a device in the portal to test"""
         self.portalcik = self.config['cik']
         self.vendorname = self.config['vendor']
         self.vendortoken = self.config['vendortoken']
@@ -91,7 +91,7 @@ class TestBase(TestCase):
         self.cik = response['key']
 
     def tearDown(self):
-        '''Clean up any test client'''
+        """Clean up any test client"""
         self.onep.drop(self.portalcik, self.rid)
 
     def makeClient(self, cik):

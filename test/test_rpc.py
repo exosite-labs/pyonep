@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # pylint: disable=W0312
-'''Test pyonep RPC'''
+"""Test pyonep RPC"""
 from __future__ import unicode_literals
 import doctest
 import re
@@ -16,12 +16,12 @@ class TestRPC(test_base.TestBase):
     __test__ = True
 
     def test_doc_examples(self):
-        '''Test documentation examples'''
+        """Test documentation examples"""
         doctest.testfile('../docs/examples.md')
 
     # @myvcr.use_cassette('vcr_cassettes/test_move.yaml')
     def test_move(self):
-        '''Test move command'''
+        """Test move command"""
         #    self.cik
         #       |
         #      cik2
@@ -41,7 +41,7 @@ class TestRPC(test_base.TestBase):
         self.assertTrue(ok, 'move succeeded')
 
     def test_create(self):
-        '''Test create API call'''
+        """Test create API call"""
         isok, response = self.onep.create(
             self.cik,
             'client',

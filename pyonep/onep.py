@@ -1,8 +1,8 @@
-﻿#==============================================================================
+﻿# ==============================================================================
 # onep.py
 # Main API library class for Exosite's Data Platform as exposed over HTTP JSON
 # RPC
-#==============================================================================
+# ==============================================================================
 #
 # Copyright (c) 2014, Exosite LLC
 # All rights reserved.
@@ -40,23 +40,23 @@ class FORMATS:
 
 
 class DeferredRequests():
-    '''Encapsulates a list of deferred requests for each auth/CIK. Once the requests
+    """Encapsulates a list of deferred requests for each auth/CIK. Once the requests
         are ready to be sent, get_method_args_pairs() returns a list of the
         method name and arguments for each request and get_notimeout() returns whether
-        the client should time out.'''
+        the client should time out."""
+
     def __init__(self):
         self._requests = {}
         self._notimeouts = {}
 
     def _authstr(self, auth):
-        '''Convert auth to str so that it can be hashed'''
+        """Convert auth to str so that it can be hashed"""
         if type(auth) is dict:
             return '{' + ','.join(["{0}:{1}".format(k, auth[k]) for k in sorted(auth.keys())]) + '}'
-        else:
-            return auth
+        return auth
 
     def add(self, auth, method, args, notimeout=False):
-        '''Append a deferred request for a particular auth/CIK.'''
+        """Append a deferred request for a particular auth/CIK."""
         authstr = self._authstr(auth)
         self._requests.setdefault(authstr, []).append((method, args))
         self._notimeouts.setdefault(authstr, False)
@@ -67,20 +67,20 @@ class DeferredRequests():
         self._requests.pop(self._authstr(auth))
 
     def has_requests(self, auth):
-        '''Returns True if there are any deferred requests for
-        auth/CIK, False otherwise.'''
+        """Returns True if there are any deferred requests for
+        auth/CIK, False otherwise."""
         authstr = self._authstr(auth)
         return (authstr in self._requests
                 and len(self._requests[authstr]) > 0)
 
     def get_method_args_pairs(self, auth):
-        '''Returns a list of method/arguments pairs corresponding to deferred
-        calls for this auth/CIK'''
+        """Returns a list of method/arguments pairs corresponding to deferred
+        calls for this auth/CIK"""
         return self._requests[self._authstr(auth)]
 
     def get_notimeout(self, auth):
-        '''Returns a boolean representing whether timeout setting should be used
-        for deferred calls for this auth/CIK'''
+        """Returns a boolean representing whether timeout setting should be used
+        for deferred calls for this auth/CIK"""
         return self._notimeouts[self._authstr(auth)]
 
 
@@ -108,27 +108,27 @@ class OnepV1():
         # starting ID for RPC calls
         self.startid = startid
         self.onephttp = onephttp.OneP_Request(host + ':' + str(port),
-                                          https=https,
-                                          httptimeout=int(httptimeout),
-                                          headers=self.headers,
-                                          reuseconnection=reuseconnection,
-                                          log=log,
-                                          curldebug=curldebug)
+                                              https=https,
+                                              httptimeout=int(httptimeout),
+                                              headers=self.headers,
+                                              reuseconnection=reuseconnection,
+                                              log=log,
+                                              curldebug=curldebug)
 
     def close(self):
-        '''Closes any open connection. This should only need to be called if
+        """Closes any open connection. This should only need to be called if
         reuseconnection is set to True. Once it's closed, the connection may be
-        reopened by making another API called.'''
+        reopened by making another API called."""
         self.onephttp.close()
 
     _loggedrequests = []
 
     def loggedrequests(self):
-        '''Returns a list of request bodies made by this instance of OnepV1'''
+        """Returns a list of request bodies made by this instance of OnepV1"""
         return self._loggedrequests
 
     def _callJsonRPC(self, auth, callrequests, returnreq=False, notimeout=False):
-        '''Calls the Exosite One Platform RPC API.
+        """Calls the Exosite One Platform RPC API.
             If returnreq is False, result is a tuple with this structure:
                 (success (boolean), response)
 
@@ -137,7 +137,7 @@ class OnepV1():
                 (request, success, response)
             notimeout, if true, ignores reuseconnection setting, creating
             a new connection with no timeout.
-                '''
+                """
         # get full auth (auth could be a CIK str)
         auth = self._getAuth(auth)
         jsonreq = {"auth": auth, "calls": callrequests}
@@ -150,11 +150,11 @@ class OnepV1():
                 "Failed to make http request: %s" % str(exception))
 
         body, response = self.onephttp.request('POST',
-                              self.url,
-                              body,
-                              self.headers,
-                              exception_fn=handle_request_exception,
-                              notimeout=notimeout)
+                                               self.url,
+                                               body,
+                                               self.headers,
+                                               exception_fn=handle_request_exception,
+                                               notimeout=notimeout)
 
         def handle_response_exception(exception):
 
@@ -198,7 +198,7 @@ class OnepV1():
         raise OneException("Unknown error")
 
     def _getAuth(self, auth):
-        '''Create the authorization/identification portion of a request.'''
+        """Create the authorization/identification portion of a request."""
         if type(auth) is dict:
             return auth
         else:
@@ -230,7 +230,7 @@ class OnepV1():
         return self.deferred.has_requests(auth)
 
     def send_deferred(self, auth):
-        '''Send all deferred requests for a particular CIK/auth.'''
+        """Send all deferred requests for a particular CIK/auth."""
         if self.deferred.has_requests(auth):
             method_arg_pairs = self.deferred.get_method_args_pairs(auth)
             calls = self._composeCalls(method_arg_pairs)
@@ -276,7 +276,7 @@ class OnepV1():
         return self._call('create', auth, [type, desc], defer)
 
     def createDataport(self, auth, desc, defer=False):
-        '''Create a dataport resource.
+        """Create a dataport resource.
            "format" and "retention" are required
             {
                 "format": "float" | "integer" | "string",
@@ -290,7 +290,7 @@ class OnepV1():
                 },
                 "subscribe": <ResourceID> |  null = null
             }
-        '''
+        """
         return self._call('create', auth, ['dataport', desc], defer)
 
     def deactivate(self, auth, codetype, code, defer=False):
@@ -327,12 +327,12 @@ class OnepV1():
             resource: Alias or ID of resource
             options: Options to define what info you would like returned.
         """
-        return self._call('info', auth,  [rid, options], defer)
+        return self._call('info', auth, [rid, options], defer)
 
     def listing(self, auth, types, options=None, rid=None, defer=False):
-        '''This provides backward compatibility with two
+        """This provides backward compatibility with two
            previous variants of listing. To use the non-deprecated
-           API, pass both options and rid.'''
+           API, pass both options and rid."""
         if options is None:
             # This variant is deprecated
             return self._call('listing', auth, [types], defer)
