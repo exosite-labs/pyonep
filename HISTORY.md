@@ -1,6 +1,26 @@
 History
 =======
 
+0.13.2 (2015-09-11)
+-------------------
+
+- remove setup.py dependency on requests
+
+
+0.13.1 (2015-09-11)
+-------------------
+
+- add requests to requirements
+
+0.13.0 (2015-09-10)
+-------------------
+
+- switch from httplib to requests
+- tests and testing improvements (tox, run in parallel)
+- package-level imports and method docs for a better 
+  interpreter experience
+- documentation site (http://pyonep.readthedocs.org)
+
 0.12.4 (2015-09-03)
 -------------------
 

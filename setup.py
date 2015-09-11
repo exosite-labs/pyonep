@@ -1,6 +1,16 @@
 from distutils.core import setup
+import re
 
-from pyonep import __version__ as version
+with open('requirements.txt') as f:
+    required = f.read().splitlines()
+
+version = ''
+with open('pyonep/__init__.py', 'r') as fd:
+    version = re.search(r'^__version__\s*=\s*[\'"]([^\'"]*)[\'"]',
+                        fd.read(), re.MULTILINE).group(1)
+
+if not version:
+    raise RuntimeError('Cannot find version information')
 
 try:
     import json
@@ -23,6 +33,7 @@ setup(name='pyonep',
       description='Python bindings for Exosite API over HTTP JSON RPC.',
       long_description=open('README.md').read() + '\n\n' +
                        open('HISTORY.md').read(),
+      install_requires=required,
       packages=['pyonep'],
       package_dir={'pyonep': 'pyonep'},
       keywords=['exosite', 'onep', 'one platform', 'm2m']

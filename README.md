@@ -16,7 +16,7 @@ earlier versions of the provision module. See below for information about
 Note that this library does not yet support the HTTP Data Interface. See
 below for more information.
 
-Supports Python 2.5 through 3.3.
+Supports Python 2.6 through 3.3.
 
 License is BSD, Copyright 2014, Exosite LLC (see LICENSE file)
 

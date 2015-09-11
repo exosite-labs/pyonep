@@ -1,2 +1,2 @@
-include LICENSE HISTORY.md README.md
+include LICENSE HISTORY.md README.md requirements.txt
 recursive-include examples *

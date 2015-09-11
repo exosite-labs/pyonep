@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 # pylint: disable=W0312
-'''Test provisioning module'''
+
+"""Test provisioning module"""
+
 from __future__ import unicode_literals
 
-import test_base
+from test import test_base
 
 
 class TestProvision(test_base.TestBase):
@@ -12,10 +14,10 @@ class TestProvision(test_base.TestBase):
     """
     # yes, test this
     __test__ = True
-
     # @myvcr.use_cassette('vcr_cassettes/test_provision_example.yaml')
+
     def test_provision_example(self):
-        '''Test provisioning example code'''
+        """Test provisioning example code"""
         from examples import provisioning
         clonecik, clonerid = self.makeClient(self.cik)
         r = provisioning.provision_example(
