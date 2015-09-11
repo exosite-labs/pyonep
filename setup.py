@@ -2,6 +2,9 @@ from distutils.core import setup
 
 from pyonep import __version__ as version
 
+with open('requirements.txt') as f:
+    required = f.read().splitlines()
+
 try:
     import json
 except ImportError:
@@ -23,6 +26,7 @@ setup(name='pyonep',
       description='Python bindings for Exosite API over HTTP JSON RPC.',
       long_description=open('README.md').read() + '\n\n' +
                        open('HISTORY.md').read(),
+      install_requires=required,
       packages=['pyonep'],
       package_dir={'pyonep': 'pyonep'},
       keywords=['exosite', 'onep', 'one platform', 'm2m']
