@@ -275,14 +275,14 @@ class OnepV1():
     def deactivate(self, auth, codetype, code, defer=False):
         return self._call('deactivate', auth, [codetype, code], defer)
 
-    def drop(self, auth, rid, defer=False):
+    def drop(self, auth, resource, defer=False):
         """ Deletes the specified resource.
 
         Args:
             auth: <cik>
-            rid: <ResourceID>
+            resource: <ResourceID>
         """
-        return self._call('drop', auth, [rid], defer)
+        return self._call('drop', auth, [resource], defer)
 
     def flush(self, auth, resource, options=None, defer=False):
         """ Empties the specified resource of data per specified constraints.
@@ -297,7 +297,7 @@ class OnepV1():
             args.append(options)
         return self._call('flush', auth, args, defer)
 
-    def info(self, auth, rid, options={}, defer=False):
+    def info(self, auth, resource, options={}, defer=False):
         """ Request creation and usage information of specified resource according to the specified
         options.
 
@@ -306,27 +306,27 @@ class OnepV1():
             resource: Alias or ID of resource
             options: Options to define what info you would like returned.
         """
-        return self._call('info', auth,  [rid, options], defer)
+        return self._call('info', auth,  [resource, options], defer)
 
-    def listing(self, auth, types, options=None, rid=None, defer=False):
+    def listing(self, auth, types, options=None, resource=None, defer=False):
         '''This provides backward compatibility with two
            previous variants of listing. To use the non-deprecated
-           API, pass both options and rid.'''
+           API, pass both options and resource.'''
         if options is None:
             # This variant is deprecated
             return self._call('listing', auth, [types], defer)
         else:
-            if rid is None:
+            if resource is None:
                 # This variant is deprecated, too
                 return self._call('listing',
                                   auth,
                                   [types, options],
                                   defer)
             else:
-                # pass rid to use the non-deprecated variant
+                # pass resource to use the non-deprecated variant
                 return self._call('listing',
                                   auth,
-                                  [rid, types, options],
+                                  [resource, types, options],
                                   defer)
 
     def lookup(self, auth, type, mapping, defer=False):
@@ -340,25 +340,25 @@ class OnepV1():
         """
         return self._call('lookup', auth, [type, mapping], defer)
 
-    def map(self, auth, rid, alias, defer=False):
+    def map(self, auth, resource, alias, defer=False):
         """ Creates an alias for a resource.
 
         Args:
             auth: <cik>
-            rid: <ResourceID>
+            resource: <ResourceID>
             alias: alias to create (map)
         """
-        return self._call('map', auth, ['alias', rid, alias], defer)
+        return self._call('map', auth, ['alias', resource, alias], defer)
 
-    def move(self, auth, resource, destinationrid, options={"aliases": True}, defer=False):
+    def move(self, auth, resource, destinationresource, options={"aliases": True}, defer=False):
         """ Moves a resource from one parent client to another.
         
         Args:
             auth: <cik>
             resource: Identifed resource to be moved.
-            destinationrid: rid of client resource is being moved to.
+            destinationresource: resource of client resource is being moved to.
         """
-        return self._call('move', auth, [resource, destinationrid, options], defer)
+        return self._call('move', auth, [resource, destinationresource, options], defer)
 
     def read(self, auth, resource, options, defer=False):
         """ Read value(s) from a dataport.
@@ -413,44 +413,44 @@ class OnepV1():
         """
         return self._call('revoke', auth, [codetype, code], defer)
 
-    def share(self, auth, rid, options={}, defer=False):
+    def share(self, auth, resource, options={}, defer=False):
         """ Generates a share code for the given resource.
 
         Args:
             auth: <cik>
-            rid: The rid of the resource.
+            resource: The identifier of the resource.
             options: Dictonary of options.
         """
-        return self._call('share', auth, [rid, options], defer)
+        return self._call('share', auth, [resource, options], defer)
 
-    def tag(self, auth, rid, action, tag, defer=False):
-        return self._call('tag', auth, [rid, action, tag], defer)
+    def tag(self, auth, resource, action, tag, defer=False):
+        return self._call('tag', auth, [resource, action, tag], defer)
 
     def unmap(self, auth, alias, defer=False):
         return self._call('unmap', auth, ['alias', alias], defer)
 
-    def update(self, auth, rid, desc={}, defer=False):
+    def update(self, auth, resource, desc={}, defer=False):
         """ Updates the description of the resource.
 
         Args:
             auth: <cik> for authentication
-            resource: Resource to be updated (<rid>)
+            resource: Resource to be updated
             desc: A Dictionary containing the update for the resource.
         """
-        return self._call('update', auth, [rid, desc], defer)
+        return self._call('update', auth, [resource, desc], defer)
 
-    def usage(self, auth, rid, metric, starttime, endtime, defer=False):
+    def usage(self, auth, resource, metric, starttime, endtime, defer=False):
         """ Returns metric usage for client and its subhierarchy.
 
         Args:
             auth: <cik> for authentication
-            rid: ResourceID
+            resource: ResourceID
             metrics: Metric to measure (as string), it may be an entity or consumable.
             starttime: Start time of window to measure useage (format is ___).
             endtime: End time of window to measure useage (format is ___).
         """
         return self._call('usage', auth,
-                          [rid, metric, starttime, endtime], defer)
+                          [resource, metric, starttime, endtime], defer)
 
     def wait(self, auth, resource, options, defer=False):
         """ This is a HTTP Long Polling API which allows a user to wait on specific resources to be
