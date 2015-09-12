@@ -31,11 +31,22 @@ For installation instructions, check out [Read The Docs](https://pyonep.readthed
 Tests
 -----
 
-To run the tests:
+Before testing, you'll need the test requirements.
 
 ```bash
 $ pip install -r test/requirements.txt
 ...
+```
+
+Run all the tests in your current Python version.
+
+```bash
+$ ./test.sh --processes=2 --process-timeout=40
+```
+
+Run all the tests in every supported Python version:
+
+```bash
 $ time ./test.sh full --processes=2 --process-timeout=40
 Starting test for py26
 Starting test for py27
@@ -48,6 +59,27 @@ All tests passed. Congratulations! :)
 real0m29.966s
 user0m31.221s
 sys0m5.684s
+```
+
+To run a single test in your current Python version:
+
+```bash
+$ nosetests -q -s test/test_rpc.py:TestRPC.test_move
+----------------------------------------------------------------------
+Ran 1 test in 35.734s
+
+OK
+```
+
+Occasionally this error happens. Deleting .tox directories helps.
+
+```bash
+...
+  File "/Users/danw/prj/exosite/pyonep/.tox-py26/py26/lib/python2.6/site-packages/coverage/data.py", line 202, in combine_parallel_data
+      os.remove(full_path)
+      OSError: [Errno 2] No such file or directory: '/Users/danw/prj/exosite/pyonep/.coverage.civet.51448.095287'
+...
+$ rm -rf .tox-py*
 ```
 
 
@@ -119,31 +151,3 @@ except httplib.HTTPException:
 ```
 
 You can also ask the provision module to raise an exception for HTTP statuses of 400 and above by passing `raise_api_exceptions=True` to the `Provision` constructore. This can consolidate code that handles API errors for a large number of provision calls. See the [provisioning example](examples/provisioning.py) to see how to do this.
-
-Migrating to 0.10.0
--------------------
-
-The [RPC listing command](http://docs.exosite.com/rpc#listing) now includes a resource identifier, which makes it possible to do multiple listing calls in a single request. The old form of listing is deprecated, and upgrading to pyonep 0.10.0 will require some changes to code. Using the old form will produce an exception. For example:
-
-```
-onep.listing(auth, ['dataport'], options={})
-```
-
-...should be changed to:
-
-```
-onep.listing(auth, {'alias': ''}, ['dataport'], options={})
-```
-
-The `options` parameter is now required, too.
-
-Migrating to 0.11.0
--------------------
-
-In order to provide better backward compatibility we've backed out the breaking changes to the listing command from 0.10.0. New code should call with both the `options` and `rid` parameters.
-
-```
-onep.listing(auth, ['dataport'], options={}, rid={'alias': ''})
-```
-
-To anyone who updated code in the 8 days 0.10.0 was up and now needs to update it again-- sorry about the thrashing. There's a fair bit of Python code in production that isn't able to tie to a particular version.

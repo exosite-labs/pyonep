@@ -8,7 +8,7 @@ and [Exosite's Provisioning/Device Management API documentation](https://github.
 Create a test child and then list the root
 
     >>> from pyonep import onep; from test import test_base
-    >>> client = test_base.create_test_client()
+    >>> client = test_base.create_temporary_client()
     >>> o = onep.OnepV1()
     >>> desc = {'format': 'string', 'retention': {'count': 'infinity', 'duration': 'infinity'}}
     >>> isok, rid = o.createDataport(client.cik, desc)

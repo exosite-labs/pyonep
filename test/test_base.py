@@ -11,7 +11,9 @@ from pyonep import onep
 
 CIK_FNTN_URL = 'https://cik.herokuapp.com/api'
 
-def create_test_client():
+
+def create_temporary_client():
+    """Create a temporary client, returning a TestClient object."""
     return TestBase.createTestClient()
 
 
