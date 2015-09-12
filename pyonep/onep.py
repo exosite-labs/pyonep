@@ -219,6 +219,17 @@ class OnepV1():
         return calls
 
     def _call(self, method, auth, arg, defer, notimeout=False):
+        """Calls the Exosite One Platform RPC API.
+
+           If `defer` is False, result is a tuple with this structure:
+
+                (success (boolean), response)
+
+           Otherwise, the result is just True.
+
+           notimeout, if True, ignores the reuseconnection setting, creating
+           a new connection with no timeout.
+        """
         if defer:
             self.deferred.add(auth, method, arg, notimeout=notimeout)
             return True
