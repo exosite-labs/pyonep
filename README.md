@@ -34,11 +34,20 @@ Tests
 To run the tests:
 
 ```bash
-cd test
-pip install -r requirements.txt
-cp testconfig.py.template testconfig.py
-# insert test config values
-./test.sh
+$ pip install -r test/requirements.txt
+...
+$ time ./test.sh full --processes=2 --process-timeout=40
+Starting test for py26
+Starting test for py27
+Starting test for py32
+Starting test for py33
+Starting test for py34
+Waiting for tests to finish
+All tests passed. Congratulations! :)
+
+real0m29.966s
+user0m31.221s
+sys0m5.684s
 ```
 
 
