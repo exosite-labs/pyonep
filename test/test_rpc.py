@@ -117,3 +117,11 @@ class TestRPC(test_base.TestBase):
         dataport_rid = response
         self.assertTrue(isok, 'dataport creation succeeded')
         self.assertTrue(re.match("^[0-9a-f]{40}$", dataport_rid), 'rid is formatted correctly')
+
+    def test_drop(self):
+        """Test drop API call"""
+        client_cik, client_rid = self.makeClient(self.cik)
+        isok, response = self.onep.drop(self.cik, client_rid)
+        self.assertTrue(isok, 'client drop succeeded')
+        isok, response = self.onep.info(self.cik, client_rid)
+        self.assertFalse(isok, 'dropped client was really dropped')

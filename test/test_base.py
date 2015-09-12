@@ -94,41 +94,44 @@ class TestBase(TestCase):
         """Clean up any test client"""
         self.onep.drop(self.portalcik, self.rid)
 
-    def makeClient(self, cik):
+    def makeClient(self, cik, name=None, desc=None):
         """
             This is not a test.
             This function is a test-helper and should
             probably be put into pyonep.
+
+            It returns a tuple: (cik, rid).
         """
-        isok, response = self.onep.create(
-            cik,
-            'client',
-            {
-                'writeinterval': 'inherit',
-                'name': 'testclient',
-                'visibility': 'parent',
-                'limits': {
-                    'dataport': 'inherit',
-                    'datarule': 'inherit',
-                    'dispatch': 'inherit',
-                    'disk': 'inherit',
-                    'io': 'inherit',
-                    'share': 'inherit',
-                    'client': 'inherit',
-                    'sms': 'inherit',
-                    'sms_bucket': 'inherit',
-                    'email': 'inherit',
-                    'email_bucket': 'inherit',
-                    'http': 'inherit',
-                    'http_bucket': 'inherit',
-                    'xmpp': 'inherit',
-                    'xmpp_bucket': 'inherit'}
-            })
+        if desc is None:
+            # default description
+            desc = {'limits': {'client': 'inherit',
+                               'dataport': 'inherit',
+                               'datarule': 'inherit',
+                               'disk': 'inherit',
+                               'dispatch': 'inherit',
+                               'email': 'inherit',
+                               'email_bucket': 'inherit',
+                               'http': 'inherit',
+                               'http_bucket': 'inherit',
+                               'share': 'inherit',
+                               'sms': 'inherit',
+                               'sms_bucket': 'inherit',
+                               'xmpp': 'inherit',
+                               'xmpp_bucket': 'inherit'}
+            }
+        if name is not None:
+            desc['name'] = name
+        isok, response = self.onep.create(cik, 'client', desc)
+        if not isok:
+            raise "Failed to create client. ONE Platform said '{0}'".format(response)
         rid = response
+
         isok, response = self.onep.info(
             cik,
             rid,
             {'key': True}
         )
+        if not isok:
+            raise "Failed to retrieve CIK. ONE Platform said '{0}'".format(response)
         cik = response['key']
         return cik, rid
