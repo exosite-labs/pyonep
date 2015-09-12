@@ -31,7 +31,7 @@ class TestBase(TestCase):
 
     # not a test
     __test__ = False
-    _multiprocess_shared_ = True
+    _multiprocess_can_split_ = True
 
     @classmethod
     def createTestClient(cls):
@@ -42,9 +42,6 @@ class TestBase(TestCase):
 
     @classmethod
     def setUpClass(cls):
-        f=open('/tmp/whatever', 'a')
-        f.write('called setUpClass\n')
-        f.close()
         cls.session = requests.Session()
         r = requests.get(CIK_FNTN_URL+'/create?vendor', timeout=15.)
         r.raise_for_status()

@@ -39,7 +39,8 @@ if [ -z "$TMPDIR" ]; then
     export TMPDIR=/tmp
 fi
 if [ "$1" == "full" ]; then
-    test_all_envs $*
+    shift
+    test_all_envs --processes=8 --process-timeout=40 $*
 else
-    test_current_env $*
+    test_current_env --processes=8 --process-timeout=40 $*
 fi
