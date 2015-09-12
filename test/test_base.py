@@ -31,10 +31,11 @@ class TestBase(TestCase):
 
     # not a test
     __test__ = False
+    _multiprocess_can_split_ = True
 
     @classmethod
     def createTestClient(cls):
-        r = requests.get(CIK_FNTN_URL+'/create?vendor')
+        r = requests.get(CIK_FNTN_URL+'/create?vendor', timeout=15.)
         r.raise_for_status()
         config = r.json()
         return TestClient(config)
@@ -42,7 +43,7 @@ class TestBase(TestCase):
     @classmethod
     def setUpClass(cls):
         cls.session = requests.Session()
-        r = requests.get(CIK_FNTN_URL+'/create?vendor')
+        r = requests.get(CIK_FNTN_URL+'/create?vendor', timeout=15.)
         r.raise_for_status()
         cls.config = r.json()
 

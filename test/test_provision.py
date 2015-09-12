@@ -5,6 +5,9 @@
 
 from __future__ import unicode_literals
 
+from nose.plugins.multiprocess import MultiProcess
+
+from pyonep import onep
 from test import test_base
 
 
@@ -14,7 +17,7 @@ class TestProvision(test_base.TestBase):
     """
     # yes, test this
     __test__ = True
-    # @myvcr.use_cassette('vcr_cassettes/test_provision_example.yaml')
+    _multiprocess_can_split_ = True
 
     def test_provision_example(self):
         """Test provisioning example code"""

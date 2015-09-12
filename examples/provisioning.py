@@ -42,6 +42,7 @@ def provision_example(vendorname, vendortoken, clonerid, portalcik, portalrid):
                             port=443,
                             manage_by_cik=False,
                             verbose=False,
+                            httptimeout=20,
                             raise_api_exceptions=True,
                             manage_by_sharecode=True)
     # manage by sharecode

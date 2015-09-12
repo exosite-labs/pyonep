@@ -4,10 +4,10 @@ from __future__ import unicode_literals
 import doctest
 import re
 
+from nose.plugins.multiprocess import MultiProcess
+
 from pyonep import onep
-
 from test import test_base
-
 
 class TestRPC(test_base.TestBase):
     """
@@ -15,6 +15,7 @@ class TestRPC(test_base.TestBase):
     """
     # yes, test this
     __test__ = True
+    _multiprocess_can_split_ = True
 
     def test_doc_examples(self):
         """Test documentation examples"""
