@@ -9,7 +9,7 @@ function test_all_envs() {
     for py_version in py26 py27 py32 py33 py34; do
         echo "Starting test for ${py_version}"
         sed "s/{envname}/${py_version}/g" tox.ini > "tox_${py_version}.ini"
-	(tox -e "$py_version" -c "tox_${py_version}.ini" -- --with-coverage --cover-erase --cover-package=pyonep --cover-package=examples > "${TMPDIR}/tox_output_${py_version}" 2>&1 || echo "${py_version}" >> tox_failures) &
+	(tox -e "$py_version" -c "tox_${py_version}.ini" -- --with-coverage --cover-erase --cover-package=pyonep --cover-package=examples $* > "${TMPDIR}/tox_output_${py_version}" 2>&1 || echo "${py_version}" >> tox_failures) &
     done
 
     # Wait for all the versions to finish testing
@@ -39,7 +39,7 @@ if [ -z "$TMPDIR" ]; then
     export TMPDIR=/tmp
 fi
 if [ "$1" == "full" ]; then
-    test_all_envs
+    test_all_envs $*
 else
-    test_current_env
+    test_current_env $*
 fi

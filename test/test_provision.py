@@ -15,6 +15,7 @@ class TestProvision(test_base.TestBase):
     # yes, test this
     __test__ = True
     # @myvcr.use_cassette('vcr_cassettes/test_provision_example.yaml')
+    _multiprocess_shared_ = True
 
     def test_provision_example(self):
         """Test provisioning example code"""
