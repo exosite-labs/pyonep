@@ -49,12 +49,13 @@ class OneP_Request:
         exception. If notimeout is True, create a new connection (regardless of
         self.reuseconnection setting) that uses the global default timeout for
         sockets (usually None)."""
-        allheaders = headers
-        allheaders.update(self.session.headers)
-
+        # This needs to be done first because self.session may be None
         if not self.reuseconnection or notimeout:
             self.close()
             self.session = Session()
+
+        allheaders = headers
+        allheaders.update(self.session.headers)
 
         try:
             if self.curldebug:
