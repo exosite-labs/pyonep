@@ -21,7 +21,7 @@ class OneP_Request:
     def __init__(self,
                  host,
                  https=True,
-                 httptimeout=5,
+                 httptimeout=15,
                  headers={},
                  reuseconnection=False,
                  log=None,
