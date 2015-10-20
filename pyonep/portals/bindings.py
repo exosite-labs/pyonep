@@ -1,7 +1,9 @@
-# pylint: disable=W0312
+# pylint: disable=W0312,R0913
 import requests, json
 from pyonep.portals.constants import HTTP_STATUS
 from pyonep.portals.portals import Portals
+from pyonep.portals.utils import dictify_device_meta,\
+                                 stringify_device_meta
 from getpass import getpass
 import sys
 
@@ -20,15 +22,23 @@ class Bindings(Portals):
                     debug=False):
         """
             Params:
-                domain: the domain of the Exosite domain your Portal is on. i.e. mydomain.exosite.com
-                portal_name: the name of the Exosite Portal. i.e. 'My Device Portal'
-                user: typically, the email address you use to logon to Portals or your Portals user name
-                auth: if left blank, the creator of the Bindings object will be prompted for their Portals 
-                      password if specifying the auth parameter, it should be either the user password or a 
-                      Portals token
-                use_token: if using a token in the auth parameter, set this to True. Otherwise, leave blank
+                domain:         the domain of the Exosite domain your Portal is on. 
+                                i.e. mydomain.exosite.com
+                portal_name:    the name of the Exosite Portal. i.e. 'My Device Portal'
+                user:           typically, the email address you use to logon to Portals 
+                                or your Portals user name
+                auth:           if left blank, the creator of the Bindings object will 
+                                be prompted for their Portals password if specifying the 
+                                auth parameter, it should be either the user password or a 
+                                Portals token
+                use_token:      if using a token in the auth parameter, set this to True. 
+                                Otherwise, leave blank
         """
-        auth = getpass('Enter User Password: ') if auth == '__prompt__' else auth
+        if auth == '__prompt__':
+            print() # some interpreters don't put a newline before the getpass prompt
+            auth = getpass('Enter User Password: ')
+        else:
+            auth = auth
         Portals.__init__(   self, 
                             domain,
                             portal_name,
@@ -63,7 +73,7 @@ class Bindings(Portals):
                 print("\t{0} - {1}".format(opt, portal[1]))
             # print('')
             valid_choices = [o[0] for o in opts]
-            choice = input("Enter choice ({0}): ".format(valid_choices) )
+            choice = _input("Enter choice ({0}): ".format(valid_choices) )
             if int(choice) in valid_choices:
                 done = True
 
@@ -112,7 +122,7 @@ class Bindings(Portals):
                         get_devices=False,
                         debug=False):
         """
-            A classmethod that returns a Bindings object.
+            A classmethod that returns a (token, Bindings object) tuple.
 
             This method can be interactive based on the input arguments.
 
@@ -130,34 +140,41 @@ class Bindings(Portals):
             instead of using user/password credentials.
 
             Examples:
-                # for interactive mode, get a password prompt, a token and a logged-in Bindings object
-                (token, B) = Bindings.login_to_portal(<domain>,
-                                                      <portal>,
-                                                      <user/email>)
+                # for interactive mode, get a password prompt, a token 
+                # and a logged-in Bindings object
+                token, B = Bindings.login_to_portal( domain=<domain>,
+                                                     portal_name=<portal>,
+                                                     user=<user/email>
+                )
 
-                # for non-interactive mode, passing in user password to get a token and a logged-in 
-                # Bindings object
-                (token, B) = Bindings.login_to_portal(<domain>,
-                                                      <portal>,
-                                                      <user/email>,
-                                                      <password>)
+                # for non-interactive mode, passing in user password to 
+                # get a token and a logged-in Bindings object
+                token, B = Bindings.login_to_portal( domain=<domain>,
+                                                     portal_name=<portal>,
+                                                     user=<user/email>,
+                                                     credential=<password>
+                )
 
-                # for non-interactive mode, passing in token to get a logged-in Bindings object
-                (token, B) = Bindings.login_to_portal(<domain>,
-                                                      <portal>,
-                                                      <user/email>,
-                                                      <token>,
-                                                      use_token=True)
+                # for non-interactive mode, passing in token to get a 
+                # logged-in Bindings object
+                token, B = Bindings.login_to_portal( domain=<domain>,
+                                                     portal_name=<portal>,
+                                                     user=<user/email>,
+                                                     credential=<token>,
+                                                     use_token=True
+                )
 
-                # for non-interactive mode, passing in token, id and rid to get a Bindings object that
-                # doesn't need to make any Portals API calls
-                (token, B) = Bindings.login_to_portal(<domain>,
-                                                      <portal>,
-                                                      <user/email>,
-                                                      <token>,
-                                                      use_token=True,
-                                                      portal_id=<portal_id>,
-                                                      portal_rid=<portal_rid>)
+                # for non-interactive mode, passing in token and id 
+                # to get a Bindings object that doesn't need to make any 
+                # Portals API calls. 
+                token, B = Bindings.login_to_portal( domain=<domain>,
+                                                     portal_name=<portal>,
+                                                     user=<user/email>,
+                                                     credential=<token>,
+                                                     use_token=True,
+                                                     portal_id=<portal_id>,
+                                                     portal_rid=<portal_rid>
+                )
         """
         if domain is None:
             domain = _input("Enter domain: ")
@@ -167,16 +184,31 @@ class Bindings(Portals):
             user = _input("Enter username: ")
         if None is credential:
             # interactive mode
-            B = Bindings(domain, portal_name, user, debug=debug)
+            B = Bindings(   domain=domain,
+                            portal_name=portal_name,
+                            user=user,
+                            debug=debug
+            )
             token = B.get_user_token()
-            print("Got token {0}".format(token))
+            # print("Got token {0}".format(token))
         elif not None is credential and not use_token:
             # non-interactive, using a user-password to retrieve token
-            B = Bindings(domain, portal_name, user, auth=credential, debug=debug)
+            B = Bindings(   domain=domain,
+                            portal_name=portal_name,
+                            user=user,
+                            auth=credential,
+                            debug=debug
+            )
             token = B.get_user_token()
         elif not None is credential and use_token:
             # non-interactive, mainly just need to instantiate an object.
-            B = Bindings(domain, portal_name, user, auth=credential, use_token=use_token, debug=debug)
+            B = Bindings(   domain=domain,
+                            portal_name=portal_name,
+                            user=user,
+                            auth=credential,
+                            use_token=use_token,
+                            debug=debug
+            )
             token = credential
 
         if portal_id is None: # or portal_rid is None:
@@ -198,7 +230,12 @@ class Bindings(Portals):
         device_obj['info']['description']['name'] = new_name
         return self.update_device(device_obj)
 
-    def add_device_with_name_location_timezone(self, model, serial, name, location, timezone):
+    def add_device_with_name_location_timezone( self,
+                                                model,
+                                                serial,
+                                                name,
+                                                location,
+                                                timezone):
         """
             This method wraps the self.add_device() and self.rename_device()
             methods.
@@ -208,8 +245,10 @@ class Bindings(Portals):
         retval = None
         retval = self.add_location_timezone_to_device(
                     self.rename_device(
-                                        self.add_device(model, serial),
-                                        name
+                        self.add_device(
+                            model,
+                            serial),
+                        name
                     ),
                     location,
                     timezone
@@ -253,6 +292,11 @@ class Bindings(Portals):
             return False
 
     def list_portal_data_sources(self):
+        """
+            List data sources of the portal.
+
+            http://docs.exosite.com/portals/#list-portal-data-source
+        """
         headers = {
                 'User-Agent': self.user_agent(),
         }
@@ -270,6 +314,11 @@ class Bindings(Portals):
             return {}
 
     def list_device_data_sources(self, device_rid):
+        """
+            List data sources of a portal device with rid 'device_rid'.
+
+            http://docs.exosite.com/portals/#list-device-data-source
+        """
         headers = {
                 'User-Agent': self.user_agent(),
         }
@@ -294,7 +343,10 @@ class Bindings(Portals):
         }
         headers.update(self.headers())
 
-        r = requests.get(   self.portals_url()+'/data-sources/['+",".join(rids)+']/data?limit='+str(limit),
+        r = requests.get(   self.portals_url()
+                            +'/data-sources/['
+                            +",".join(rids)
+                            +']/data?limit='+str(limit),
                             headers=headers, auth=self.auth())
         if HTTP_STATUS.OK == r.status_code:
             return r.json()
@@ -332,8 +384,8 @@ class Bindings(Portals):
 
         # Parse 'meta' key's raw string values for each device
         for device in devices:
-            device['info']['description']['meta'] = json.loads(device['info']['description']['meta'])
-                
+            dictify_device_meta(device)
+
         return devices
 
     def map_aliases_to_device_objects(self):
@@ -386,8 +438,11 @@ class Bindings(Portals):
             print('{0}\t\t{1}\t\t{2}'.format(
                     dev['info']['description']['name'],
                     dev['sn'],
-                    dev['portals_aliases'] if len(dev['portals_aliases']) != 1 else dev['portals_aliases'][0],
-                ))
+                    dev['portals_aliases']\
+                        if len(dev['portals_aliases']) != 1
+                        else dev['portals_aliases'][0]
+                )
+            )
 
     def print_sorted_device_list(self, device_list=None, sort_key='sn'):
         """
@@ -415,7 +470,10 @@ class Bindings(Portals):
                     for k in dev_list if k['info']['description'][sort_key] is not None ]
             sort_keys = sorted(sort_keys)
             for key in sort_keys:
-                sorted_dev_list.extend([ d for d in dev_list if d['info']['description'][sort_key] == key ])
+                sorted_dev_list.extend( [ d for d in dev_list\
+                                            if d['info']['description'][sort_key] == key
+                                        ]
+                )
 
         elif sort_key == 'portals_aliases':
             sort_keys = [ k[sort_key] for k in dev_list if k[sort_key] is not None ]
@@ -439,10 +497,13 @@ class Bindings(Portals):
         return None
 
     def get_user_permission_from_email(self, email):
+        """ Returns a user's permissions object when given the user email."""
         _id = self.get_user_id_from_email(email)
         return self.get_user_permission(_id)
 
     def add_dplist_permission_for_user_on_portal(self, user_email, portal_id):
+        """ Adds the 'd_p_list' permission to a user object when provided
+            a user_email and portal_id."""
         _id = self.get_user_id_from_email(user_email)
         print(self.get_user_permission_from_email(user_email))
         retval = self.add_user_permission(  _id, json.dumps( 
@@ -452,8 +513,9 @@ class Bindings(Portals):
         print(self.get_user_permission_from_email(user_email))
         return retval
 
-    def get_portal_cik(self):
-        portal = self.get_portal_by_name(self.portal_name())
+    def get_portal_cik(self, portal_name):
+        """ Retrieves portal object according to 'portal_name' and
+        returns its cik. """
+        portal = self.get_portal_by_name(portal_name)
         cik = portal[2][1]['info']['key']
-        # print('Portal {0} cik is {1}'.format(self.portal_name(), cik))
         return cik
