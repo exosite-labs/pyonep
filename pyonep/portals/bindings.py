@@ -488,7 +488,8 @@ class Bindings(Portals):
         self.print_device_list(device_list=sorted_dev_list)
 
     def get_user_id_from_email(self, email):
-        """ Uses the get-all-user-accounts PAPI to retrieve the user-id by supplying an email. """
+        """ Uses the get-all-user-accounts Portals API to retrieve the
+        user-id by supplying an email. """
         accts = self.get_all_user_accounts()
 
         for acct in accts:
