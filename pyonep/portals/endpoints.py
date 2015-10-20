@@ -141,7 +141,7 @@ class Endpoints(Domain):
         else:
             print("get_user_token: Something went wrong: <{0}>: {1}".format(
                         r.status_code, r.reason))
-            r.get_domain_portal_ids()
+            r.raise_for_status()
 
     def get_domain_portal_ids(self):
         """
@@ -163,7 +163,7 @@ class Endpoints(Domain):
         else:
             print("get_user_portals: Something went wrong: <{0}>: {1}".format(
                         r.status_code, r.reason))
-            r.get_domain_portal_ids()
+            r.raise_for_status()
 
     def get_user_portals(self):
         """
