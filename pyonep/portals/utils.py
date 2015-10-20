@@ -8,12 +8,27 @@ import requests, time, json
 from urllib.parse import quote_plus
 
 def dictify_device_meta(device_object):
+    """ Input: Portals device object.
+        Output: The same device object with the device meta
+                converted to a python dictionary. """
     try:
-        if isinstance(device_object['description']['meta'], str):
-            device_object['description']['meta'] =\
-                json.loads(device_object['description']['meta'])
+        if isinstance(device_object['info']['description']['meta'], str):
+            device_object['info']['description']['meta'] =\
+                json.loads(device_object['info']['description']['meta'])
     except ValueError as err:
-        print("dictify: {0}".format(device_object['description']['meta']))
+        print("dictify: {0}".format(err))
+    return device_object
+
+def stringify_device_meta(device_object):
+    """ Input: Portals device object.
+        Output: The same device object with the device meta
+                converted to a python string. """
+    try:
+        if isinstance(device_object['info']['description']['meta'], dict):
+            device_object['info']['description']['meta'] =\
+                json.dumps(device_object['info']['description']['meta'])
+    except ValueError as err:
+        print("stringify: {0}".format(err))
     return device_object
 
 def get_map_url_and_timezone(address):
