@@ -4,6 +4,7 @@
 # pylint: disable=W0312
 import requests, json
 from pyonep.portals.constants import HTTP_STATUS
+from pyonep.portals.utils import dictify_device_meta
 from pyonep.portals.__init__ import __version__ as VERSION
 from requests.auth import HTTPBasicAuth
 
@@ -78,35 +79,45 @@ class Portals(Domain):
         self.__portal_id = portal_id
         # self.__portal_rid = portal_rid
         self.__portal_cik = None
-        http_client.HTTPConnection.debuglevel = 1 if debug else 0
+        http_client.HTTPConnection.debuglevel = int(debug)
 
 
     # #####################################################
     #   Portals class member setters and getters.
     # #####################################################
     def set_portals_url(self, url):
+        """ Member variable setter for  Portals API Base url. """
         self.__purl = url
     def set_vendor(self, vendor):
+        """ Member variable setter for Exosite Vendor. """
         self.__vendor = vendor
     def set_portal_id(self, _id):
+        """ Member variable setter for numerical Portal ID. """
         self.__portal_id = _id
     # def set_portal_rid(self, rid):
     #   self.__portal_rid = rid
     def set_portal_cik(self, cik):
+        """ Member variable setter for Portal CIK. """
         self.__portal_cik = cik
     def set_portal_name(self, name):
+        """ Member variable setter for Portal name. """
         self.__portal_name = name
     def portals_url(self):
+        """ Returns Portals API Base url. """
         return self.__purl
     def vendor(self):
+        """ Returns Exosite Vendor. """
         return self.__vendor
     def portal_id(self):
+        """ Returns numerical Portal ID. """
         return self.__portal_id
     # def portal_rid(self):
     #   return self.__portal_rid
     def portal_cik(self):
+        """ Returns numerical Portal CIK. """
         return self.__portal_cik
     def portal_name(self):
+        """ Returns numerical Portal name. """
         return self.__portal_name
 
     # #####################################################
@@ -225,8 +236,7 @@ class Portals(Domain):
         if HTTP_STATUS.ADDED == r.status_code:
             # fix the 'meta' to be dictionary instead of string
             device_obj = r.json()
-            device_obj['info']['description']['meta'] = json.loads(device_obj['info']['description']['meta'])
-            return device_obj
+            return dictify_device_meta(device_obj)
         else:
             print("add_device: Something went wrong: <{0}>: {1}".format(
                         r.status_code, r.reason))
@@ -238,7 +248,8 @@ class Portals(Domain):
             http://docs.exosite.com/portals/#update-device
         """
         rid = device_obj['rid']
-        device_obj['info']['description']['meta'] = json.dumps(device_obj['info']['description']['meta'])
+        device_obj['info']['description']['meta'] = \
+                json.dumps(device_obj['info']['description']['meta'])
         headers = {
                 'User-Agent': self.user_agent(),
         }
