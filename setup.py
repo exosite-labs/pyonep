@@ -34,7 +34,7 @@ setup(name='pyonep',
       long_description=open('README.md').read() + '\n\n' +
                        open('HISTORY.md').read(),
       install_requires=required,
-      packages=['pyonep'],
+      packages=['pyonep', 'pyonep.portals'],
       package_dir={'pyonep': 'pyonep'},
       keywords=['exosite', 'onep', 'one platform', 'm2m']
       )
