@@ -1,97 +1,33 @@
-About pyonep
-============
+Version Migrations
+=====
 
-The pyonep package is an API library with Python bindings to the 
-following Exosite One Platform APIs:
-
-* [RPC API](https://github.com/exosite/docs/tree/master/rpc)
-* [Provisioning/Device Management API](https://github.com/exosite/docs/tree/master/provision)
-
-Check out our docs on [Read The Docs](https://pyonep.readthedocs.org/).
-
-
-__Warning__: version 0.13.4 requires changes to applications that used 
-earlier versions of pyonep. See below for information about 
-[migrating your applications from 0.12.x to 0.13.4](#migrating-to-0134)
-
-Note that this library does not support the HTTP Data Interface. See
-below for more information.
-
-Supports Python 2.6 through 3.3.
-
-License is BSD, Copyright 2015, Exosite LLC (see LICENSE file)
-
-
-Installation
-------------
-
-For installation instructions, check out [Read The Docs](https://pyonep.readthedocs.org/en/latest/install.html).
-
-
-Tests
------
-
-Before testing, you'll need the test requirements.
-
-```bash
-$ pip install -r test/requirements.txt
-...
-```
-
-Run all the tests in your current Python version.
-
-```bash
-$ ./test.sh --processes=2 --process-timeout=40
-```
-
-Run all the tests in every supported Python version:
-
-```bash
-$ time ./test.sh full --processes=2 --process-timeout=40
-Starting test for py26
-Starting test for py27
-Starting test for py32
-Starting test for py33
-Starting test for py34
-Waiting for tests to finish
-All tests passed. Congratulations! :)
-
-real0m29.966s
-user0m31.221s
-sys0m5.684s
-```
-
-To run a single test in your current Python version:
-
-```bash
-$ nosetests -q -s test/test_rpc.py:TestRPC.test_move
-----------------------------------------------------------------------
-Ran 1 test in 35.734s
-
-OK
-```
-
-Occasionally this error happens. Deleting .tox directories helps.
-
-```bash
-...
-  File "/Users/danw/prj/exosite/pyonep/.tox-py26/py26/lib/python2.6/site-packages/coverage/data.py", line 202, in combine_parallel_data
-      os.remove(full_path)
-      OSError: [Errno 2] No such file or directory: '/Users/danw/prj/exosite/pyonep/.coverage.civet.51448.095287'
-...
-$ rm -rf .tox-py*
-```
-
-
-Migrating to 0.13.4
+Migrating to 0.11.0
 -------------------
 
-Version 0.13.4 includes two breaking changes:
+In order to provide better backward compatibility we've backed out the breaking changes to the listing command from 0.10.0. New code should call with both the `options` and `rid` parameters.
 
-- datastore.py is removed
-- `rid` parameter is renamed to `resource`
+```
+onep.listing(auth, ['dataport'], options={}, rid={'alias': ''})
+```
 
+To anyone who updated code in the 8 days 0.10.0 was up and now needs to update it again-- sorry about the thrashing. There's a fair bit of Python code in production that isn't able to tie to a particular version.
 
+Migrating to 0.10.0
+-------------------
+
+The [RPC listing command](http://docs.exosite.com/rpc#listing) now includes a resource identifier, which makes it possible to do multiple listing calls in a single request. The old form of listing is deprecated, and upgrading to pyonep 0.10.0 will require some changes to code. Using the old form will produce an exception. For example:
+
+```
+onep.listing(auth, ['dataport'], options={})
+```
+
+...should be changed to:
+
+```
+onep.listing(auth, {'alias': ''}, ['dataport'], options={})
+```
+
+The `options` parameter is now required, too.
 
 Migrating to 0.8.0
 ------------------
