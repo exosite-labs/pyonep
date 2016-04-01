@@ -101,6 +101,7 @@ class OnepV1():
         self.url = url
         self._clientid = None
         self._resourceid = None
+        self._token = None
         self.deferred = DeferredRequests()
         if agent is not None:
             self.headers['User-Agent'] = agent
@@ -207,6 +208,8 @@ class OnepV1():
                 return {"cik": auth, "client_id": self._clientid}
             elif None != self._resourceid:
                 return {"cik": auth, "resource_id": self._resourceid}
+            elif None != self._token:
+                return {"token": self._token}
             return {"cik": auth}
 
     def _composeCalls(self, method_args_pairs):
@@ -328,6 +331,20 @@ class OnepV1():
         if options is not None:
             args.append(options)
         return self._call('flush', auth, args, defer)
+
+    def grant(self, auth, resource, permissions, ttl=None, defer=False):
+        """ Grant resources with specific permissions and return a token.
+
+        Args:
+            auth: <cik>
+            resource: Alias or ID of resource.
+            permissions: permissions of resources.
+            ttl: Time To Live.
+        """
+        args = [resource, permissions]
+        if ttl is not None:
+            args.append({"ttl": ttl})
+        return self._call('grant', auth, args, defer)
 
     def info(self, auth, resource, options={}, defer=False):
         """ Request creation and usage information of specified resource according to the specified
