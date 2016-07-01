@@ -97,6 +97,38 @@ class TestBase(TestCase):
         """Clean up any test client"""
         self.onep.drop(self.portalcik, self.rid)
 
+    def makeDataport(self, cik, format, alias=None, name=None):
+        """Create a dataport under client cik"""
+        """
+            This is not a test.
+            This function is a test-helper and should
+            probably be put into pyonep.
+
+            On error raise an exception.
+            On success return the rid of the device
+        """
+
+        # default description
+        desc = {
+            'format': format,
+            'retention': {"count": "infinity",
+                          "duration": "infinity"}
+        }
+        if name is not None:
+            desc['name'] = name
+        isok, response = self.onep.create(cik, 'dataport', desc)
+        if not isok:
+            raise "Failed to create dataport. ONE Platform said '{0}'".format(response)
+        rid = response
+
+        if alias is not None:
+            isok, response = self.onep.map(cik, rid, alias)
+            if not isok:
+                raise "Failed to map dataport with alias. ONE Platform said '{0}'".format(response)
+
+        # return the rid of the created dataport
+        return rid
+
     def makeClient(self, cik, name=None, desc=None):
         """
             This is not a test.

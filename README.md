@@ -19,7 +19,7 @@ below for more information.
 
 Supports Python 2.6 through 3.3.
 
-License is BSD, Copyright 2015, Exosite LLC (see LICENSE file)
+License is BSD, Copyright 2016, Exosite LLC (see LICENSE file)
 
 
 Installation

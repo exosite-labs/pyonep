@@ -9,7 +9,7 @@
        2. call request()
        3. call getresponse() to get a HTTPResponse object
 
-   Copyright (c) 2014, Exosite LLC"""
+   Copyright (c) 2016, Exosite LLC"""
 # pylint: disable = W0312
 
 import sys

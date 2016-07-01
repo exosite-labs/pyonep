@@ -48,7 +48,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'pyonep'
-copyright = u'2015, Exosite'
+copyright = u'2016, Exosite'
 author = u'Exosite'
 
 # The version info for the project you're documenting, acts as replacement for

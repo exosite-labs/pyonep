@@ -1,10 +1,10 @@
 ﻿# ==============================================================================
 # onep.py
-# Main API library class for Exosite's Data Platform as exposed over HTTP JSON
+# Main API library class for Exosite's One Platform as exposed over HTTP JSON
 # RPC
 # ==============================================================================
 #
-# Copyright (c) 2014, Exosite LLC
+# Copyright (c) 2016, Exosite LLC
 # All rights reserved.
 #
 import sys
@@ -328,6 +328,20 @@ class OnepV1():
         if options is not None:
             args.append(options)
         return self._call('flush', auth, args, defer)
+
+    def grant(self, auth, resource, permissions, ttl=None, defer=False):
+        """ Grant resources with specific permissions and return a token.
+
+        Args:
+            auth: <cik>
+            resource: Alias or ID of resource.
+            permissions: permissions of resources.
+            ttl: Time To Live.
+        """
+        args = [resource, permissions]
+        if ttl is not None:
+            args.append({"ttl": ttl})
+        return self._call('grant', auth, args, defer)
 
     def info(self, auth, resource, options={}, defer=False):
         """ Request creation and usage information of specified resource according to the specified

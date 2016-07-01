@@ -7,7 +7,7 @@ following Exosite One Platform APIs:
 * [RPC API](https://github.com/exosite/docs/tree/master/rpc)
 * [Provisioning/Device Management API](https://github.com/exosite/docs/tree/master/provision)
 
-pyonep supports Python 2.5 through 3.3. Its license is BSD, Copyright 2014, Exosite LLC.
+pyonep supports Python 2.5 through 3.3. Its license is BSD, Copyright 2016, Exosite LLC.
 
 Here's an example:
 

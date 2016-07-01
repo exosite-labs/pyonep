@@ -6,7 +6,7 @@
 # Warning: pyonep version 0.8.0 introduces breaking change to the
 #          provisioning interface. See README.md for details.
 #
-# Copyright (c) 2014, Exosite LLC
+# Copyright (c) 2016, Exosite LLC
 # All rights reserved.
 #
 
@@ -63,7 +63,7 @@ class ProvisionResponse:
 
 class Provision(object):
     """A connection manager for dealing with the provisioning API, given as set of options.
-    
+
     Args:
         host: A string for the hostname of the provisioning server.  Defaults to m2.exosite.com.
         port: A string for the server port.  Defaults to '80'.
@@ -119,15 +119,15 @@ class Provision(object):
 
     def _request(self, path, key, data, method, key_is_cik, extra_headers={}):
         """Generically shared HTTP request method.
-        
+
         Args:
             path: The API endpoint to interact with.
             key: A string for the key used by the device for the API.  Either a CIK or token.
             data: A string for the pre-encoded data to be sent with this request.
             method: A string denoting the HTTP verb to use for the request (e.g. 'GET', 'POST')
             key_is_cik: Whether or not the device key used is a CIK or token.
-            extra_headers: A dictionary of extra headers to include with the request. 
-        
+            extra_headers: A dictionary of extra headers to include with the request.
+
         Returns:
             A ProvisionResponse containing the result of the HTTP request.
         """
@@ -162,8 +162,8 @@ class Provision(object):
         return pr
 
     def close(self):
-        """Closes any open connections. 
-        
+        """Closes any open connections.
+
         This should only need to be called if `reuseconnection` is set to True. Once closed,
         the connection may be reopened by making another API call.
         """
@@ -171,13 +171,13 @@ class Provision(object):
 
     def content_create(self, key, model, contentid, meta, protected=False):
         """Creates a content entity bucket with the given `contentid`.
-        
+
         This method maps to
         https://github.com/exosite/docs/tree/master/provision#post---create-content-entity.
-        
+
         Args:
             key: The CIK or Token for the device
-            model: 
+            model:
             contentid: The ID used to name the entity bucket
             meta:
             protected: Whether or not this is restricted to certain device serial numbers only.
@@ -192,15 +192,15 @@ class Provision(object):
 
     def content_download(self, cik, vendor, model, contentid):
         """(Speculation) Fetches content information for a given vendor, model, and ID as chunks.
-        
+
         This method might map to:
         https://github.com/exosite/docs/tree/master/provision#get---get-content-blob-1,
         but seems to be missing serial number.
-        
+
         Args:
             cik: The CIK for the device
             vendor: The name of the vendor
-            model: 
+            model:
             contentid: The ID used to name the entity bucket
         """
         data = urlencode({'vendor': vendor,
@@ -212,14 +212,14 @@ class Provision(object):
 
     def content_info(self, key, model, contentid, vendor=None):
         """(Speculation) Fetches content information for a given vendor, model, and ID.
-        
+
         This method might map to:
         https://github.com/exosite/docs/tree/master/provision#get---get-content-info-1,
         but seems to be missing serial number.
-        
+
         Args:
             key: The CIK or Token for the device
-            model: 
+            model:
             contentid: The ID used to name the entity bucket
             vendor: The name of the vendor
         """
@@ -236,39 +236,39 @@ class Provision(object):
 
     def content_list(self, key, model):
         """Returns the list of content IDs for a given model.
-        
+
         This method maps to
         https://github.com/exosite/docs/tree/master/provision#get---list-content-ids
-        
+
         Args:
             key: The CIK or Token for the device
-            model: 
+            model:
         """
         path = PROVISION_MANAGE_CONTENT + model + '/'
         return self._request(path, key, '', 'GET', self._manage_by_cik)
 
     def content_remove(self, key, model, contentid):
         """Deletes the information for the given contentid under the given model.
-        
+
         This method maps to
         https://github.com/exosite/docs/tree/master/provision#delete---delete-content
-        
+
         Args:
             key: The CIK or Token for the device
-            model: 
+            model:
         """
         path = PROVISION_MANAGE_CONTENT + model + '/' + contentid
         return self._request(path, key, '', 'DELETE', self._manage_by_cik)
 
     def content_upload(self, key, model, contentid, data, mimetype):
         """Store the given data as a result of a query for content id given the model.
-        
+
         This method maps to
         https://github.com/exosite/docs/tree/master/provision#post---upload-content
-        
+
         Args:
             key: The CIK or Token for the device
-            model: 
+            model:
             contentid: The ID used to name the entity bucket
             data: The data blob to save
             mimetype: The Content-Type to use when serving the blob later

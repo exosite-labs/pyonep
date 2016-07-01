@@ -30,6 +30,31 @@ class TestRPC(test_base.TestBase):
         self.assertTrue(ok, 'info call succeeded')
         self.assertEqual(info['basic']['status'], 'activated')
 
+    def test_token(self):
+        """Test token grant/use"""
+        # grant token to cik
+        ok, result = self.onep.grant(
+            self.cik,
+            self.rid,
+            { self.rid: [ "read", "write" ] },
+            ttl=1000)
+
+        self.assertTrue(ok, 'grant succeeded')
+        token = result
+        self.assertEqual(len(token), 40, 'token is correct length')
+
+        child_rid = self.makeDataport(self.cik, 'string', 'message', 'Message')
+
+        # write a value
+        ok, result = self.onep.write({'token': token}, {'alias': 'message'}, '你好')
+        self.assertTrue(ok, 'write to dataport using token')
+
+        # read value back
+        ok, result = self.onep.read({'token': token}, {'alias': 'message'}, {'limit': 1})
+        self.assertEqual(result[0][1], '你好')
+        self.assertTrue(ok, 'read back from dataport using token')
+
+
     def test_move(self):
         """Test move command"""
         #    self.cik

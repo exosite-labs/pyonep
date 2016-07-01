@@ -8,7 +8,7 @@
 #
 # Tested with python 2.6
 #
-# Copyright (c) 2014, Exosite LLC
+# Copyright (c) 2016, Exosite LLC
 # All rights reserved.
 #
 
