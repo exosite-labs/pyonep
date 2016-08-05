@@ -262,6 +262,7 @@ class Portals(Endpoints):
             http://docs.exosite.com/portals/#update-device
             http://docs.exosite.com/portals/#device-object
         """
+        dictify_device_meta(device_obj)
         device_obj['info']['description']['meta']['location'] = location
         device_obj['info']['description']['meta']['Location'] = location
         device_obj['info']['description']['meta']['timezone'] = timezone

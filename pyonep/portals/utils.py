@@ -17,7 +17,8 @@ def dictify_device_meta(device_object):
         Output: The same device object with the device meta
                 converted to a python dictionary. """
     try:
-        if isinstance(device_object['info']['description']['meta'], str):
+        if  isinstance(device_object['info']['description']['meta'], str) or \
+            isinstance(device_object['info']['description']['meta'], unicode):
             device_object['info']['description']['meta'] =\
                 json.loads(device_object['info']['description']['meta'])
     except ValueError as err:
