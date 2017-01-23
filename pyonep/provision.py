@@ -321,17 +321,24 @@ class Provision(object):
         return self._request(PROVISION_ACTIVATE,
                              '', data, 'POST', self._manage_by_cik)
 
-    def serialnumber_add(self, key, model, sn):
-        data = urlencode({'add': 'true',
-                          'sn': sn})
+    def serialnumber_add(self, key, model, sn, extra=None):
+        data = {'add': 'true', 'sn': sn}
+        if extra:
+            data['extra'] = extra
         path = PROVISION_MANAGE_MODEL + model + '/'
-        return self._request(path, key, data, 'POST', self._manage_by_cik)
+        return self._request(path, key, urlencode(data), 'POST', self._manage_by_cik)
 
     def serialnumber_add_batch(self, key, model, sns=[]):
-        data = urlencode({'add': 'true',
-                          'sn[]': sns}, doseq=True)
+        data = {'add': 'true', 'sn[]': sns}
         path = PROVISION_MANAGE_MODEL + model + '/'
-        return self._request(path, key, data, 'POST', self._manage_by_cik)
+        return self._request(path, key, urlencode(data, doseq=True), 'POST', self._manage_by_cik)
+
+    def serialnumber_add_batch_csv(self, key, model, csv_string):
+        path = PROVISION_MANAGE_MODEL + model + '/'
+        extra_headers = {}
+        extra_headers['Content-Type'] = 'text/csv; charset=utf-8'
+        return self._request(path, key, csv_string, 'POST', self._manage_by_cik,
+                             extra_headers=extra_headers)
 
     def serialnumber_disable(self, key, model, serialnumber):
         data = urlencode({'disable': 'true'})

@@ -10,6 +10,8 @@
 #
 import sys
 import random
+import io
+import csv
 import logging
 try:
     import httplib
@@ -28,6 +30,15 @@ logging.basicConfig(stream=sys.stderr)
 logging.getLogger("pyonep.onep").setLevel(logging.ERROR)
 logging.getLogger("pyonep.provision").setLevel(logging.ERROR)
 
+def random_csv_string():
+    output = io.StringIO()
+    writer = csv.writer(output, quoting=csv.QUOTE_NONE)
+    r = random.randint(1, 10000000)
+    for i in range(1,11):
+        csvdata = ['{:03d}{}'.format(i, r), 'Extra Info{}'.format(r)]
+        writer.writerow(csvdata)
+    return output.getvalue()
+
 def provision_example(vendorname, vendortoken, clonerid, portalcik, portalrid):
     print('pyonep version ' + pyonep.__version__)
     r = random.randint(1, 10000000)
@@ -35,6 +46,9 @@ def provision_example(vendorname, vendortoken, clonerid, portalcik, portalrid):
     sn1 = '001' + str(r)
     sn2 = '002' + str(r)
     sn3 = '003' + str(r)
+    sn4 = '004' + str(r)
+    csv_string = random_csv_string()
+    extra = 'Extra info' + str(r)
     op = OnepV1()
 
     provision = Provision('m2.exosite.com',
@@ -63,8 +77,12 @@ def provision_example(vendorname, vendortoken, clonerid, portalcik, portalrid):
         print(provision.model_info(vendortoken, model).body)
         print("serialnumber_add()")
         provision.serialnumber_add(vendortoken, model, sn1)
+        print("serialnumber_add()")
+        provision.serialnumber_add(vendortoken, model, sn4, extra=extra)
         print("serialnumber_add_batch()")
         provision.serialnumber_add_batch(vendortoken, model, [sn2, sn3])
+        print("serialnumber_add_batch_csv()")
+        provision.serialnumber_add_batch_csv(vendortoken, model, csv_string)
         print(provision.serialnumber_list(vendortoken, model, limit=10).body)
         print("serialnumber_remove_batch()")
         provision.serialnumber_remove_batch(vendortoken, model, [sn2, sn3])
