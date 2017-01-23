@@ -1,7 +1,7 @@
-﻿#==========================================================================
+﻿# ==========================================================================
 # provisioning.py
 # Demonstrates use of the provision API
-#==========================================================================
+# ==========================================================================
 #
 # Tested with python 2.7.2
 #
@@ -30,14 +30,16 @@ logging.basicConfig(stream=sys.stderr)
 logging.getLogger("pyonep.onep").setLevel(logging.ERROR)
 logging.getLogger("pyonep.provision").setLevel(logging.ERROR)
 
+
 def random_csv_string():
     output = io.StringIO()
     writer = csv.writer(output, quoting=csv.QUOTE_NONE)
     r = random.randint(1, 10000000)
-    for i in range(1,11):
+    for i in range(1, 11):
         csvdata = ['{:03d}{}'.format(i, r), 'Extra Info{}'.format(r)]
         writer.writerow(csvdata)
     return output.getvalue()
+
 
 def provision_example(vendorname, vendortoken, clonerid, portalcik, portalrid):
     print('pyonep version ' + pyonep.__version__)
@@ -52,16 +54,16 @@ def provision_example(vendorname, vendortoken, clonerid, portalcik, portalrid):
     op = OnepV1()
 
     provision = Provision('m2.exosite.com',
-                            https=True,
-                            port=443,
-                            manage_by_cik=False,
-                            verbose=False,
-                            httptimeout=20,
-                            raise_api_exceptions=True,
-                            manage_by_sharecode=True)
+                          https=True,
+                          port=443,
+                          manage_by_cik=False,
+                          verbose=False,
+                          httptimeout=20,
+                          raise_api_exceptions=True,
+                          manage_by_sharecode=True)
     # manage by sharecode
-    option = "[\"" + vendorname + "\", \"" + model +"\"]"
-    meta = {"meta" : option}
+    option = "[\"" + vendorname + "\", \"" + model + "\"]"
+    meta = {"meta": option}
     print("op.share", portalcik, clonerid, meta)
     isok, sharecode = op.share(portalcik, clonerid, meta)
     if not isok:
@@ -111,11 +113,11 @@ def provision_example(vendorname, vendortoken, clonerid, portalcik, portalrid):
         def test_content(content_id, content_data, content_type, content_meta):
             print("content_create()")
             provision.content_create(vendortoken, model, content_id,
-                                    content_meta)
+                                     content_meta)
             print(provision.content_list(vendortoken, model))
             print("content_upload()")
             print(provision.content_upload(vendortoken, model, content_id,
-                                        content_data, content_type))
+                                           content_data, content_type))
             print(provision.content_list(vendortoken, model))
             print(provision.content_info(vendortoken, model, content_id))
             print("content_download()")
@@ -141,6 +143,7 @@ def provision_example(vendorname, vendortoken, clonerid, portalcik, portalrid):
 
     # no error
     return True
+
 
 if __name__ == '__main__':
     # To make tests run, keep test/testconfig.py.template in sync with this.
