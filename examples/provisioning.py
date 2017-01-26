@@ -88,7 +88,7 @@ def provision_example(vendorname, vendortoken, clonerid, portalcik, portalrid):
         print(provision.serialnumber_list(vendortoken, model, limit=10).body)
         print("serialnumber_remove_batch()")
         provision.serialnumber_remove_batch(vendortoken, model, [sn2, sn3])
-        print(provision.serialnumber_list(vendortoken, model).body)
+        print(provision.serialnumber_list(vendortoken, model, status=True).body)
         print("serialnumber_enable()")
         provision.serialnumber_enable(
             vendortoken, model, sn1,
