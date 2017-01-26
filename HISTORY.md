@@ -1,6 +1,13 @@
 History
 =======
 
+0.13.8 (2017-01-26)
+-------------------
+
+- Include Extra info parameter with serial number additions
+- Report serial number status with listing
+
+
 0.13.7 (2016-05-19)
 -------------------
 
